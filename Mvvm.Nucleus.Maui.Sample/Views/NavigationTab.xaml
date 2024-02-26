@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
+             x:Class="Mvvm.Nucleus.Maui.Sample.NavigationTab"
+             x:DataType="local:NavigationTabViewModel"
+             Title="Navigation">
+
+    <ScrollView>
+
+        <VerticalStackLayout
+            Spacing="10"
+            Margin="40">
+
+            <Label 
+                Text="Nucleus.Mvvm Navigation"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                Style="{StaticResource Headline}" />
+
+            <Label
+                Text="Navigation is done in Nucleus.Mvvm through the INavigationService, generally from ViewModels. The default, and currently the only supported implemention, uses Maui Shell." />
+            
+            <Label
+                Text="The buttons below demonstrate navigation to a globally registered view (see MauiProgram.cs). See the NavigationViewModel for the code behind these buttons." />
+            
+            <ContentView />
+
+            <Button
+                Text="Navigation by Type"
+                Command="{Binding NavigateByTypeCommand}"/>
+            
+            <Button
+                Text="Navigation by Global Route"
+                Command="{Binding NavigateByRouteCommand}"/>
+
+            <Button
+                Text="Navigation by Modal"
+                Command="{Binding NavigateByModalCommand}"/>
+            
+            <Button
+                Text="Navigation with Parameters"
+                Command="{Binding NavigateWithParametersCommand}"/>
+            
+            <Button
+                Text="Switch Tabs"
+                Command="{Binding SwitchTabsCommand}"/>
+            
+             <Button
+                Text="Restart App"
+                Command="{Binding RestartAppCommand}"/>
+
+        </VerticalStackLayout>
+    
+    </ScrollView>
+
+</ContentPage>

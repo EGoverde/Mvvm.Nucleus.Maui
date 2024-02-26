@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Mvvm.Nucleus.Maui.Sample.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Mvvm.Nucleus.Maui.Sample">
+
+    <ShellContent
+        Title="Intro"
+        ContentTemplate="{DataTemplate local:Intro}"
+        Route="Intro" />
+
+    <TabBar Route="Tabs">
+
+        <Tab Route="NavigationTab" Title="Navigation">
+            <ShellContent ContentTemplate="{DataTemplate local:NavigationTab}" />
+        </Tab>
+
+        <Tab Route="HelpTab" Title="Help">
+            <ShellContent ContentTemplate="{DataTemplate local:HelpTab}" />
+       </Tab>
+
+    </TabBar>
+
+</Shell>
