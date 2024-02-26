@@ -8,12 +8,11 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 - Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
 - Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
 - ViewModels events (e.a. Appearing, Navigation, Initialization) through interfaces.
-
-**Nucleus does not require a specific base class for its Views or ViewModels.**
+- Flexibility in Views and ViewModels, no base classes are required.
 
 ## Getting started
 
-Nucleus MVVM requires little code to get started and remains similar to a regular MAUI app. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
 
                 builder.UseNucleusMvvm<App, AppShell>(options =>
                     options.RegisterTypes(dependencyOptions => 
@@ -24,7 +23,7 @@ Nucleus MVVM requires little code to get started and remains similar to a regula
 
 See the documentation for **Navigation Service** to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
-ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) a they can trigger logic on events like navigation or its page appearing.
+ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) they can trigger logic on events like navigation or its page appearing.
 
 It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
 
@@ -46,7 +45,7 @@ Parameters can be added by supplying an `IDictionary<string, object>()`, which w
 
 URL parameters (e.a. &param=true) are not used in the Nucleus events, but are still supported as their default Shell implementation when using routes. The dictionary however will also be passed as usual and could be used through `IQueryAttributable`.
 
-Modal navigation is included as an experimental feature (it is not an offical part of Shell).
+*Modal navigation is included as an experimental feature (it is not an offical part of Shell).*
 
 ## Event Interfaces
 
