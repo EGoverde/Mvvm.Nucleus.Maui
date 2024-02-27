@@ -8,12 +8,11 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 - Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
 - Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
 - ViewModels events (e.a. Appearing, Navigation, Initialization) through interfaces.
-
-**Nucleus does not require a specific base class for its Views or ViewModels.**
+- Flexibility in Views and ViewModels, no base classes are required.
 
 ## Getting started
 
-Nucleus MVVM requires little code to get started and remains similar to a regular MAUI app. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
 
                 builder.UseNucleusMvvm<App, AppShell>(options =>
                     options.RegisterTypes(dependencyOptions => 
