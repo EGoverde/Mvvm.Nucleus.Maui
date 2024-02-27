@@ -57,10 +57,6 @@ namespace Mvvm.Nucleus.Maui
             internal set => _isNavigating = value;
         }
 
-        internal PresentationMode? NavigatingPresentationMode { get; set; }
-
-        public bool? NavigatingWrapNavigationPage { get; set; }
-
         public NucleusMvvmCore(Application application, IViewFactory viewFactory, ILogger<NucleusMvvmCore> logger)
         {
             Application = application;

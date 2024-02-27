@@ -50,9 +50,21 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigateModalAsync()
     {
-        await _navigationService.NavigateModalAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
         {
-            { "Navigation", $"Modally from {PageIdentifier}."}
+            { "Navigation", $"Modally from {PageIdentifier}."},
+            { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated }
+        });
+    }
+
+    [RelayCommand]
+    private async Task NavigateModalWithNavigationStackAsync()
+    {
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        {
+            { "Navigation", $"Modally from {PageIdentifier}."},
+            { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated },
+            { NucleusNavigationParameters.WrapInNavigationPage, true },
         });
     }
 
@@ -84,7 +96,9 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     {
         var stringBuilder = new StringBuilder();
 
-        foreach (var navigationParameter in navigationParameters)
+        var parameters = navigationParameters.Where(x => x.Key != NucleusNavigationParameters.NavigatingPresentationMode && x.Key != NucleusNavigationParameters.WrapInNavigationPage);
+
+        foreach (var navigationParameter in parameters)
         {
             if (stringBuilder.Length == 0)
             {

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using System.Runtime.Versioning;
 
 namespace Mvvm.Nucleus.Maui
 {
@@ -10,67 +9,70 @@ namespace Mvvm.Nucleus.Maui
 
         public bool IsNavigating => NucleusMvvmCore.Current.IsNavigating;
 
+        public Uri CurrentRoute => throw new NotImplementedException();
+
         public NavigationServiceModeless(NucleusMvvmOptions nucleusMvvmOptions, ILogger<NavigationServiceModeless> logger)
         {
             _nucleusMvvmOptions = nucleusMvvmOptions;
             _logger = logger;
         }
 
-        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task NavigateAsync<TView>()
         {
-            return NavigateAsync(typeof(TView), navigationParameters, isAnimated, false);
+            return NavigateAsync<TView>(null);
         }
 
-        public Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
-            return NavigateAsync(viewType, navigationParameters, isAnimated, false);
+            return NavigateAsync(typeof(TView), navigationParameters, isAnimated);
         }
 
-        public Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task NavigateBackAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        [RequiresPreviewFeatures]
-        public Task NavigateModalAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true)
-        {
-            return NavigateAsync(typeof(TView), navigationParameters, isAnimated, true, wrapNavigationPage);
-        }
-
-        [RequiresPreviewFeatures]
-        public Task NavigateModalAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true)
-        {
-            return NavigateAsync(viewType, navigationParameters, isAnimated, true, wrapNavigationPage);
-        }
-
-        [RequiresPreviewFeatures]
-        public Task CloseModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        [RequiresPreviewFeatures]
-        public Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters, bool isAnimated, bool isModal, bool wrapNavigationPage = false)
+        public virtual Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
             var viewMapping = GetViewMapping(viewType);
             if (viewMapping == null)
             {
                 _logger.LogError($"No valid mapping found for view of type '{viewType}'.");
                 
-                return Task.CompletedTask;
+                throw new NotImplementedException();
             }
 
-            return Task.CompletedTask;
+            throw new NotImplementedException();
+        }
+
+        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task NavigateBackAsync()
+        {
+            return NavigateBackAsync(null);
+        }
+
+        public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CloseModalAsync()
+        {
+            return CloseModalAsync(null);
+        }
+
+        public virtual Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CloseAllModalAsync()
+        {
+            return CloseAllModalAsync(null);
+        }
+
+        public virtual Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        {
+            throw new NotImplementedException();
         }
 
         private ViewMapping? GetViewMapping(Type viewType)

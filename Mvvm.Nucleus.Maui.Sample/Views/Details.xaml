@@ -72,6 +72,10 @@
         <Button
             Text="Show More Details (Modal)"
             Command="{Binding NavigateModalCommand}"/>
+        
+        <Button
+            Text="Show More Details (Modal + Stack)"
+            Command="{Binding NavigateModalWithNavigationStackCommand}"/>
 
         <Button
             Text="Navigate Backwards"

@@ -19,7 +19,6 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<EnablePreviewFeatures>True</EnablePreviewFeatures>
 
 		<!-- Display name -->
 		<ApplicationTitle>Mvvm.Nucleus.Maui.Sample</ApplicationTitle>

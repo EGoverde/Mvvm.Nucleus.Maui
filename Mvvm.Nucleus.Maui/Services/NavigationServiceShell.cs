@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Runtime.Versioning;
 
 namespace Mvvm.Nucleus.Maui
 {
@@ -10,48 +9,60 @@ namespace Mvvm.Nucleus.Maui
 
         public bool IsNavigating => NucleusMvvmCore.Current.IsNavigating;
 
+        public Uri CurrentRoute => Shell.Current.CurrentState.Location;
+
         public NavigationServiceShell(NucleusMvvmOptions nucleusMvvmOptions, ILogger<NavigationServiceShell> logger)
         {
             _nucleusMvvmOptions = nucleusMvvmOptions;
             _logger = logger;
         }
 
-        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task NavigateAsync<TView>()
         {
-            return NavigateAsync(typeof(TView), navigationParameters, isAnimated, false);
+            return NavigateAsync<TView>(null);
         }
 
-        public Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
-            return NavigateAsync(viewType, navigationParameters, isAnimated, false);
+            return NavigateAsync(typeof(TView), navigationParameters, isAnimated);
         }
 
-        public Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        {
+            var viewMapping = GetViewMapping(viewType);
+            if (viewMapping == null)
+            {
+                _logger.LogError($"No valid mapping found for view of type '{viewType}'.");
+                return;
+            }
+
+            NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
+            await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
+        }
+
+        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
             return Shell.Current.GoToAsync(route, isAnimated, new ShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
-        public Task NavigateBackAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task NavigateBackAsync()
+        {
+            return NavigateBackAsync(null);
+        }
+
+        public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
             return Shell.Current.GoToAsync("..", isAnimated, new ShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
-        [RequiresPreviewFeatures]
-        public Task NavigateModalAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true)
+        public Task CloseModalAsync()
         {
-            return NavigateAsync(typeof(TView), navigationParameters, isAnimated, true, wrapNavigationPage);
+            return CloseModalAsync(null);
         }
 
-        [RequiresPreviewFeatures]
-        public Task NavigateModalAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true)
-        {
-            return NavigateAsync(viewType, navigationParameters, isAnimated, true, wrapNavigationPage);
-        }
-
-        [RequiresPreviewFeatures]
-        public async Task CloseModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public virtual async Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             var navigation = Shell.Current.CurrentPage?.Navigation;
 
@@ -75,8 +86,12 @@ namespace Mvvm.Nucleus.Maui
             await Shell.Current.GoToAsync(navigationPath, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
         }
 
-        [RequiresPreviewFeatures]
-        public async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public Task CloseAllModalAsync()
+        {
+            return CloseAllModalAsync(null);
+        }
+
+        public virtual async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             var currentPage = Shell.Current.CurrentPage;
             var navigation = currentPage?.Navigation;
@@ -105,30 +120,6 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
             await Shell.Current.GoToAsync(navigationPath, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
-        }
-
-        private async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters, bool isAnimated, bool isModal, bool wrapNavigationPage = false)
-        {
-            var viewMapping = GetViewMapping(viewType);
-            if (viewMapping == null)
-            {
-                _logger.LogError($"No valid mapping found for view of type '{viewType}'.");
-                return;
-            }
-
-            if (isModal)
-            {
-                NucleusMvvmCore.Current.NavigatingPresentationMode = isAnimated ? PresentationMode.ModalAnimated : PresentationMode.Modal;
-                NucleusMvvmCore.Current.NavigatingWrapNavigationPage = wrapNavigationPage;
-            }
-            else
-            {
-                NucleusMvvmCore.Current.NavigatingPresentationMode = null;
-                NucleusMvvmCore.Current.NavigatingWrapNavigationPage = null;
-            }
-
-            NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
         }
 
         private ViewMapping? GetViewMapping(Type viewType)

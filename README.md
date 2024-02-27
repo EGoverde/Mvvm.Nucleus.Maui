@@ -24,7 +24,7 @@ Nucleus MVVM requires little code to get started and remains similar to a regula
 
 See the documentation for **Navigation Service** to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
-ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) a they can trigger logic on events like navigation or its page appearing.
+ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) they can trigger logic on events like navigation or its page appearing.
 
 It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
 
@@ -42,11 +42,18 @@ Views and their ViewModels need to be registered in `MauiProgram.cs`. Pages defi
 
 Any pages not defined witin `AppShell.xaml` are known as *global routes* and can be pushed from any page. You can register these simply as `RegisterView<MyGlobalView, MyGlobalViewModel>()`, as by default they will get their name as route. You can however supply a custom one. Routes always have to be unique, or the registration will fail.
 
-Parameters can be added by supplying an `IDictionary<string, object>()`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. For Nucleus interfaces these parameters will only be passed during a single navigation action.
+Parameters can be added by supplying an `IDictionary<string, object>`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. For Nucleus interfaces these parameters will only be passed during a single navigation action.
 
 URL parameters (e.a. &param=true) are not used in the Nucleus events, but are still supported as their default Shell implementation when using routes. The dictionary however will also be passed as usual and could be used through `IQueryAttributable`.
 
-Modal navigation is included as an experimental feature (it is not an offical part of Shell).
+## Modal Navigation
+
+When navigating Nucleus will look for known parameters in the navigation parameter `IDictionary<string, object>`. Currently the following parameters are supported:
+
+**NucleusNavigationParameters.NavigatingPresentationMode**: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
+**NucleusNavigationParameters.WrapInNavigationPage**: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
+
+*Note that above paramaters allow for modal presentation in Shell including deeper navigation (see sample project). However this appears an under developed area of Shell and might not be stable.*
 
 ## Event Interfaces
 

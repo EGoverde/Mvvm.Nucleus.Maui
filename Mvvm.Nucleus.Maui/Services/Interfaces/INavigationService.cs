@@ -1,29 +1,29 @@
-﻿using System.Runtime.Versioning;
-
-namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui
 {
     public interface INavigationService
 	{
         bool IsNavigating { get; }
 
-        Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
+        Uri CurrentRoute { get; }
+
+        Task NavigateAsync<TView>();
+
+        Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true);
 
         Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
 
         Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
 
-        Task NavigateBackAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
+        Task NavigateBackAsync();
 
-        [RequiresPreviewFeatures]
-        Task NavigateModalAsync<TView>(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true);
+        Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true);
 
-        [RequiresPreviewFeatures]
-        Task NavigateModalAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true, bool wrapNavigationPage = true);
+        Task CloseModalAsync();
 
-        [RequiresPreviewFeatures]
-        Task CloseModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
+        Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true);
 
-        [RequiresPreviewFeatures]
-        Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters = null, bool isAnimated = true);
+        Task CloseAllModalAsync();
+
+        Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true);
     }
 }

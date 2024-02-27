@@ -39,6 +39,10 @@
                 Command="{Binding NavigateByModalCommand}"/>
             
             <Button
+                Text="Navigation by Modal + Stack"
+                Command="{Binding NavigationByModalWithNavigationStackCommand}"/>
+
+            <Button
                 Text="Navigation with Parameters"
                 Command="{Binding NavigateWithParametersCommand}"/>
             

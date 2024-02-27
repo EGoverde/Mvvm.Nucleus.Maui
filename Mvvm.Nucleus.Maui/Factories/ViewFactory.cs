@@ -59,11 +59,22 @@ namespace Mvvm.Nucleus.Maui
                     page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page });
                 }
 
-                var presentationMode = NucleusMvvmCore.Current.NavigatingPresentationMode;
-                var wrapNavigationPage = NucleusMvvmCore.Current.NavigatingWrapNavigationPage;
+                var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object>();
 
-                NucleusMvvmCore.Current.NavigatingPresentationMode = null;
-                NucleusMvvmCore.Current.NavigatingWrapNavigationPage = null;
+                PresentationMode? presentationMode = null;
+                var wrapNavigationPage = false;
+                
+                if (navigationParameters.ContainsKey(NucleusNavigationParameters.NavigatingPresentationMode) &&
+                    navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode] is PresentationMode)
+                {
+                    presentationMode = (PresentationMode)navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode];
+                }
+
+                if (navigationParameters.ContainsKey(NucleusNavigationParameters.WrapInNavigationPage) &&
+                    navigationParameters[NucleusNavigationParameters.WrapInNavigationPage] is bool)
+                {
+                    wrapNavigationPage = (bool)navigationParameters[NucleusNavigationParameters.WrapInNavigationPage];
+                }
 
                 if (presentationMode != null)
                 {
@@ -72,7 +83,7 @@ namespace Mvvm.Nucleus.Maui
 
                 if (wrapNavigationPage == true)
                 {
-                    element = new NavigationPage(page);;
+                    element = new NavigationPage(page);
 
                     if (presentationMode != null)
                     {
