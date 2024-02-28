@@ -31,9 +31,9 @@ public static class MauiProgram
 				options.OnAppStart(serviceProvider => Console.WriteLine("OnAppStart"));
 
 				// Some additional configuration is available.
-				options.AddQueryParametersToDictionary = true; // Default: True. When true query parameters (e.a. route?key=val) are automatically added to the navigation parameter dictionary.
-				options.UseShellNavigationQueryParameters = true; // Default: True. When true passing navigation parameters using Shell the one-time-use ShellNavigationQueryParameters is used.
-				options.IgnoreNavigationWhenInProgress = true; // Default: False. When true trying to navigate using the INavigationService while IsNavigating is true will ignore those requests.
+				options.AddQueryParametersToDictionary = true; // Default: True. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
+				options.UseShellNavigationQueryParameters = true; // Default: True. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
+				options.IgnoreNavigationWhenInProgress = true; // Default: False. If set when trying to navigate using the `INavigationService` while `IsNavigating` is `true` requests will be ignored.
 
             })
 			.ConfigureFonts(fonts =>

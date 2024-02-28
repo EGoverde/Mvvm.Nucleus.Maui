@@ -25,17 +25,19 @@ See the documentation for **Navigation Service** to see the usage and difference
 
 ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
 
-Within the options the following additional configuration can be changed:
+### Configuration
+
+Within the options the following additional settings can be changed:
 
 - `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
-- `UseShellNavigationQueryParameters`: Default `true`. If set when using navigation parameters using `Shell` the one-time-use ShellNavigationQueryParameters is used.
+- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
 - `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while `IsNavigating` is `true` requests will be ignored.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
 ## Navigation service
 
-Navigation can be done through injecting the `INavigationService`. Currently only the `Shell` implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
+Navigation can be done through injecting the `INavigationService`. Currently only the Shell implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
 
 - `await NavigateAsync<Home>();`
 - `await NavigateAsync(typeof(Home))`
@@ -47,14 +49,14 @@ Any pages not defined witin `AppShell.xaml` are known as *global routes* and can
 
 ## Passing data
 
-When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
+When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
 
 Values can be retrieved using regular `IDictionary` methods, but additionally there are the following extensions:
 
 - **navigationParameters.GetValueOrDefault<T>(key, defaultValue)**
 - **navigationParameters.GetStructOrDefault<T>(key, defaultValue)**
 
-If using `Shell` these parameters can additionally be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see **Getting started**).
+If using Shell these parameters can also be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see **Getting started**).
 
 ## Modal navigation
 
@@ -63,7 +65,7 @@ When navigating Nucleus will look for certain parameters in the navigation param
 - **NucleusNavigationParameters.NavigatingPresentationMode**: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
 - **NucleusNavigationParameters.WrapInNavigationPage**: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
 
-*Note that above parameters allow for modal presentation in `Shell` including deeper navigation (see sample project). However this appears an underdeveloped area of Shell and might not be stable.*
+*Note that above parameters allow for modal presentation in Shell including deeper navigation (see sample project). However this appears an underdeveloped area of Shell and might not be stable.*
 
 ## Event interfaces
 
@@ -93,7 +95,7 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 - Currently Shell is the only supported navigation type, but groundworks have been laid for a 'modeless' implementation.
 - Currently Shell is automatically setup as the MainPage without any customization options for a startup flow.
 - There is limited support for 'modal' presentation in Shell, this logic might be removed in favor of a modeless-specific implementation.
-- The implementation for IDestructible as logic to clean up Views and ViewModels is not yet in place.
+- The implementation for `IDestructible` as logic to clean up Views and ViewModels is not yet in place.
 - Limited logic for passing events from a page to its children is there, but a more complete concept would be nice.
 - More complete documentation, especially in the form of XML comments in the code.
 
