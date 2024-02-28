@@ -16,15 +16,15 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<EnableWindowsTargeting>True</EnableWindowsTargeting>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<PackageId>Mvvm.Nucleus.Maui</PackageId>
 		<Title>Nucleus MVVM for MAUI</Title>
 		<Description>MVVM Framework for MAUI mobile applications. Build on top of MAUI and the MVVM Community Toolkit.</Description>
 		<Authors>Erik Goverde</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/EGoverde/Mvvm.Nucleus.Maui</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/EGoverde/Mvvm.Nucleus.Maui</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<GenerateRequiresPreviewFeaturesAttribute>True</GenerateRequiresPreviewFeaturesAttribute>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
@@ -38,7 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\README.md" Pack="true" PackagePath="\"/>
+	  <None Include="..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
