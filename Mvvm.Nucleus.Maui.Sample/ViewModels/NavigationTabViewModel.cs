@@ -61,6 +61,18 @@ public partial class NavigationTabViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task NavigateWithQueryAsync()
+    {
+        var parameterValue = await _pageDialogService.DisplayPromptAsync("Prompt", "Enter a value for the parameter.");
+        if (string.IsNullOrEmpty(parameterValue))
+        {
+            return;
+        }
+
+        await _navigationService.NavigateToRouteAsync($"{nameof(Details)}?Sample={parameterValue}");
+    }
+
+    [RelayCommand]
     private async Task SwitchTabsAsync()
     {
         await _navigationService.NavigateAsync<HelpTab>();

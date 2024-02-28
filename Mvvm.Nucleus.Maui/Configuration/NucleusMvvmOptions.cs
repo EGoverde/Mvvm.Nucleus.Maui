@@ -14,7 +14,7 @@
 
         public NavigationType NavigationType { get; } = NavigationType.Shell;
 
-        public bool AddRouteQueryParametersToDictionary { get; set; } = true;
+        public bool AddQueryParametersToDictionary { get; set; } = true;
 
         public bool UseShellNavigationQueryParameters {get; set; } = true;
 

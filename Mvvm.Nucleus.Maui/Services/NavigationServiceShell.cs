@@ -55,7 +55,7 @@ namespace Mvvm.Nucleus.Maui
 
             var parameters = GetOrCreateNavigationParameters(navigationParameters);
 
-            if (_nucleusMvvmOptions.AddRouteQueryParametersToDictionary)
+            if (_nucleusMvvmOptions.AddQueryParametersToDictionary)
             {
                 var queryParameters = GetQueryParameterDictionary(route);
 
@@ -217,7 +217,8 @@ namespace Mvvm.Nucleus.Maui
 		{
             Dictionary<string, string> result = new(StringComparer.Ordinal);
 
-            if (!Uri.TryCreate(route, UriKind.RelativeOrAbsolute, out Uri? uri) || string.IsNullOrWhiteSpace(uri.Query))
+            var isSuccess = Uri.TryCreate(new Uri ("app://root/"), route, out Uri? uri);
+            if (!isSuccess || string.IsNullOrWhiteSpace(uri?.Query))
             {
                 return result;
             }

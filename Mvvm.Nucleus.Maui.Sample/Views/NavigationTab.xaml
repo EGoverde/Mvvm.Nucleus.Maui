@@ -45,6 +45,10 @@
             <Button
                 Text="Navigation with Parameters"
                 Command="{Binding NavigateWithParametersCommand}"/>
+
+            <Button
+                Text="Navigation with Query"
+                Command="{Binding NavigateWithQueryCommand}"/>
             
             <Button
                 Text="Switch Tabs"
