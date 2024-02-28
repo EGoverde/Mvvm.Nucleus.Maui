@@ -2,5 +2,5 @@
 
 public interface IConfirmNavigationAsync
 {
-    Task<bool> CanNavigateAsync(NavigationDirection navigationDirection, IDictionary<string, object> navigationParameters);
+    Task<bool> CanNavigateAsync(NavigationDirection navigationDirection, IDictionary<string, object?> navigationParameters);
 }

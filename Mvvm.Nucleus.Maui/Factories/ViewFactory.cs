@@ -59,7 +59,7 @@ namespace Mvvm.Nucleus.Maui
                     page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page });
                 }
 
-                var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object>();
+                var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object?>();
 
                 PresentationMode? presentationMode = null;
                 var wrapNavigationPage = false;

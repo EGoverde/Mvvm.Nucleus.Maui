@@ -22,12 +22,12 @@ namespace Mvvm.Nucleus.Maui
             return NavigateAsync<TView>(null);
         }
 
-        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        public Task NavigateAsync<TView>(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
         {
             return NavigateAsync(typeof(TView), navigationParameters, isAnimated);
         }
 
-        public virtual Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public virtual Task NavigateAsync(Type viewType, IDictionary<string, object?>? navigationParameters = null, bool isAnimated = true)
         {
             var viewMapping = GetViewMapping(viewType);
             if (viewMapping == null)
@@ -40,7 +40,7 @@ namespace Mvvm.Nucleus.Maui
             throw new NotImplementedException();
         }
 
-        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object?>? navigationParameters = null, bool isAnimated = true)
         {
             throw new NotImplementedException();
         }
@@ -50,7 +50,7 @@ namespace Mvvm.Nucleus.Maui
             return NavigateBackAsync(null);
         }
 
-        public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        public virtual Task NavigateBackAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
         {
             throw new NotImplementedException();
         }
@@ -60,7 +60,7 @@ namespace Mvvm.Nucleus.Maui
             return CloseModalAsync(null);
         }
 
-        public virtual Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        public virtual Task CloseModalAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
         {
             throw new NotImplementedException();
         }
@@ -70,7 +70,7 @@ namespace Mvvm.Nucleus.Maui
             return CloseAllModalAsync(null);
         }
 
-        public virtual Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+        public virtual Task CloseAllModalAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
         {
             throw new NotImplementedException();
         }

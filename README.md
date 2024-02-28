@@ -12,7 +12,7 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Getting started
 
-Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
 
                 builder.UseNucleusMvvm<App, AppShell>(options =>
                     options.RegisterTypes(dependencyOptions => 
@@ -23,15 +23,17 @@ Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mv
 
 See the documentation for **Navigation Service** to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
-ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) they can trigger logic on events like navigation or its page appearing.
+ViewModels can be of any type and support dependency injection. By implementing interfaces (**see Event Interfaces**) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
 
-It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
+Within the options the following additional configuration can be changed:
 
-Additionally it is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings.
+- `options.AddQueryParametersToDictionary`: Default **true**. When `true` query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
+- `options.UseShellNavigationQueryParameters`: Default **true**. When `true` passing navigation parameters using `Shell` the one-time-use ShellNavigationQueryParameters is used.
+- `options.IgnoreNavigationWhenInProgress`: Default **False**. When `true` trying to navigate using the `INavigationService` while `IsNavigating` is `true` will ignore those requests.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
-## Navigation Service
+## Navigation service
 
 Navigation can be done through injecting the `INavigationService`. Currently only the `Shell` implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
 
@@ -43,20 +45,24 @@ Views and their ViewModels need to be registered in `MauiProgram.cs`. Pages defi
 
 Any pages not defined witin `AppShell.xaml` are known as *global routes* and can be pushed from any page. You can register these simply as `RegisterView<MyGlobalView, MyGlobalViewModel>()`, as by default they will get their name as route. You can however supply a custom one. Routes always have to be unique, or the registration will fail.
 
-Parameters can be added by supplying an `IDictionary<string, object>`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. For Nucleus interfaces these parameters will only be passed during a single navigation action.
+## Passing data
 
-URL parameters (e.a. &param=true) are not used in the Nucleus events, but are still supported as their default Shell implementation when using routes. The dictionary however will also be passed as usual and could be used through `IQueryAttributable`.
+When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. ?myValue=value), but not the recommended approach.
 
-## Modal Navigation
+Values can be retrieved using regular `IDictionary` methods, but additionally there are the extensions `navigationParameters.GetValueOrDefault<T>(key, defaultValue) and navigationParameters.GetStructOrDefault<T>(key, defaultValue)`.
 
-When navigating Nucleus will look for known parameters in the navigation parameter `IDictionary<string, object>`. Currently the following parameters are supported:
+If using `Shell` these parameters can additionally be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data, including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see **Getting started**).
+
+## Modal navigation
+
+When navigating Nucleus will look for certain parameters in the navigation parameter `IDictionary<string, object?>`. Currently the following parameters are supported:
 
 **NucleusNavigationParameters.NavigatingPresentationMode**: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
 **NucleusNavigationParameters.WrapInNavigationPage**: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
 
-*Note that above paramaters allow for modal presentation in Shell including deeper navigation (see sample project). However this appears an under developed area of Shell and might not be stable.*
+*Note that above paramaters allow for modal presentation in Shell including deeper navigation (see sample project). However this appears an underdeveloped area of Shell and might not be stable.*
 
-## Event Interfaces
+## Event interfaces
 
 - **IApplicationLifeCycleAware:** When the app is going to the background or returning.
 - **IConfirmNavigation(Async):** Allows to interupt the navigation, for example by asking for confirmation.
@@ -73,7 +79,9 @@ Some compatibility classes have been included to simplify migration for projects
 
 - Interfaces for similar ViewModels events (e.a. `IPageLifecycleAware`) are mostly kept identical to Prism.
 - BindableBase class has been created to add some missing functions to `ObservableObject`.
-- NavigationParameters class has been added as a named `IDictionary<string, object>`.
+- NavigationParameters class has been added as a named `IDictionary<string, object?>`.
+
+Note that the `NavigationParameter` compatibility class (and Prism implementation) differs from IDictionary in that it returns null when accessing a non-existing key (e.a. navigationParameters["nonKey"]). See **Passing Data**.
 
 Contrary to Prism, dependency injection in Nucleus uses the default Microsoft implementation, which means that apart from registering Views/ViewModels, any other registration should be done through the usual `Services.AddSingleton<>` and similar.
 

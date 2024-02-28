@@ -29,7 +29,7 @@ public partial class NavigationTabViewModel : ObservableObject
     [RelayCommand]
     private async Task NavigateByModalAsync()
     {
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated }
         });
@@ -38,7 +38,7 @@ public partial class NavigationTabViewModel : ObservableObject
     [RelayCommand]
     private async Task NavigationByModalWithNavigationStackAsync()
     {
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated },
             { NucleusNavigationParameters.WrapInNavigationPage, true }
@@ -54,7 +54,7 @@ public partial class NavigationTabViewModel : ObservableObject
             return;
         }
 
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { "Sample", parameterValue }
         });

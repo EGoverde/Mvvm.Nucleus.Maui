@@ -26,13 +26,13 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
         _pageIdentifier = Guid.NewGuid().ToString();
     }
 
-    public void Init(IDictionary<string, object> navigationParameters)
+    public void Init(IDictionary<string, object?> navigationParameters)
     {
         OnInitData = $"Triggered ({DateTime.Now:HH:mm:ss)})";
         SetNavigationParameterData(navigationParameters);
     }
 
-    public void Refresh(IDictionary<string, object> navigationParameters)
+    public void Refresh(IDictionary<string, object?> navigationParameters)
     {
         OnRefreshData = $"Triggered ({DateTime.Now:HH:mm:ss)})";
         SetNavigationParameterData(navigationParameters);
@@ -41,7 +41,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigatePushAsync()
     {
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { "Navigation", $"Pushed from {PageIdentifier}."}
         });
@@ -50,7 +50,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigateModalAsync()
     {
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { "Navigation", $"Modally from {PageIdentifier}."},
             { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated }
@@ -60,7 +60,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigateModalWithNavigationStackAsync()
     {
-        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+        await _navigationService.NavigateAsync<Details>(new Dictionary<string, object?>
         {
             { "Navigation", $"Modally from {PageIdentifier}."},
             { NucleusNavigationParameters.NavigatingPresentationMode, PresentationMode.ModalAnimated },
@@ -71,7 +71,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigateBackAsync()
     {
-        await _navigationService.NavigateBackAsync(new Dictionary<string, object>
+        await _navigationService.NavigateBackAsync(new Dictionary<string, object?>
         {
             { "Navigation", $"Popped from {PageIdentifier}."}
         });
@@ -80,7 +80,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task CloseModalAsync()
     {
-        await _navigationService.CloseModalAsync(new Dictionary<string, object>
+        await _navigationService.CloseModalAsync(new Dictionary<string, object?>
         {
             { "Navigation", $"Modal Closed from {PageIdentifier}."}
         });
@@ -92,7 +92,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
         await _navigationService.CloseAllModalAsync();
     }
 
-    private void SetNavigationParameterData(IDictionary<string, object> navigationParameters)
+    private void SetNavigationParameterData(IDictionary<string, object?> navigationParameters)
     {
         var stringBuilder = new StringBuilder();
 
