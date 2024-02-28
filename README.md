@@ -53,7 +53,7 @@ Any pages not defined witin `AppShell.xaml` are known as *global routes* and can
 
 ## Passing data
 
-When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
+When navigating an `IDictionary<string, object>` can be passed to the `INavigationService`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
 
 Values can be retrieved using regular `IDictionary` methods, but additionally there are the following extensions:
 
@@ -64,7 +64,7 @@ If using Shell these parameters can also be used as described in the [MAUI docum
 
 ## Modal navigation
 
-When navigating Nucleus will look for certain parameters in the navigation parameter `IDictionary<string, object?>`. Currently the following parameters are supported:
+When navigating Nucleus will look for certain parameters in the navigation parameter `IDictionary<string, object>`. Currently the following parameters are supported:
 
 - `NucleusNavigationParameters.NavigatingPresentationMode`: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
 - `NucleusNavigationParameters.WrapInNavigationPage`: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
@@ -88,7 +88,7 @@ Some compatibility classes have been included to simplify migration for projects
 
 - Interfaces for similar ViewModels events (e.a. `IPageLifecycleAware`) are mostly kept identical to Prism.
 - BindableBase class has been created to add some missing functions to `ObservableObject`.
-- NavigationParameters class has been added as a named `IDictionary<string, object?>`.
+- NavigationParameters class has been added as a named `IDictionary<string, object>`.
 
 Note that the `NavigationParameter` compatibility class (and Prism implementation) differs from IDictionary in that it returns null when accessing a non-existing key (e.a. navigationParameters["nonKey"]). See [Passing data](#passing-data).
 

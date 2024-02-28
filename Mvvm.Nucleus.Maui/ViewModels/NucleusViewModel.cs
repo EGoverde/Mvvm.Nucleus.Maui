@@ -5,9 +5,9 @@ namespace Mvvm.Nucleus.Maui
 {
     public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IInitializableAsync, INavigatedAware
     {
-        Task OnInitAsync(IDictionary<string, object?> parameters);
+        Task OnInitAsync(IDictionary<string, object> parameters);
 
-        Task OnRefreshAsync(IDictionary<string, object?> parameters);
+        Task OnRefreshAsync(IDictionary<string, object> parameters);
     }
 
     public abstract class NucleusViewModel : BindableBase, INucleusViewModel
@@ -64,7 +64,7 @@ namespace Mvvm.Nucleus.Maui
 
         public bool IsBusy => GetIsBusy();
 
-        public async Task InitAsync(IDictionary<string, object?> navigationParameters)
+        public async Task InitAsync(IDictionary<string, object> navigationParameters)
         {
             if (IsInitialized)
             {
@@ -91,7 +91,7 @@ namespace Mvvm.Nucleus.Maui
             };
         }
 
-        public async Task RefreshAsync(IDictionary<string, object?> navigationParameters)
+        public async Task RefreshAsync(IDictionary<string, object> navigationParameters)
         {
             if (IsRefreshing)
             {
@@ -111,12 +111,12 @@ namespace Mvvm.Nucleus.Maui
             };
         }
 
-        public virtual Task OnInitAsync(IDictionary<string, object?> parameters)
+        public virtual Task OnInitAsync(IDictionary<string, object> parameters)
         {
             return Task.CompletedTask;
         }
 
-        public virtual Task OnRefreshAsync(IDictionary<string, object?> parameters)
+        public virtual Task OnRefreshAsync(IDictionary<string, object> parameters)
         {
             return Task.CompletedTask;
         }
@@ -126,15 +126,15 @@ namespace Mvvm.Nucleus.Maui
             return IsInitializing || IsRefreshing || IsLoading;
         }
 
-        public virtual void OnNavigatedTo(IDictionary<string, object?> navigationParameters)
+        public virtual void OnNavigatedTo(IDictionary<string, object> navigationParameters)
         {
         }
 
-        public virtual void OnNavigatedFrom(IDictionary<string, object?> navigationParameters)
+        public virtual void OnNavigatedFrom(IDictionary<string, object> navigationParameters)
         {
         }
 
-        public virtual void OnNavigatingFrom(IDictionary<string, object?> navigationParameters)
+        public virtual void OnNavigatingFrom(IDictionary<string, object> navigationParameters)
         {
         }
     }

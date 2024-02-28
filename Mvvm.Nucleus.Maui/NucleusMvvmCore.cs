@@ -7,16 +7,16 @@ namespace Mvvm.Nucleus.Maui
     {
         private static NucleusMvvmCore? _current;
 
-        private IDictionary<string, object?> _navigationParameters = new Dictionary<string, object?>();
+        private IDictionary<string, object> _navigationParameters = new Dictionary<string, object>();
 
         private bool _isNavigating;
 
         internal ILogger<NucleusMvvmCore>? Logger { get; }
 
-        internal IDictionary<string, object?> NavigationParameters
+        internal IDictionary<string, object> NavigationParameters
         {
             get => _navigationParameters;
-            set => _navigationParameters = value ?? new Dictionary<string, object?>();
+            set => _navigationParameters = value ?? new Dictionary<string, object>();
         }
 
         public static NucleusMvvmCore Current

@@ -22,12 +22,12 @@ namespace Mvvm.Nucleus.Maui
             return NavigateAsync<TView>(null);
         }
 
-        public Task NavigateAsync<TView>(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
+        public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             return NavigateAsync(typeof(TView), navigationParameters, isAnimated);
         }
 
-        public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object?>? navigationParameters = null, bool isAnimated = true)
+        public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
             if (ShouldIgnoreNavigationRequest())
             {
@@ -46,7 +46,7 @@ namespace Mvvm.Nucleus.Maui
             await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
-        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object?>? navigationParameters = null, bool isAnimated = true)
+        public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
             if (ShouldIgnoreNavigationRequest())
             {
@@ -81,7 +81,7 @@ namespace Mvvm.Nucleus.Maui
             return NavigateBackAsync(null);
         }
 
-        public virtual Task NavigateBackAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
+        public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             if (ShouldIgnoreNavigationRequest())
             {
@@ -98,7 +98,7 @@ namespace Mvvm.Nucleus.Maui
             return CloseModalAsync(null);
         }
 
-        public virtual async Task CloseModalAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
+        public virtual async Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             if (ShouldIgnoreNavigationRequest())
             {
@@ -133,7 +133,7 @@ namespace Mvvm.Nucleus.Maui
             return CloseAllModalAsync(null);
         }
 
-        public virtual async Task CloseAllModalAsync(IDictionary<string, object?>? navigationParameters, bool isAnimated = true)
+        public virtual async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
             if (ShouldIgnoreNavigationRequest())
             {
@@ -193,12 +193,12 @@ namespace Mvvm.Nucleus.Maui
             return viewMappings.FirstOrDefault();
         }
 
-        private IDictionary<string, object?> GetOrCreateNavigationParameters(IDictionary<string, object?>? navigationParameters)
+        private IDictionary<string, object> GetOrCreateNavigationParameters(IDictionary<string, object>? navigationParameters)
         {
-            return navigationParameters ?? new Dictionary<string, object?>();
+            return navigationParameters ?? new Dictionary<string, object>();
         }
 
-        private IDictionary<string, object?> GetOrCreateShellNavigationQueryParameters(IDictionary<string, object?>? navigationParameters)
+        private IDictionary<string, object> GetOrCreateShellNavigationQueryParameters(IDictionary<string, object>? navigationParameters)
         {
             if (navigationParameters is ShellNavigationQueryParameters)
             {
@@ -207,10 +207,10 @@ namespace Mvvm.Nucleus.Maui
 
             if (_nucleusMvvmOptions.UseShellNavigationQueryParameters)
             {
-                return new ShellNavigationQueryParameters(navigationParameters ?? new Dictionary<string, object?>());
+                return new ShellNavigationQueryParameters(navigationParameters ?? new Dictionary<string, object>());
             }
 
-            return navigationParameters ?? new Dictionary<string, object?>();
+            return navigationParameters ?? new Dictionary<string, object>();
         }
 
         private IDictionary<string, string> GetQueryParameterDictionary(string route)

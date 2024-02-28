@@ -59,7 +59,7 @@ namespace Mvvm.Nucleus.Maui
                     page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page });
                 }
 
-                var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object?>();
+                var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object>();
 
                 PresentationMode? presentationMode = null;
                 var wrapNavigationPage = false;
@@ -67,13 +67,13 @@ namespace Mvvm.Nucleus.Maui
                 if (navigationParameters.ContainsKey(NucleusNavigationParameters.NavigatingPresentationMode) &&
                     navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode] is PresentationMode)
                 {
-                    presentationMode = (PresentationMode)navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode];
+                    presentationMode = (PresentationMode)navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode]!;
                 }
 
                 if (navigationParameters.ContainsKey(NucleusNavigationParameters.WrapInNavigationPage) &&
                     navigationParameters[NucleusNavigationParameters.WrapInNavigationPage] is bool)
                 {
-                    wrapNavigationPage = (bool)navigationParameters[NucleusNavigationParameters.WrapInNavigationPage];
+                    wrapNavigationPage = (bool)navigationParameters[NucleusNavigationParameters.WrapInNavigationPage]!;
                 }
 
                 if (presentationMode != null)
