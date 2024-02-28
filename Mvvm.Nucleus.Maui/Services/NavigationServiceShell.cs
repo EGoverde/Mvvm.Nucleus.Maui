@@ -29,6 +29,11 @@ namespace Mvvm.Nucleus.Maui
 
         public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
+            if (ShouldIgnoreNavigationRequest())
+            {
+                return;
+            }
+
             var viewMapping = GetViewMapping(viewType);
             if (viewMapping == null)
             {
@@ -37,13 +42,38 @@ namespace Mvvm.Nucleus.Maui
             }
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
+
+            await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
         {
-            NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            return Shell.Current.GoToAsync(route, isAnimated, new ShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            if (ShouldIgnoreNavigationRequest())
+            {
+                return Task.CompletedTask;
+            }
+
+            var parameters = GetOrCreateNavigationParameters(navigationParameters);
+
+            if (_nucleusMvvmOptions.AddRouteQueryParametersToDictionary)
+            {
+                var queryParameters = GetQueryParameterDictionary(route);
+
+                foreach (var parameter in queryParameters)
+                {
+                    if (parameters.ContainsKey(parameter.Key))
+                    {
+                        _logger.LogWarning($"Query parameter with key '{parameter.Key}' already exists in NavigationParameters, not adding value.");
+                        continue;
+                    }
+                        
+                    parameters.Add(parameter.Key, parameter.Value);
+                }
+            }
+
+            NucleusMvvmCore.Current.NavigationParameters = parameters;
+
+            return Shell.Current.GoToAsync(route, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task NavigateBackAsync()
@@ -53,8 +83,14 @@ namespace Mvvm.Nucleus.Maui
 
         public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
+            if (ShouldIgnoreNavigationRequest())
+            {
+                return Task.CompletedTask;
+            }
+
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            return Shell.Current.GoToAsync("..", isAnimated, new ShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+
+            return Shell.Current.GoToAsync("..", isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task CloseModalAsync()
@@ -64,6 +100,11 @@ namespace Mvvm.Nucleus.Maui
 
         public virtual async Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
+            if (ShouldIgnoreNavigationRequest())
+            {
+                return;
+            }
+
             var navigation = Shell.Current.CurrentPage?.Navigation;
 
             var modalStackCount = navigation?.ModalStack?.Count ?? 0;
@@ -83,7 +124,8 @@ namespace Mvvm.Nucleus.Maui
             }
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            await Shell.Current.GoToAsync(navigationPath, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
+
+            await Shell.Current.GoToAsync(navigationPath, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task CloseAllModalAsync()
@@ -93,6 +135,11 @@ namespace Mvvm.Nucleus.Maui
 
         public virtual async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
         {
+            if (ShouldIgnoreNavigationRequest())
+            {
+                return;
+            }
+
             var currentPage = Shell.Current.CurrentPage;
             var navigation = currentPage?.Navigation;
 
@@ -119,7 +166,20 @@ namespace Mvvm.Nucleus.Maui
             }
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
-            await Shell.Current.GoToAsync(navigationPath, isAnimated, NucleusMvvmCore.Current.NavigationParameters);
+
+            await Shell.Current.GoToAsync(navigationPath, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        }
+
+        private bool ShouldIgnoreNavigationRequest()
+        {
+            if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
+            {
+                _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
+
+                return true;
+            }
+
+            return false;
         }
 
         private ViewMapping? GetViewMapping(Type viewType)
@@ -137,5 +197,45 @@ namespace Mvvm.Nucleus.Maui
         {
             return navigationParameters ?? new Dictionary<string, object>();
         }
+
+        private IDictionary<string, object> GetOrCreateShellNavigationQueryParameters(IDictionary<string, object>? navigationParameters)
+        {
+            if (navigationParameters is ShellNavigationQueryParameters)
+            {
+                return navigationParameters;
+            }
+
+            if (_nucleusMvvmOptions.UseShellNavigationQueryParameters)
+            {
+                return new ShellNavigationQueryParameters(navigationParameters ?? new Dictionary<string, object>());
+            }
+
+            return navigationParameters ?? new Dictionary<string, object>();
+        }
+
+        private IDictionary<string, string> GetQueryParameterDictionary(string route)
+		{
+            Dictionary<string, string> result = new(StringComparer.Ordinal);
+
+            if (!Uri.TryCreate(route, UriKind.RelativeOrAbsolute, out Uri? uri) || string.IsNullOrWhiteSpace(uri.Query))
+            {
+                return result;
+            }
+
+			var query = uri.Query.StartsWith("?", StringComparison.Ordinal) ? uri.Query.Substring(1) : uri.Query;
+
+			foreach (var part in query.Split('&'))
+			{
+				var p = part.Split('=');
+				if (p.Length != 2)
+                {
+					continue;
+                }
+
+				result[p[0]] = p[1];
+			}
+
+			return result;
+		}
     }
 }

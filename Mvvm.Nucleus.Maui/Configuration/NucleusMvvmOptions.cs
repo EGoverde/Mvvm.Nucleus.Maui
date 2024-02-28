@@ -8,12 +8,16 @@
 
         internal Action<IServiceProvider>? OnAppStart { get; set; }
 
-        public NavigationType NavigationType { get; } = NavigationType.Shell;
-
-        public DialogServiceOptions DialogOptions { get; } = new DialogServiceOptions();
-        
         public IReadOnlyCollection<ViewMapping> ViewMappings => DependencyOptions.ViewMappings;
 
         internal DependencyOptions DependencyOptions { get; } = new DependencyOptions();
+
+        public NavigationType NavigationType { get; } = NavigationType.Shell;
+
+        public bool AddRouteQueryParametersToDictionary { get; set; } = true;
+
+        public bool UseShellNavigationQueryParameters {get; set; } = true;
+
+        public bool IgnoreNavigationWhenInProgress { get; set; } = false;
     }
 }

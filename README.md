@@ -27,6 +27,8 @@ ViewModels can be of any type and support dependency injection. By implementing 
 
 It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings. An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
 
+Additionally it is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings.
+
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
 ## Navigation Service
