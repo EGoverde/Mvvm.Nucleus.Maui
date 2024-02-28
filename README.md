@@ -27,9 +27,9 @@ ViewModels can be of any type and support dependency injection. By implementing 
 
 Within the options the following additional configuration can be changed:
 
-- `options.AddQueryParametersToDictionary`: Default **true**. When `true` query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
-- `options.UseShellNavigationQueryParameters`: Default **true**. When `true` passing navigation parameters using `Shell` the one-time-use ShellNavigationQueryParameters is used.
-- `options.IgnoreNavigationWhenInProgress`: Default **False**. When `true` trying to navigate using the `INavigationService` while `IsNavigating` is `true` will ignore those requests.
+- `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
+- `UseShellNavigationQueryParameters`: Default `true`. If set when using navigation parameters using `Shell` the one-time-use ShellNavigationQueryParameters is used.
+- `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while `IsNavigating` is `true` requests will be ignored.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
@@ -47,20 +47,23 @@ Any pages not defined witin `AppShell.xaml` are known as *global routes* and can
 
 ## Passing data
 
-When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. ?myValue=value), but not the recommended approach.
+When navigating an `IDictionary<string, object?>` can be passed to the `INavigationService, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
 
-Values can be retrieved using regular `IDictionary` methods, but additionally there are the extensions `navigationParameters.GetValueOrDefault<T>(key, defaultValue) and navigationParameters.GetStructOrDefault<T>(key, defaultValue)`.
+Values can be retrieved using regular `IDictionary` methods, but additionally there are the following extensions:
 
-If using `Shell` these parameters can additionally be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data, including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see **Getting started**).
+- **navigationParameters.GetValueOrDefault<T>(key, defaultValue)**
+- **navigationParameters.GetStructOrDefault<T>(key, defaultValue)**
+
+If using `Shell` these parameters can additionally be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see **Getting started**).
 
 ## Modal navigation
 
 When navigating Nucleus will look for certain parameters in the navigation parameter `IDictionary<string, object?>`. Currently the following parameters are supported:
 
-**NucleusNavigationParameters.NavigatingPresentationMode**: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
-**NucleusNavigationParameters.WrapInNavigationPage**: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
+- **NucleusNavigationParameters.NavigatingPresentationMode**: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
+- **NucleusNavigationParameters.WrapInNavigationPage**: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
 
-*Note that above paramaters allow for modal presentation in Shell including deeper navigation (see sample project). However this appears an underdeveloped area of Shell and might not be stable.*
+*Note that above parameters allow for modal presentation in `Shell` including deeper navigation (see sample project). However this appears an underdeveloped area of Shell and might not be stable.*
 
 ## Event interfaces
 
