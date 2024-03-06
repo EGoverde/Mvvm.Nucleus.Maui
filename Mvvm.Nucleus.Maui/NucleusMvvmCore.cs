@@ -150,12 +150,9 @@ namespace Mvvm.Nucleus.Maui
 
         private async void ShellNavigating(object sender, ShellNavigatingEventArgs e)
         {
-            if (!e.CanCancel)
-            {
-                return;
-            }
+            var isCanceled = false;
 
-            if (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push)
+            if (e.CanCancel && (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
             {
                 var navigationDirection = default(NavigationDirection);
 
@@ -173,6 +170,7 @@ namespace Mvvm.Nucleus.Maui
                 var confirmNavigation = Shell?.CurrentPage?.BindingContext as IConfirmNavigation;
                 if (confirmNavigation != null && !confirmNavigation.CanNavigate(navigationDirection, NavigationParameters))
                 {
+                    isCanceled = true;
                     e.Cancel();
                 }
                 else
@@ -185,12 +183,19 @@ namespace Mvvm.Nucleus.Maui
                         var confirm = await confirmNavigationAsync.CanNavigateAsync(navigationDirection, NavigationParameters);
                         if (!confirm)
                         {
+                            isCanceled = true;
                             e.Cancel();
                         }
 
                         token.Complete();
                     }
                 }
+            }
+
+            if (isCanceled)
+            {
+                Logger?.LogInformation($"Shell Navigation Canceled.");
+                return;
             }
 
             Logger?.LogInformation($"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
