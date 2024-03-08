@@ -18,6 +18,8 @@
 
         public bool UseShellNavigationQueryParameters {get; set; } = true;
 
+        public bool UsePageDestructionOnNavigation { get; set; } = false;
+
         public bool IgnoreNavigationWhenInProgress { get; set; } = false;
     }
 }

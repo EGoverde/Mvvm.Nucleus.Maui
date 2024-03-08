@@ -9,8 +9,6 @@ namespace Mvvm.Nucleus.Maui
 
         private IDictionary<string, object> _navigationParameters = new Dictionary<string, object>();
 
-        private bool _isNavigating;
-
         internal ILogger<NucleusMvvmCore>? Logger { get; }
 
         internal IDictionary<string, object> NavigationParameters
@@ -29,9 +27,13 @@ namespace Mvvm.Nucleus.Maui
 
         private Window? _window;
 
-        public EventHandler? AppStopped;
+        internal event EventHandler<ShellNavigatedEventArgs>? ShellNavigated;
 
-        public EventHandler? AppResumed;
+        internal event EventHandler<ShellNavigatingEventArgs>? ShellNavigating;
+
+        public event EventHandler? AppStopped;
+
+        public event EventHandler? AppResumed;
 
         public Application Application { get; }
 
@@ -49,12 +51,6 @@ namespace Mvvm.Nucleus.Maui
         {
             get => _window ?? throw new InvalidOperationException("NucleusMvvm could not detect a Window.");
             private set => RegisterWindow(value);
-        }
-
-        public bool IsNavigating
-        {
-            get => _isNavigating;
-            internal set => _isNavigating = value;
         }
 
         public NucleusMvvmCore(Application application, IViewFactory viewFactory, ILogger<NucleusMvvmCore> logger)
@@ -78,9 +74,6 @@ namespace Mvvm.Nucleus.Maui
                     Window = (sender as Application)?.MainPage?.Window;
                 }
             };
-
-            AppStopped += OnAppStopped!;
-            AppResumed += OnAppResumed!;
         }
 
         internal async void RunTaskInVoidAndTrackException(Func<Task> task, Action? onFinished = null, [CallerMemberName] string callerName = "")
@@ -108,16 +101,16 @@ namespace Mvvm.Nucleus.Maui
 
             if (_shell != null)
             {
-                _shell.Navigating -= ShellNavigating!;
-                _shell.Navigated -= ShellNavigated!;
+                _shell.Navigated -= OnShellNavigated!;
+                _shell.Navigating -= OnShellNavigating!;
             }
 
             _shell = shell;
 
             if (shell != null)
             {
-                shell.Navigating += ShellNavigating!;
-                shell.Navigated += ShellNavigated!;
+                shell.Navigating += OnShellNavigating!;
+                shell.Navigated += OnShellNavigated!;
 
                 Logger?.LogInformation("Set or updated NucleusMvvm Shell reference.");
             }
@@ -132,92 +125,41 @@ namespace Mvvm.Nucleus.Maui
 
             if (_window != null)
             {
-                _window.Stopped -= AppStopped!;
-                _window.Resumed -= AppResumed!;
-
+                _window.Stopped -= OnAppStopped!;
+                _window.Resumed -= OnAppResumed!;
             }
 
             _window = window;
 
             if (window != null)
             {
-                window.Stopped += AppStopped!;
-                window.Resumed += AppResumed!;
+                window.Stopped += OnAppStopped!;
+                window.Resumed += OnAppResumed!;
 
                 Logger?.LogInformation("Set or updated NucleusMvvm Window reference.");
             }
         }
 
-        private async void ShellNavigating(object sender, ShellNavigatingEventArgs e)
-        {
-            var isCanceled = false;
-
-            if (e.CanCancel && (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
-            {
-                var navigationDirection = default(NavigationDirection);
-
-                switch(e.Source)
-                {
-                    case ShellNavigationSource.Pop:
-                    case ShellNavigationSource.PopToRoot:
-                        navigationDirection = NavigationDirection.Back;
-                        break;
-                    case ShellNavigationSource.Push:
-                        navigationDirection = NavigationDirection.Forwards;
-                        break;
-                }
-
-                var confirmNavigation = Shell?.CurrentPage?.BindingContext as IConfirmNavigation;
-                if (confirmNavigation != null && !confirmNavigation.CanNavigate(navigationDirection, NavigationParameters))
-                {
-                    isCanceled = true;
-                    e.Cancel();
-                }
-                else
-                {
-                    var confirmNavigationAsync = Shell?.CurrentPage?.BindingContext as IConfirmNavigationAsync;
-                    if (confirmNavigationAsync != null)
-                    {
-                        var token = e.GetDeferral();
-                        
-                        var confirm = await confirmNavigationAsync.CanNavigateAsync(navigationDirection, NavigationParameters);
-                        if (!confirm)
-                        {
-                            isCanceled = true;
-                            e.Cancel();
-                        }
-
-                        token.Complete();
-                    }
-                }
-            }
-
-            if (isCanceled)
-            {
-                Logger?.LogInformation($"Shell Navigation Canceled.");
-                return;
-            }
-
-            Logger?.LogInformation($"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
-
-            IsNavigating = true;
-        }
-
-        private void ShellNavigated(object sender, ShellNavigatedEventArgs e)
-        {
-            Logger?.LogInformation($"Shell Navigated '{e.Current?.Location}' ({e.Source}).");
-
-            IsNavigating = false;
-        }
-
         private void OnAppStopped(object sender, EventArgs e)
         {
             Logger?.LogInformation("App is stopping.");
+            AppStopped?.Invoke(sender, e);
         }
 
         private void OnAppResumed(object sender, EventArgs e)
         {
             Logger?.LogInformation("App is resuming.");
+            AppResumed?.Invoke(sender, e);
+        }
+
+        private void OnShellNavigating(object sender, ShellNavigatingEventArgs e)
+        {
+            ShellNavigating?.Invoke(sender, e);
+        }
+
+        private void OnShellNavigated(object sender, ShellNavigatedEventArgs e)
+        {
+            ShellNavigated?.Invoke(sender, e);
         }
     }
 }

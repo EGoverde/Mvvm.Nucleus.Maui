@@ -37,6 +37,7 @@ Within the options the following additional settings can be changed:
 
 - `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
 - `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
+- `UsePageDestructionOnNavigation`: Default `false`. Attempts to unload behaviors and unset bindingcontext of pages when they are popped, as well as triggers the `IDestructible` interface.
 - `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while it is already busy requests will be ignored.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
@@ -52,6 +53,8 @@ Navigation can be done through injecting the `INavigationService`. Currently onl
 Views and their ViewModels need to be registered in `MauiProgram.cs`. Pages defined within `AppShell.xaml` are known as *absolute routes* and should be registered using `RegisterShellView<MyView, MyViewModel>("//MyRoute")`. It is important that the given route matches the XAML. 
 
 Any pages not defined witin `AppShell.xaml` are known as *global routes* and can be pushed from any page. You can register these simply as `RegisterView<MyGlobalView, MyGlobalViewModel>()`, as by default they will get their name as route. You can however supply a custom one. Routes always have to be unique, or the registration will fail.
+
+*Note that in Shell pages on the root-level (e.a. //home) will be reused after the intial navigation, even if set to `Transient`.*
 
 ## Passing data
 
@@ -77,7 +80,7 @@ Note that above parameters allow for modal presentation in Shell including deepe
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, for example by asking for confirmation.
-- `IDestructible`: Currently not implemented, see [Limitations / Planned features](#limitations--planned-features).
+- `IDestructible`: Requires `UsePageDestructionOnNavigation` set to `true`. Triggered when a pages is no longer in the navigation stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
 - `IPageLifecycleAware`: Appearing and disappearing events from the view.
@@ -101,7 +104,6 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 - Currently Shell is the only supported navigation type, but groundworks have been laid for a 'modeless' implementation.
 - Currently Shell is automatically setup as the MainPage without any customization options for a startup flow.
 - There is limited support for 'modal' presentation in Shell, this logic might be removed in favor of a modeless-specific implementation.
-- The implementation for `IDestructible` as logic to clean up Views and ViewModels is not yet in place.
 - Limited logic for passing events from a page to its children is there, but a more complete concept would be nice.
 - More complete documentation, especially in the form of XML comments in the code.
 

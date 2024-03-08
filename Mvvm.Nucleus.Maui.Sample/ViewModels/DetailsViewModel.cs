@@ -78,6 +78,15 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     }
 
     [RelayCommand]
+    private async Task NavigateBackTwiceAsync()
+    {
+        await _navigationService.NavigateToRouteAsync("../..", new Dictionary<string, object>
+        {
+            { "Navigation", $"Popped from {PageIdentifier}."}
+        });
+    }
+
+    [RelayCommand]
     private async Task CloseModalAsync()
     {
         await _navigationService.CloseModalAsync(new Dictionary<string, object>
@@ -90,6 +99,12 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     private async Task CloseAllModalAsync()
     {
         await _navigationService.CloseAllModalAsync();
+    }
+    
+    [RelayCommand]
+    private async Task NavigateToIntroAsync()
+    {
+        await _navigationService.NavigateAsync<Intro>();
     }
 
     private void SetNavigationParameterData(IDictionary<string, object> navigationParameters)

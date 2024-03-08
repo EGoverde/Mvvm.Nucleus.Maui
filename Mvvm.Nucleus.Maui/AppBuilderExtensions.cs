@@ -18,7 +18,7 @@ namespace Mvvm.Nucleus.Maui
             RegisterMvvmOptions(builder, nucleusMvvmOptions);
 
             builder.Services.AddSingleton<Application, TApp>();
-            builder.Services.AddSingleton<Shell, TShell>();
+            builder.Services.AddTransient<Shell, TShell>();
             builder.Services.AddSingleton<NucleusMvvmCore>();
             builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
 

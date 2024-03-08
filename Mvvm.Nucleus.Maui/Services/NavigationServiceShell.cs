@@ -5,9 +5,12 @@ namespace Mvvm.Nucleus.Maui
     public class NavigationServiceShell : INavigationService
     {
         private readonly NucleusMvvmOptions _nucleusMvvmOptions;
+
         private readonly ILogger<NavigationServiceShell> _logger;
 
-        public bool IsNavigating => NucleusMvvmCore.Current.IsNavigating;
+        private IList<Page> _navigationStackOnNavigating = new List<Page>();
+
+        public bool IsNavigating { get; protected set; }
 
         public Uri CurrentRoute => Shell.Current.CurrentState.Location;
 
@@ -15,6 +18,9 @@ namespace Mvvm.Nucleus.Maui
         {
             _nucleusMvvmOptions = nucleusMvvmOptions;
             _logger = logger;
+
+            NucleusMvvmCore.Current.ShellNavigating += ShellNavigating!;
+            NucleusMvvmCore.Current.ShellNavigated += ShellNavigated!;
         }
 
         public Task NavigateAsync<TView>()
@@ -170,16 +176,110 @@ namespace Mvvm.Nucleus.Maui
             await Shell.Current.GoToAsync(navigationPath, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
-        private bool ShouldIgnoreNavigationRequest()
+        protected virtual IList<Page> GetPagesToDestroy(ShellNavigatedEventArgs e, IList<Page> pagesBeforeNavigating, IList<Page> pagesAfterNavigating)
         {
-            if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
-            {
-                _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
+            var result = new List<Page>();
 
-                return true;
+            if (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.ShellItemChanged)
+            {
+                result = pagesBeforeNavigating!.Reverse().Where(x => !pagesAfterNavigating.Contains(x)).ToList();
             }
 
-            return false;
+            return result;
+        }
+
+        protected virtual void DestroyPages(IList<Page> pages)
+        {
+            foreach (var page in pages)
+            {
+                _logger.LogInformation($"Destroying Page '{page.GetType().Name}'.");
+
+                if (page.BindingContext is IDestructible destructible)
+                {
+                    destructible.Destroy();
+                }
+
+                page.Behaviors?.Clear();
+                page.BindingContext = null;
+            }
+        }
+
+        private async void ShellNavigating(object sender, ShellNavigatingEventArgs e)
+        {
+            var isCanceled = false;
+            
+            if (e.CanCancel && (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
+            {
+                var currentBindingContext = NucleusMvvmCore.Current.Shell?.CurrentPage?.BindingContext;
+                var navigationDirection = default(NavigationDirection);
+
+                switch(e.Source)
+                {
+                    case ShellNavigationSource.Pop:
+                    case ShellNavigationSource.PopToRoot:
+                        navigationDirection = NavigationDirection.Back;
+                        break;
+                    case ShellNavigationSource.Push:
+                        navigationDirection = NavigationDirection.Forwards;
+                        break;
+                }
+
+                var confirmNavigation = currentBindingContext as IConfirmNavigation;
+                if (confirmNavigation != null && !confirmNavigation.CanNavigate(navigationDirection, NucleusMvvmCore.Current.NavigationParameters))
+                {
+                    isCanceled = true;
+                    e.Cancel();
+                }
+                else
+                {
+                    var confirmNavigationAsync =  currentBindingContext as IConfirmNavigationAsync;
+                    if (confirmNavigationAsync != null)
+                    {
+                        var token = e.GetDeferral();
+                        
+                        var confirm = await confirmNavigationAsync.CanNavigateAsync(navigationDirection, NucleusMvvmCore.Current.NavigationParameters);
+                        if (!confirm)
+                        {
+                            isCanceled = true;
+                            e.Cancel();
+                        }
+
+                        token.Complete();
+                    }
+                }
+            }
+
+            if (isCanceled)
+            {
+                _logger?.LogInformation($"Shell Navigation Canceled.");
+                return;
+            }
+
+            _logger.LogInformation($"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
+
+            IsNavigating = true;
+
+            if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
+            {
+                _navigationStackOnNavigating = GetPagesFromNavigationStack();
+            }
+        }
+
+        private void ShellNavigated(object sender, ShellNavigatedEventArgs e)
+        {
+            _logger.LogInformation($"Shell Navigated '{e.Current?.Location}' ({e.Source}).");
+
+            if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
+            {
+                var pagesAfterNavigating = GetPagesFromNavigationStack();
+                var pagesBeforeNavigating = new List<Page>(_navigationStackOnNavigating ?? new List<Page>());
+
+                _navigationStackOnNavigating!.Clear();
+
+                DestroyPages(GetPagesToDestroy(e, pagesBeforeNavigating, pagesAfterNavigating));
+            }
+        
+            IsNavigating = false;
         }
 
         private ViewMapping? GetViewMapping(Type viewType)
@@ -238,5 +338,36 @@ namespace Mvvm.Nucleus.Maui
 
 			return result;
 		}
+
+        private bool ShouldIgnoreNavigationRequest()
+        {
+            if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
+            {
+                _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private IList<Page> GetPagesFromNavigationStack()
+        {
+            var result = new List<Page>(NucleusMvvmCore.Current.Shell?.CurrentPage?.Navigation?.NavigationStack?.Skip(1) ?? new List<Page>());
+            
+            foreach (var modalPage in NucleusMvvmCore.Current.Shell?.CurrentPage?.Navigation?.ModalStack ?? new List<Page>())
+            {
+                if (modalPage.Navigation.NavigationStack.Count > 0)
+                {
+                    result.AddRange(modalPage.Navigation.NavigationStack);
+                }
+                else
+                {
+                    result.Add(modalPage);
+                }
+            }
+
+            return result;
+        }
     }
 }

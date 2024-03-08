@@ -7,7 +7,7 @@ namespace Mvvm.Nucleus.Maui
         private readonly NucleusMvvmOptions _nucleusMvvmOptions;
         private readonly ILogger<NavigationServiceModeless> _logger;
 
-        public bool IsNavigating => NucleusMvvmCore.Current.IsNavigating;
+        public bool IsNavigating => throw new NotImplementedException();
 
         public Uri CurrentRoute => throw new NotImplementedException();
 
