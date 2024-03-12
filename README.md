@@ -54,7 +54,7 @@ Views and their ViewModels need to be registered in `MauiProgram.cs`. Pages defi
 
 Any pages not defined witin `AppShell.xaml` are known as *global routes* and can be pushed from any page. You can register these simply as `RegisterView<MyGlobalView, MyGlobalViewModel>()`, as by default they will get their name as route. You can however supply a custom one. Routes always have to be unique, or the registration will fail.
 
-*Note that in Shell pages on the root-level (e.a. //home) will be reused after the intial navigation, even if set to `Transient`.*
+*Note that in Shell pages on the root-level (e.a. //home) will be reused after the intial navigation, even if set to `Transient`. See [this issue](https://github.com/dotnet/maui/issues/9300)*
 
 ## Passing data
 
@@ -74,13 +74,13 @@ When navigating Nucleus will look for certain parameters in the navigation param
 - `NucleusNavigationParameters.NavigatingPresentationMode`: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
 - `NucleusNavigationParameters.WrapInNavigationPage`: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
 
-Note that above parameters allow for modal presentation in Shell including deeper navigation (see the Sample Project in the repository). However this appears an underdeveloped area of Shell and might not be stable.
+Note that above parameters allow for modal presentation in Shell including deeper navigation (see the Sample Project in the repository). However this appears an underdeveloped area of Shell and might not be stable. See 
 
 ## Event interfaces
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, for example by asking for confirmation.
-- `IDestructible`: Requires `UsePageDestructionOnNavigation` set to `true`. Triggered when a pages is no longer in the navigation stack.
+- `IDestructible`: Requires `UsePageDestructionOnNavigation`. Triggered when `transient` pages are removed from the stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
 - `IPageLifecycleAware`: Appearing and disappearing events from the view.

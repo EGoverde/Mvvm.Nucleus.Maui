@@ -8,7 +8,7 @@ namespace Mvvm.Nucleus.Maui
 
         private readonly ILogger<NavigationServiceShell> _logger;
 
-        private IList<Page> _navigationStackOnNavigating = new List<Page>();
+        private IList<Page> _transientPagesOnNavigating = new List<Page>();
 
         public bool IsNavigating { get; protected set; }
 
@@ -194,9 +194,26 @@ namespace Mvvm.Nucleus.Maui
             {
                 _logger.LogInformation($"Destroying Page '{page.GetType().Name}'.");
 
-                if (page.BindingContext is IDestructible destructible)
+                if (page.BindingContext is IDestructible pageBindingContextDestructible)
                 {
-                    destructible.Destroy();
+                    pageBindingContextDestructible.Destroy();
+                }
+
+                var elements = page.Behaviors?
+                    .Where(x => x is NucleusMvvmPageBehavior nucleusMvvmPageBehavior && nucleusMvvmPageBehavior.Element != null)?
+                    .Select(x => ((NucleusMvvmPageBehavior)x).Element!)?
+                    .ToList() ?? new List<Element>();
+
+                foreach (var element in elements)
+                {
+                    _logger.LogInformation($"Destroying Element '{element.GetType().Name}'.");
+
+                    if (element.BindingContext is IDestructible elementBindingContextDestructible)
+                    {
+                        elementBindingContextDestructible.Destroy();
+                    }
+
+                    element.BindingContext = null;
                 }
 
                 page.Behaviors?.Clear();
@@ -261,7 +278,7 @@ namespace Mvvm.Nucleus.Maui
 
             if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
             {
-                _navigationStackOnNavigating = GetPagesFromNavigationStack();
+                _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
             }
         }
 
@@ -271,10 +288,10 @@ namespace Mvvm.Nucleus.Maui
 
             if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
             {
-                var pagesAfterNavigating = GetPagesFromNavigationStack();
-                var pagesBeforeNavigating = new List<Page>(_navigationStackOnNavigating ?? new List<Page>());
+                var pagesAfterNavigating = GetTransientPagesFromNavigationStack();
+                var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
 
-                _navigationStackOnNavigating!.Clear();
+                _transientPagesOnNavigating!.Clear();
 
                 DestroyPages(GetPagesToDestroy(e, pagesBeforeNavigating, pagesAfterNavigating));
             }
@@ -351,7 +368,7 @@ namespace Mvvm.Nucleus.Maui
             return false;
         }
 
-        private IList<Page> GetPagesFromNavigationStack()
+        private IList<Page> GetTransientPagesFromNavigationStack()
         {
             var result = new List<Page>(NucleusMvvmCore.Current.Shell?.CurrentPage?.Navigation?.NavigationStack?.Skip(1) ?? new List<Page>());
             
@@ -366,6 +383,13 @@ namespace Mvvm.Nucleus.Maui
                     result.Add(modalPage);
                 }
             }
+
+            var nonTransientPageTypes = _nucleusMvvmOptions
+                .ViewMappings
+                .Where(x => x.RegistrationScope != ViewScope.Transient)
+                .Select(x => x.ViewType);
+
+            result = result.Where(x => x != null && !nonTransientPageTypes.Contains(x.GetType())).ToList();
 
             return result;
         }
