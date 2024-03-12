@@ -16,10 +16,12 @@
 
         public bool AddQueryParametersToDictionary { get; set; } = true;
 
-        public bool UseShellNavigationQueryParameters {get; set; } = true;
+        public bool AlwaysDisableNavigationAnimation { get; set; } = false;
+
+        public bool IgnoreNavigationWhenInProgress { get; set; } = false;
 
         public bool UsePageDestructionOnNavigation { get; set; } = false;
 
-        public bool IgnoreNavigationWhenInProgress { get; set; } = false;
+        public bool UseShellNavigationQueryParameters {get; set; } = true;
     }
 }

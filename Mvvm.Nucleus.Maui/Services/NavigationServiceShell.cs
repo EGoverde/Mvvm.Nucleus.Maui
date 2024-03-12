@@ -49,7 +49,7 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-            await Shell.Current.GoToAsync(viewMapping.Route, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            await Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
@@ -79,7 +79,7 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = parameters;
 
-            return Shell.Current.GoToAsync(route, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            return Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task NavigateBackAsync()
@@ -96,7 +96,7 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-            return Shell.Current.GoToAsync("..", isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            return Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task CloseModalAsync()
@@ -131,7 +131,7 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-            await Shell.Current.GoToAsync(navigationPath, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            await Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         public Task CloseAllModalAsync()
@@ -173,7 +173,7 @@ namespace Mvvm.Nucleus.Maui
 
             NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-            await Shell.Current.GoToAsync(navigationPath, isAnimated, GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+            await Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
         }
 
         protected virtual IList<Page> GetPagesToDestroy(ShellNavigatedEventArgs e, IList<Page> pagesBeforeNavigating, IList<Page> pagesAfterNavigating)
@@ -356,16 +356,9 @@ namespace Mvvm.Nucleus.Maui
 			return result;
 		}
 
-        private bool ShouldIgnoreNavigationRequest()
+        private bool GetIsAnimated(bool isAnimated)
         {
-            if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
-            {
-                _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
-
-                return true;
-            }
-
-            return false;
+            return _nucleusMvvmOptions.AlwaysDisableNavigationAnimation ? false : isAnimated;
         }
 
         private IList<Page> GetTransientPagesFromNavigationStack()
@@ -392,6 +385,18 @@ namespace Mvvm.Nucleus.Maui
             result = result.Where(x => x != null && !nonTransientPageTypes.Contains(x.GetType())).ToList();
 
             return result;
+        }
+
+        private bool ShouldIgnoreNavigationRequest()
+        {
+            if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
+            {
+                _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

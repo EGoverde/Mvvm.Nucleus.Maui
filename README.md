@@ -36,9 +36,10 @@ An optional `NucleusViewModel` is included to have some boilerplate events like 
 Within the options the following additional settings can be changed:
 
 - `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
-- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
-- `UsePageDestructionOnNavigation`: Default `false`. Attempts to unload behaviors and unset bindingcontext of pages when they are popped, as well as triggers the `IDestructible` interface.
+- `AlwaysDisableNavigationAnimation`: Default `false`. If set no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
 - `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while it is already busy requests will be ignored.
+- `UsePageDestructionOnNavigation`: Default `false`. Attempts to unload behaviors and unset bindingcontext of pages when they are popped, as well as triggers the `IDestructible` interface.
+- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 

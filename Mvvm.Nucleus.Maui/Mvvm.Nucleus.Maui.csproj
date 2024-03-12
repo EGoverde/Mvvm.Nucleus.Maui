@@ -16,7 +16,7 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<EnableWindowsTargeting>True</EnableWindowsTargeting>
-		<Version>0.1.3</Version>
+		<Version>0.1.4</Version>
 		<PackageId>Mvvm.Nucleus.Maui</PackageId>
 		<Title>Nucleus MVVM for MAUI</Title>
 		<Description>MVVM Framework for MAUI mobile applications. Build on top of MAUI and the MVVM Community Toolkit.</Description>
