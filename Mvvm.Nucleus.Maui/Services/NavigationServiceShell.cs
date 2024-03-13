@@ -191,33 +191,16 @@ namespace Mvvm.Nucleus.Maui
         protected virtual void DestroyPages(IList<Page> pages)
         {
             foreach (var page in pages)
-            {
-                _logger.LogInformation($"Destroying Page '{page.GetType().Name}'.");
-
-                if (page.BindingContext is IDestructible pageBindingContextDestructible)
+            {   
+                var pageNucleusBehaviors = page.Behaviors?
+                    .Where(x => x is NucleusMvvmPageBehavior)?
+                    .Select(x => (NucleusMvvmPageBehavior)x)
+                    .ToList() ?? new List<NucleusMvvmPageBehavior>();
+                
+                foreach (var nucleusMvvmPageBehavior in pageNucleusBehaviors)
                 {
-                    pageBindingContextDestructible.Destroy();
+                    nucleusMvvmPageBehavior.DestroyAfterNavigatedFrom = true;
                 }
-
-                var elements = page.Behaviors?
-                    .Where(x => x is NucleusMvvmPageBehavior nucleusMvvmPageBehavior && nucleusMvvmPageBehavior.Element != null)?
-                    .Select(x => ((NucleusMvvmPageBehavior)x).Element!)?
-                    .ToList() ?? new List<Element>();
-
-                foreach (var element in elements)
-                {
-                    _logger.LogInformation($"Destroying Element '{element.GetType().Name}'.");
-
-                    if (element.BindingContext is IDestructible elementBindingContextDestructible)
-                    {
-                        elementBindingContextDestructible.Destroy();
-                    }
-
-                    element.BindingContext = null;
-                }
-
-                page.Behaviors?.Clear();
-                page.BindingContext = null;
             }
         }
 
