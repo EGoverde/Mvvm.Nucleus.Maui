@@ -53,6 +53,8 @@ namespace Mvvm.Nucleus.Maui
             private set => RegisterWindow(value);
         }
 
+        public Page CurrentPage => GetCurrentPage(Application.Current?.MainPage ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
+
         public NucleusMvvmCore(Application application, IViewFactory viewFactory, ILogger<NucleusMvvmCore> logger)
         {
             Application = application;
@@ -160,6 +162,28 @@ namespace Mvvm.Nucleus.Maui
         private void OnShellNavigated(object sender, ShellNavigatedEventArgs e)
         {
             ShellNavigated?.Invoke(sender, e);
+        }
+
+        private Page GetCurrentPage(Page page)
+        {
+            if (page?.Navigation.ModalStack.LastOrDefault() is Page modalPage)
+            {
+                return modalPage;
+            }
+            else if (page is FlyoutPage flyoutPage)
+            {
+                return GetCurrentPage(flyoutPage.Detail);
+            }
+            else if (page is Shell shell && shell.CurrentItem?.CurrentItem is IShellSectionController shellSectionController)
+            {
+                return shellSectionController.PresentedPage;
+            }
+            else if (page is IPageContainer<Page> pageContainer)
+            {
+                return GetCurrentPage(pageContainer.CurrentPage);
+            }
+
+            return page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page.");
         }
     }
 }

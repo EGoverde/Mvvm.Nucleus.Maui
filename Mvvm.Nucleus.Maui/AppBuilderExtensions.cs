@@ -21,16 +21,15 @@ namespace Mvvm.Nucleus.Maui
             builder.Services.AddTransient<Shell, TShell>();
             builder.Services.AddSingleton<NucleusMvvmCore>();
             builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
+            builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
 
             switch(nucleusMvvmOptions.NavigationType)
             {
                 case NavigationType.Shell:
                     builder.Services.TryAddSingleton<INavigationService, NavigationServiceShell>();
-                    builder.Services.TryAddSingleton<IPageDialogService, PageDialogServiceShell>();
                     break;
                 case NavigationType.Modeless:
                     builder.Services.TryAddSingleton<INavigationService, NavigationServiceShell>();
-                    builder.Services.TryAddSingleton<IPageDialogService, PageDialogServiceModeless>();
                     break;
             }
 
