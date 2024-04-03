@@ -10,6 +10,8 @@
 
         public IReadOnlyCollection<ViewMapping> ViewMappings => DependencyOptions.ViewMappings;
 
+        public IReadOnlyCollection<PopupMapping> PopupMappings => DependencyOptions.PopupMappings;
+
         internal DependencyOptions DependencyOptions { get; } = new DependencyOptions();
 
         public NavigationType NavigationType { get; } = NavigationType.Shell;

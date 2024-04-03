@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Mvvm.Nucleus.Maui
 {
@@ -8,7 +9,9 @@ namespace Mvvm.Nucleus.Maui
             where TApp : Application
             where TShell : Shell
         {
-            builder.UseMauiApp<TApp>();
+            builder
+                .UseMauiApp<TApp>()
+                .UseMauiCommunityToolkit();
 
             var nucleusMvvmOptions = new NucleusMvvmOptions();
             options?.Invoke(nucleusMvvmOptions);
@@ -17,11 +20,12 @@ namespace Mvvm.Nucleus.Maui
 
             RegisterMvvmOptions(builder, nucleusMvvmOptions);
 
-            builder.Services.AddSingleton<Application, TApp>();
-            builder.Services.AddTransient<Shell, TShell>();
+            builder.Services.TryAddSingleton<Application, TApp>();
+            builder.Services.TryAddTransient<Shell, TShell>();
             builder.Services.AddSingleton<NucleusMvvmCore>();
             builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
             builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
+            builder.Services.TryAddSingleton<IPopupService, PopupService>();
 
             switch(nucleusMvvmOptions.NavigationType)
             {
@@ -83,19 +87,19 @@ namespace Mvvm.Nucleus.Maui
                     case ViewScope.Scoped:
                         mauiAppBuilder.Services
                             .AddScoped(viewMapping.ViewType, viewResolver)
-                            .AddScoped(viewMapping.ViewModelType);
+                            .TryAddScoped(viewMapping.ViewModelType);
                         break;
 
                     case ViewScope.Singleton:
                         mauiAppBuilder.Services
                             .AddSingleton(viewMapping.ViewType, viewResolver)
-                            .AddSingleton(viewMapping.ViewModelType);
+                            .TryAddSingleton(viewMapping.ViewModelType);
                         break;
                     case ViewScope.Transient:
                     default:
                         mauiAppBuilder.Services
                             .AddTransient(viewMapping.ViewType, viewResolver)
-                            .AddTransient(viewMapping.ViewModelType);
+                            .TryAddTransient(viewMapping.ViewModelType);
                         break;
                 }
 

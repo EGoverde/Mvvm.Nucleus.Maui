@@ -1,6 +1,6 @@
 # Nucleus MVVM for MAUI
 
-Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui), the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and the [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/). Its purpose is for better separation of UI and logic using MVVM conventions.
+Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui), the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/). Its purpose is for better separation of UI and logic using MVVM conventions.
 
 [![NuGet version (Mvvm.Nucleus.Maui)](https://img.shields.io/nuget/v/Mvvm.Nucleus.Maui.svg?style=flat-square)](https://www.nuget.org/packages/Mvvm.Nucleus.Maui/)
 
@@ -18,12 +18,17 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
 
-                builder.UseNucleusMvvm<App, AppShell>(options =>
+                builder
+                .UseNucleusMvvm<App, AppShell>(options =>
+                {
                     options.RegisterTypes(dependencyOptions => 
                         dependencyOptions.RegisterShellView<MyAbsoluteView, MyAbsoluteViewModel>("//MyAbsoluteView");
                         dependencyOptions.RegisterView<MyGlobalView, MyGlobalViewModel>("//MyGlobalView");
                     );
-                )..
+                })
+                .Etc..
+
+*Note that the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/) is a dependency of Nucleus. You should not call `UseMauiCommunityToolkit` manually, as this is already done through `UseNucleusMvvm`.*
 
 See [Navigation](#navigation) to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
