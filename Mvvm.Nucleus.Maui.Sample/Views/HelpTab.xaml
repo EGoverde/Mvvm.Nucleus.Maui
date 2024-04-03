@@ -10,12 +10,6 @@
         Spacing="10"
         Margin="40">
 
-        <Label 
-            Text="Nucleus.Mvvm Help"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center"
-            Style="{StaticResource Headline}" />
-
         <Label
             Text="This sample app will be expanded upon in the future when new features are added to Nucleus.Mvvm." />
 

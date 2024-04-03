@@ -17,6 +17,7 @@ public static class MauiProgram
 					// It is important to match the given routes found in the XAML.
 					dependencyOptions.RegisterShellView<Intro, IntroViewModel>("//Intro");
 					dependencyOptions.RegisterShellView<NavigationTab, NavigationTabViewModel>("//Tabs/NavigationTab");
+					dependencyOptions.RegisterShellView<DialogTab, DialogTabViewModel>("//Tabs/DialogTab");
                 	dependencyOptions.RegisterShellView<HelpTab, HelpTabViewModel>("//Tabs/HelpTab");
 
 					// These are pages not found within AppShell.xaml and use 'Global' routes.

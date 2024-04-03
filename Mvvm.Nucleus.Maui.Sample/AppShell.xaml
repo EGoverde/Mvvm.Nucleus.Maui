@@ -18,6 +18,10 @@
             <ShellContent ContentTemplate="{DataTemplate local:NavigationTab}" />
         </Tab>
 
+        <Tab Route="DialogTab" Title="Dialog">
+            <ShellContent ContentTemplate="{DataTemplate local:DialogTab}" />
+        </Tab>
+
         <Tab Route="HelpTab" Title="Help">
             <ShellContent ContentTemplate="{DataTemplate local:HelpTab}" />
        </Tab>

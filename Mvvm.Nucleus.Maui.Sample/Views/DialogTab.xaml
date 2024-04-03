@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
+             x:Class="Mvvm.Nucleus.Maui.Sample.DialogTab"
+             x:DataType="local:DialogTabViewModel"
+             Title="Dialog">
+
+    <ScrollView>
+
+        <VerticalStackLayout
+            Spacing="10"
+            Margin="40">
+
+            <Label
+                Text="Dialogs can be displayed in Nucleus.Mvvm through the IPageDialogService, generally from ViewModels." />
+            
+            <Label
+                Text="The buttons below demonstrate various calls to this service. See the DialogTabViewModel for the code behind these buttons." />
+            
+            <ContentView />
+
+            <Button
+                Text="Display Alert"
+                Command="{Binding DisplayAlertCommand}"/>
+
+            <Button
+                Text="Display Confirm"
+                Command="{Binding DisplayConfirmCommand}"/>
+
+            <Button
+                Text="Display Prompt"
+                Command="{Binding DisplayPromptCommand}"/>
+
+            <Button
+                Text="Display Action Sheet"
+                Command="{Binding DisplayActionSheetCommand}"/>
+            
+        </VerticalStackLayout>
+    
+    </ScrollView>
+
+</ContentPage>

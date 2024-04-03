@@ -25,7 +25,7 @@ Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mv
                     );
                 )..
 
-See [Navigation Service](#navigation-service) to see the usage and differences between `RegisterShellView` and `RegisterView`.
+See [Navigation](#navigation) to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
 ViewModels can be of any type and support dependency injection. By implementing interfaces (see [Event interfaces](#event-interfaces)) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings.
 
@@ -43,7 +43,12 @@ Within the options the following additional settings can be changed:
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
-## Navigation service
+## Services
+
+- `INavigationService`: Handles various navigation flows, see [Navigation](#navigation).
+- `IPageDialogService`: Show alerts, action sheets and input prompts using the functionality from the MAUI Page.
+
+## Navigation
 
 Navigation can be done through injecting the `INavigationService`. Currently only the Shell implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
 
@@ -57,7 +62,7 @@ Any pages not defined witin `AppShell.xaml` are known as *global routes* and can
 
 *Note that in Shell pages on the root-level (e.a. //home) will be reused after the intial navigation, even if set to `Transient`. See [this issue](https://github.com/dotnet/maui/issues/9300)*
 
-## Passing data
+### Passing data
 
 When navigating an `IDictionary<string, object>` can be passed to the `INavigationService`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
 
@@ -68,7 +73,7 @@ Values can be retrieved using regular `IDictionary` methods, but additionally th
 
 If using Shell these parameters can also be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see [Getting started](#getting-started)).
 
-## Modal navigation
+### Modal navigation
 
 When navigating Nucleus will look for certain parameters in the navigation parameter `IDictionary<string, object>`. Currently the following parameters are supported:
 
@@ -77,7 +82,7 @@ When navigating Nucleus will look for certain parameters in the navigation param
 
 Note that above parameters allow for modal presentation in Shell including deeper navigation (see the Sample Project in the repository). However this appears an underdeveloped area of Shell and might not be stable. See 
 
-## Event interfaces
+### Navigation interfaces
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, for example by asking for confirmation.
