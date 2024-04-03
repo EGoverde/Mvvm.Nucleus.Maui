@@ -46,7 +46,7 @@ See the *Sample Project* in the repository for more examples of Nucleus MVVM usa
 ## Services
 
 - `INavigationService`: Handles various navigation flows, see [Navigation](#navigation).
-- `IPageDialogService`: Show alerts, action sheets and prompts using [MAUI Page](https://learn.microsoft.com/en-us/dotnet/maui/user-interface/pop-ups).
+- `IPageDialogService`: Show alerts, action sheets and prompts using [MAUI Page Alerts](https://learn.microsoft.com/en-us/dotnet/maui/user-interface/pop-ups).
 
 ## Navigation
 
