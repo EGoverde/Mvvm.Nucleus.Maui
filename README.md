@@ -1,6 +1,6 @@
 # Nucleus MVVM for MAUI
 
-Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui) and the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and aims for better separation of UI and logic.
+Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui), the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and the [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/). Its purpose is for better separation of UI and logic using MVVM conventions.
 
 [![NuGet version (Mvvm.Nucleus.Maui)](https://img.shields.io/nuget/v/Mvvm.Nucleus.Maui.svg?style=flat-square)](https://www.nuget.org/packages/Mvvm.Nucleus.Maui/)
 
