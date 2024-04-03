@@ -61,16 +61,11 @@ public class PopupService : IPopupService
         if (popupMapping != null && popupMapping.PopupViewModelType != null)
         {
             popup.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType);
-
-            if (popup.BindingContext is IPopupViewModel popupViewModel)
-            {
-                popupViewModel.Popup = new WeakReference<Popup>(popup);
-            }
         }
 
         void popupOpened(object? sender, PopupOpenedEventArgs eventArgs)
         {
-            if (sender is Popup popup && popup.BindingContext is IPopupViewModel popupViewModel)
+            if (sender is Popup popup && popup.BindingContext is IPopupLifecycleAware popupViewModel)
             {
                 popupViewModel.OnOpened();
             }
@@ -83,7 +78,7 @@ public class PopupService : IPopupService
                 popup.Opened -= popupOpened;
                 popup.Closed -= popupClosed;
 
-                if (popup.BindingContext is IPopupViewModel popupViewModel)
+                if (popup.BindingContext is IPopupLifecycleAware popupViewModel)
                 {
                     popupViewModel.OnClosed();
                 }
@@ -105,6 +100,39 @@ public class PopupService : IPopupService
 
         popup.Opened += popupOpened;
         popup.Closed += popupClosed;
+
+        if (popup.BindingContext != null)
+        {
+            if (popup.BindingContext is IPopupInitializable popupBindingContextInitializable)
+            {
+                popupBindingContextInitializable.Init(navigationParameters ?? new Dictionary<string, object>());
+            }
+
+            if (popup.BindingContext is IPopupInitializableAsync popupBindingContextInitializableAsync)
+            {
+                var initTask = popupBindingContextInitializableAsync.InitAsync(navigationParameters ?? new Dictionary<string, object>());
+
+                if (popupBindingContextInitializableAsync.AwaitInitializeBeforeShowing)
+                {
+                    await initTask;
+                }
+            }
+        }
+
+        if (popup is IPopupInitializable popupInitializable)
+        {
+            popupInitializable.Init(navigationParameters ?? new Dictionary<string, object>());
+        }
+
+        if (popup is IPopupInitializableAsync popupInitializableAsync)
+        {
+            var initTask  = popupInitializableAsync.InitAsync(navigationParameters ?? new Dictionary<string, object>());
+
+            if (popupInitializableAsync.AwaitInitializeBeforeShowing)
+            {
+                await initTask;
+            }
+        }
 
         return await NucleusMvvmCore.Current.CurrentPage.ShowPopupAsync(popup, token);
     }

@@ -2,11 +2,7 @@
 
 namespace Mvvm.Nucleus.Maui;
 
-public interface IPopupViewModel
+public interface IPopupAware
 {
     WeakReference<Popup> Popup { get; set; }
-
-    void OnOpened();
-
-    void OnClosed();
 }
