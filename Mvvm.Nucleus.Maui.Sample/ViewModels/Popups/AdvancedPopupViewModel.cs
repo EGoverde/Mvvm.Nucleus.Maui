@@ -4,16 +4,30 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : BindableBase, IPopupAware, IPopupInitializable
+public partial class AdvancedPopupViewModel : BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable
 {
     public WeakReference<Popup>? Popup { get; set; }
 
     [ObservableProperty]
-    private string? _popupText;
+    private string _popupText = string.Empty;
+
+    [ObservableProperty]
+    private string _popupState = "Default";
 
     public void Init(IDictionary<string, object> navigationParameters)
     {
-        PopupText = navigationParameters.GetValueOrDefault("Text", "Sample Text");
+        PopupText = navigationParameters.GetValueOrDefault<string>("Text") ??  "Sample Text";
+        PopupState = "Initialized";
+    }
+
+    public void OnOpened()
+    {
+        PopupState = "Opened";
+    }
+
+    public void OnClosed()
+    {
+        PopupState = "Closed";
     }
 
     [RelayCommand]

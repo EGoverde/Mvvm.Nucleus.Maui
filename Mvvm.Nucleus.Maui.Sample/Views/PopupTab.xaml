@@ -16,12 +16,16 @@
         <ContentView />
 
         <Button
-            Text="Show Simple Popup"
+            Text="Show Popup without ViewModel"
             Command="{Binding ShowSimplePopupCommand}"/>
 
         <Button
-            Text="Show Advanced Popup"
+            Text="Show Popup with ViewModel"
             Command="{Binding ShowAdvancedPopupCommand}"/>
+
+        <Button
+            Text="Show Popup with NucleusPopupViewModel"
+            Command="{Binding ShowNucleusPopupCommand}"/>
 
     </VerticalStackLayout>
     

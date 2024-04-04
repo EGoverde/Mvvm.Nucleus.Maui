@@ -51,11 +51,30 @@ See the *Sample Project* in the repository for more examples of Nucleus MVVM usa
 ## Services
 
 - `INavigationService`: Handles various navigation flows, see [Navigation](#navigation).
+- `IPopupService`: Show popups using [CommunityToolkit.MAUI Popups](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/views/popup), see [Popups](#popups).
 - `IPageDialogService`: Show alerts, action sheets and prompts using [MAUI Page Alerts](https://learn.microsoft.com/en-us/dotnet/maui/user-interface/pop-ups).
+
+## Popups
+
+Nucleus can display [CommunityToolkit.MAUI Popups](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/views/popup) through the `IPopupService`. This works very similar to navigation.
+
+Popups can be used with or without ViewModels and require registration in `MauiProgram.cs` using `RegisterPopup<MyPopup>` or `RegisterPopup<MyPopup, MyPopupViewModel>`.
+
+After registration popups can be shown by passing the view type to one of the various `ShowPopupAsync` methods. The result can be awaited, either as an `object?` or a given type (*note that the popup is responsible for the correct type*).
+
+Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)). These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
+
+Using the `IPopupAware` the ViewModel can receive a reference to the popup, which is required in order to close the popup programatically. Alternatively the `NucleusPopupViewModel` can be used for common functionality, such as a CloseCommand and function.
+
+### Popup interfaces
+
+- `IPopupAware`: Allows access to the Popup using a WeakReference. *ViewModel-Only.*
+- `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
+- `IPopupLifeCycleAware`: Events on opening and closing the popup. *ViewModel-Only.*
 
 ## Navigation
 
-Navigation can be done through injecting the `INavigationService`. Currently only the Shell implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
+Navigation can be done through the `INavigationService`. Currently only the Shell implemention is supported. Navigation is done by either specifying the (type of the) View or a Route.
 
 - `await NavigateAsync<Home>();`
 - `await NavigateAsync(typeof(Home))`

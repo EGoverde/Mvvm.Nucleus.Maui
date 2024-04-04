@@ -39,4 +39,19 @@ public partial class PopupTabViewModel : ObservableObject
 
         await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
     }
+
+    [RelayCommand]
+    private async Task ShowNucleusPopupAsync()
+    {
+        var navigationParameters = new Dictionary<string, object>
+        {
+            { "Text", "Text from navigation parameters." }
+        };
+
+        var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
+
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+    }
+
+    
 }

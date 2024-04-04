@@ -14,13 +14,13 @@ public interface INucleusPopupViewModel : INotifyPropertyChanged, INotifyPropert
     Task OnInitAsync(IDictionary<string, object> parameters);
 }
 
-public partial class NucleusPopupViewModel : BindableBase, INucleusPopupViewModel
+public abstract partial class NucleusPopupViewModel : BindableBase, INucleusPopupViewModel
 {
     private bool _isInitializing;
 
     private bool _isInitialized;
 
-    public virtual bool AwaitInitializeBeforeShowing => true;
+    public virtual bool AwaitInitializeBeforeShowing => false;
 
     public WeakReference<Popup>? Popup { get; set; }
 
@@ -79,9 +79,14 @@ public partial class NucleusPopupViewModel : BindableBase, INucleusPopupViewMode
     [RelayCommand]
     protected virtual async Task CloseAsync(object? result = null)
     {
-        if (Popup != null && Popup.TryGetTarget(out Popup? popup) && popup != null)
+        if (GetPopup() is Popup popup)
         {
             await popup.CloseAsync(result);
         }
+    }
+
+    protected Popup? GetPopup()
+    {
+        return Popup?.TryGetTarget(out Popup? popup) == true && popup != null ? popup : default;
     }
 }
