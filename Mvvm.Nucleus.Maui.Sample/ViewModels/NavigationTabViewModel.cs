@@ -75,7 +75,7 @@ public partial class NavigationTabViewModel : ObservableObject
     [RelayCommand]
     private async Task SwitchTabsAsync()
     {
-        await _navigationService.NavigateAsync<HelpTab>();
+        await _navigationService.NavigateAsync<PopupTab>();
     }
 
     [RelayCommand]

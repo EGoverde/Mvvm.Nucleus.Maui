@@ -57,10 +57,12 @@ public class PopupService : IPopupService
             throw new InvalidOperationException($"Nucleus failed to create a popup of type '{popupViewType}'");
         }
 
+        object? bindingContext = null;
+
         var popupMapping = _nucleusMvvmOptions.PopupMappings.FirstOrDefault(x => x.PopupViewType == popupViewType);
         if (popupMapping != null && popupMapping.PopupViewModelType != null)
         {
-            popup.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType);
+            bindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType);
         }
 
         void popupOpened(object? sender, PopupOpenedEventArgs eventArgs)
@@ -101,23 +103,22 @@ public class PopupService : IPopupService
         popup.Opened += popupOpened;
         popup.Closed += popupClosed;
 
-        if (popup.BindingContext != null)
+        if (bindingContext is IPopupInitializable popupBindingContextInitializable)
         {
-            if (popup.BindingContext is IPopupInitializable popupBindingContextInitializable)
-            {
-                popupBindingContextInitializable.Init(navigationParameters ?? new Dictionary<string, object>());
-            }
+            popupBindingContextInitializable.Init(navigationParameters ?? new Dictionary<string, object>());
+        }
 
-            if (popup.BindingContext is IPopupInitializableAsync popupBindingContextInitializableAsync)
-            {
-                var initTask = popupBindingContextInitializableAsync.InitAsync(navigationParameters ?? new Dictionary<string, object>());
+        if (bindingContext is IPopupInitializableAsync popupBindingContextInitializableAsync)
+        {
+            var initTask = popupBindingContextInitializableAsync.InitAsync(navigationParameters ?? new Dictionary<string, object>());
 
-                if (popupBindingContextInitializableAsync.AwaitInitializeBeforeShowing)
-                {
-                    await initTask;
-                }
+            if (popupBindingContextInitializableAsync.AwaitInitializeBeforeShowing)
+            {
+                await initTask;
             }
         }
+
+        popup.BindingContext = bindingContext;
 
         if (popup is IPopupInitializable popupInitializable)
         {

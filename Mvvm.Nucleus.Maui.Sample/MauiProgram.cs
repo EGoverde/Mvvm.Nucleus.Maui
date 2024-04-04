@@ -17,12 +17,16 @@ public static class MauiProgram
 					// It is important to match the given routes found in the XAML.
 					dependencyOptions.RegisterShellView<Intro, IntroViewModel>("//Intro");
 					dependencyOptions.RegisterShellView<NavigationTab, NavigationTabViewModel>("//Tabs/NavigationTab");
+                	dependencyOptions.RegisterShellView<PopupTab, PopupTabViewModel>("//Tabs/PopupTab");
 					dependencyOptions.RegisterShellView<DialogTab, DialogTabViewModel>("//Tabs/DialogTab");
-                	dependencyOptions.RegisterShellView<HelpTab, HelpTabViewModel>("//Tabs/HelpTab");
 
 					// These are pages not found within AppShell.xaml and use 'Global' routes.
 					// They can be pushed from any page and are not restricted to a path.
                 	dependencyOptions.RegisterView<Details, DetailsViewModel>();
+
+					// These are popups, both with and without viewmodels. These can be used through IPopupService.
+					dependencyOptions.RegisterPopup<SimplePopup>();
+					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>();
 				});
 
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.

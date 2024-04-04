@@ -4,5 +4,5 @@ namespace Mvvm.Nucleus.Maui;
 
 public interface IPopupAware
 {
-    WeakReference<Popup> Popup { get; set; }
+    WeakReference<Popup>? Popup { get; set; }
 }

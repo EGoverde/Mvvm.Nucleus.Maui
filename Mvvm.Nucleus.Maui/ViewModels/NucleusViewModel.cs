@@ -1,141 +1,150 @@
 ﻿using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 
-namespace Mvvm.Nucleus.Maui
-{
-    public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IInitializableAsync, INavigatedAware
-    {
-        Task OnInitAsync(IDictionary<string, object> parameters);
+namespace Mvvm.Nucleus.Maui;
 
-        Task OnRefreshAsync(IDictionary<string, object> parameters);
+public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IInitializableAsync, INavigatedAware
+{
+    bool IsInitialized { get; }
+
+    bool IsInitializing { get; }
+
+    bool IsRefreshing { get; }
+
+    bool IsLoading { get; }
+
+    bool IsBusy { get; }
+
+    Task OnInitAsync(IDictionary<string, object> parameters);
+
+    Task OnRefreshAsync(IDictionary<string, object> parameters);
+}
+
+public abstract class NucleusViewModel : BindableBase, INucleusViewModel
+{
+    private bool _isInitializing;
+
+    private bool _isInitialized;
+
+    private bool _isRefreshing;
+
+    private bool _isLoading;
+
+    public bool IsInitialized
+    {
+        get => _isInitialized;
+        private set => SetProperty(ref _isInitialized, value);
     }
 
-    public abstract class NucleusViewModel : BindableBase, INucleusViewModel
+    public bool IsInitializing
     {
-        private bool _isInitializing;
-
-        private bool _isInitialized;
-
-        private bool _isRefreshing;
-
-        private bool _isLoading;
-
-        public bool IsInitialized
+        get => _isInitializing;
+        private set
         {
-            get => _isInitialized;
-            private set => SetProperty(ref _isInitialized, value);
-        }
-
-        public bool IsInitializing
-        {
-            get => _isInitializing;
-            private set
+            if (SetProperty(ref _isInitializing, value))
             {
-                if (SetProperty(ref _isInitializing, value))
-                {
-                    OnPropertyChanged(nameof(IsBusy));
-                }
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
+    }
 
-        public bool IsRefreshing
+    public bool IsRefreshing
+    {
+        get => _isRefreshing;
+        private set
         {
-            get => _isRefreshing;
-            private set
+            if (SetProperty(ref _isRefreshing, value))
             {
-                if (SetProperty(ref _isRefreshing, value))
-                {
-                    OnPropertyChanged(nameof(IsBusy));
-                }
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
+    }
 
-        public bool IsLoading
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
         {
-            get => _isLoading;
-            set
+            if (SetProperty(ref _isLoading, value))
             {
-                if (SetProperty(ref _isLoading, value))
-                {
-                    OnPropertyChanged(nameof(IsBusy));
-                }
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
+    }
 
-        public bool IsBusy => GetIsBusy();
+    public bool IsBusy => GetIsBusy();
 
-        public async Task InitAsync(IDictionary<string, object> navigationParameters)
+    public async Task InitAsync(IDictionary<string, object> navigationParameters)
+    {
+        if (IsInitialized)
         {
-            if (IsInitialized)
-            {
-                NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already initialized.", GetType());
-                return;
-            }
-
-            if (IsInitializing)
-            {
-                NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already in the process of initializing.", GetType());
-                return;
-            }
-
-            IsInitializing = true;
-
-            try
-            {
-                await OnInitAsync(navigationParameters);
-            }
-            finally
-            {
-                IsInitialized = true;
-                IsInitializing = false;
-            };
+            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already initialized.", GetType());
+            return;
         }
 
-        public async Task RefreshAsync(IDictionary<string, object> navigationParameters)
+        if (IsInitializing)
         {
-            if (IsRefreshing)
-            {
-                NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already in the process of refreshing.", GetType());
-                return;
-            }
-
-            IsRefreshing = true;
-
-            try
-            {
-                await OnRefreshAsync(navigationParameters);
-            }
-            finally
-            {
-                IsRefreshing = false;
-            };
+            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already in the process of initializing.", GetType());
+            return;
         }
 
-        public virtual Task OnInitAsync(IDictionary<string, object> parameters)
+        IsInitializing = true;
+
+        try
         {
-            return Task.CompletedTask;
+            await OnInitAsync(navigationParameters);
+        }
+        finally
+        {
+            IsInitialized = true;
+            IsInitializing = false;
+        };
+    }
+
+    public async Task RefreshAsync(IDictionary<string, object> navigationParameters)
+    {
+        if (IsRefreshing)
+        {
+            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{0}' is already in the process of refreshing.", GetType());
+            return;
         }
 
-        public virtual Task OnRefreshAsync(IDictionary<string, object> parameters)
-        {
-            return Task.CompletedTask;
-        }
+        IsRefreshing = true;
 
-        protected virtual bool GetIsBusy()
+        try
         {
-            return IsInitializing || IsRefreshing || IsLoading;
+            await OnRefreshAsync(navigationParameters);
         }
+        finally
+        {
+            IsRefreshing = false;
+        };
+    }
 
-        public virtual void OnNavigatedTo(IDictionary<string, object> navigationParameters)
-        {
-        }
+    public virtual Task OnInitAsync(IDictionary<string, object> parameters)
+    {
+        return Task.CompletedTask;
+    }
 
-        public virtual void OnNavigatedFrom(IDictionary<string, object> navigationParameters)
-        {
-        }
+    public virtual Task OnRefreshAsync(IDictionary<string, object> parameters)
+    {
+        return Task.CompletedTask;
+    }
 
-        public virtual void OnNavigatingFrom(IDictionary<string, object> navigationParameters)
-        {
-        }
+    protected virtual bool GetIsBusy()
+    {
+        return IsInitializing || IsRefreshing || IsLoading;
+    }
+
+    public virtual void OnNavigatedTo(IDictionary<string, object> navigationParameters)
+    {
+    }
+
+    public virtual void OnNavigatedFrom(IDictionary<string, object> navigationParameters)
+    {
+    }
+
+    public virtual void OnNavigatingFrom(IDictionary<string, object> navigationParameters)
+    {
     }
 }

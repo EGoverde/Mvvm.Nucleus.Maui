@@ -71,8 +71,8 @@
 	  <Compile Update="Views/NavigationTab.xaml.cs">
 	    <DependentUpon>NavigationTab.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views/HelpTab.xaml.cs">
-	    <DependentUpon>HelpTab.xaml</DependentUpon>
+	  <Compile Update="Views/PopupTab.xaml.cs">
+	    <DependentUpon>PopupTab.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

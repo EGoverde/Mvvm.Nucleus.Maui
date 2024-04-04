@@ -1,8 +1,8 @@
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class HelpTab : ContentPage
+public partial class PopupTab : ContentPage
 {
-	public HelpTab()
+	public PopupTab()
 	{
 		InitializeComponent();
 	}
