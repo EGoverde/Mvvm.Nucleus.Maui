@@ -120,6 +120,11 @@ public class PopupService : IPopupService
 
         popup.BindingContext = bindingContext;
 
+        if (bindingContext is IPopupAware popupAware)
+        {
+            popupAware.Popup = new WeakReference<Popup>(popup);
+        }
+
         if (popup is IPopupInitializable popupInitializable)
         {
             popupInitializable.Init(navigationParameters ?? new Dictionary<string, object>());

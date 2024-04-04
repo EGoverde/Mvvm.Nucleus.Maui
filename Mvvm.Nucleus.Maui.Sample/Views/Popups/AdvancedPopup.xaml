@@ -7,10 +7,17 @@
              x:DataType="local:AdvancedPopupViewModel">
 
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+
+        <Label
+            Text="{Binding PopupText}"
+            Margin="20"/>
+
+        <Button
+            Text="Close Popup"
+            Command="{Binding CloseCommand}"
+            CommandParameter="Closed using ICommand."
+            Margin="20,0,20,20" />
+
     </VerticalStackLayout>
 
 </toolkit:Popup>
