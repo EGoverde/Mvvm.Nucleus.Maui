@@ -24,9 +24,9 @@ public class PopupService : IPopupService
         return CreateAndShowPopupAsync(typeof(TPopup));
     }
 
-    public Task<TResult?> ShowPopupAsync<TPopup, TResult>() where TPopup : Popup
+    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultResult = default) where TPopup : Popup
     {
-        return ConvertResultAsync<TResult>(CreateAndShowPopupAsync(typeof(TPopup)));
+        return ConvertResultAsync(CreateAndShowPopupAsync(typeof(TPopup)), defaultResult);
     }
 
     public Task<object?> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : Popup
@@ -34,19 +34,19 @@ public class PopupService : IPopupService
         return CreateAndShowPopupAsync(typeof(TPopup), navigationParameters, token);
     }
 
-    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : Popup
+    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : Popup
     {
-        return ConvertResultAsync<TResult>(CreateAndShowPopupAsync(typeof(TPopup), navigationParameters, token));
+        return ConvertResultAsync(CreateAndShowPopupAsync(typeof(TPopup), navigationParameters, token), defaultResult);
     }
 
-    public Task<TResult?> ShowPopupAsync<TResult>(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default)
-    {
-        return ConvertResultAsync<TResult>(CreateAndShowPopupAsync(popupViewType, navigationParameters, token));
-    }
-
-   public Task<object?> ShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default)
+    public Task<object?> ShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default)
     {
         return CreateAndShowPopupAsync(popupViewType, navigationParameters, token);
+    }
+
+    public Task<TResult?> ShowPopupAsync<TResult>(Type popupViewType, IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default)
+    {
+        return ConvertResultAsync(CreateAndShowPopupAsync(popupViewType, navigationParameters, token), defaultResult);
     }
 
     protected virtual async Task<object?> CreateAndShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters = default, CancellationToken token = default)
@@ -150,14 +150,22 @@ public class PopupService : IPopupService
         return (Popup)ActivatorUtilities.CreateInstance(_serviceProvider, popupViewType);
     }
 
-    protected virtual async Task<TResult?> ConvertResultAsync<TResult>(Task<object?> resultTask)
+    protected virtual async Task<TResult?> ConvertResultAsync<TResult>(Task<object?> resultTask, TResult? defaultResult)
     {
         var result = await resultTask;
+        
         if (result == null)
         {
-            return (TResult?)result;
+            _logger.LogInformation($"Return value from popup is null, using the default result (if given).");
+            return defaultResult;
+        }
+        
+        if (result is not TResult)
+        {
+            _logger.LogError($"Return value '{result.GetType()}' from popup does not match expected type ({typeof(TResult)}), using the default result (if given).");
+            return defaultResult;
         }
 
-        return (TResult?)Convert.ChangeType(result, typeof(TResult?));
+        return (TResult)result;
     }
 }
