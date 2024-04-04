@@ -22,8 +22,10 @@
 
         public bool IgnoreNavigationWhenInProgress { get; set; } = false;
 
-        public bool UsePageDestructionOnNavigation { get; set; } = false;
+        public bool UsePageDestructionOnNavigation { get; set; } = true;
 
         public bool UseShellNavigationQueryParameters {get; set; } = true;
+
+        public bool UsePopupDestructionAfterClose {get; set; } = true;
     }
 }

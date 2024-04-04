@@ -85,18 +85,21 @@ public class PopupService : IPopupService
                     popupViewModel.OnClosed();
                 }
 
-                if (popup.BindingContext is IDestructible destructibleViewModel)
+                if (_nucleusMvvmOptions.UsePopupDestructionAfterClose)
                 {
-                    destructibleViewModel.Destroy();
-                }
+                    if (popup.BindingContext is IDestructible destructibleViewModel)
+                    {
+                        destructibleViewModel.Destroy();
+                    }
 
-                if (popup is IDestructible destructiblePopup)
-                {
-                    destructiblePopup.Destroy();
-                }
+                    if (popup is IDestructible destructiblePopup)
+                    {
+                        destructiblePopup.Destroy();
+                    }
 
-                popup.Parent = null;
-                popup.BindingContext = null;
+                    popup.Parent = null;
+                    popup.BindingContext = null;
+                }
             }
         };
 
