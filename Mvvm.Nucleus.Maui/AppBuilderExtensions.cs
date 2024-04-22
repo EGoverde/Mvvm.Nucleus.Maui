@@ -12,7 +12,7 @@ public static class AppBuilderExtensions
     /// <typeparam name="TShell">The <see cref="Type"/> of the subclass of <see cref="Shell"/> for this app.</typeparam>
     /// <param name="builder">The <see cref="MauiAppBuilder"/>.</param>
     /// <param name="options">The <see cref="Action"/> that uses <see cref="NucleusMvvmOptions"/> to configure Nucleus.</param>
-    /// <returns>The configured <see cref="MauiAppBuilder">.</returns>
+    /// <returns>The configured <see cref="MauiAppBuilder"/>.</returns>
     public static MauiAppBuilder UseNucleusMvvm<TApp, TShell>(this MauiAppBuilder builder, Action<NucleusMvvmOptions>? options = null)
         where TApp : Application
         where TShell : Shell
