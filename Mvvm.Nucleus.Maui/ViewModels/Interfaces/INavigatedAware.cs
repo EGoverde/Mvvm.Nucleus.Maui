@@ -1,11 +1,10 @@
-﻿namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui;
+
+public interface INavigatedAware
 {
-	public interface INavigatedAware
-	{
-		void OnNavigatedTo(IDictionary<string, object> navigationParameters);
+	void OnNavigatedTo(IDictionary<string, object> navigationParameters);
 
-		void OnNavigatedFrom(IDictionary<string, object> navigationParameters);
+	void OnNavigatedFrom(IDictionary<string, object> navigationParameters);
 
-		void OnNavigatingFrom(IDictionary<string, object> navigationParameters);
-	}
+	void OnNavigatingFrom(IDictionary<string, object> navigationParameters);
 }

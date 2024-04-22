@@ -1,8 +1,7 @@
-﻿namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui;
+
+public enum ViewRouteType
 {
-	public enum ViewRouteType
-	{
-		AbsoluteRoute = 0,
-        GlobalRoute = 1,
-    }
+	AbsoluteRoute = 0,
+	GlobalRoute = 1,
 }

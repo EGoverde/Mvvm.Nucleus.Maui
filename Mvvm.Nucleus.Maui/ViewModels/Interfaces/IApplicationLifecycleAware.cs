@@ -1,9 +1,8 @@
-﻿namespace Mvvm.Nucleus.Maui
-{
-    public interface IApplicationLifecycleAware
-    {
-        void OnSleep();
+﻿namespace Mvvm.Nucleus.Maui;
 
-        void OnResume();
-    }
+public interface IApplicationLifecycleAware
+{
+    void OnSleep();
+
+    void OnResume();
 }

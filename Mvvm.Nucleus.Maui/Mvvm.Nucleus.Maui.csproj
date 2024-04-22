@@ -26,6 +26,7 @@
 		<PackageProjectUrl>https://github.com/EGoverde/Mvvm.Nucleus.Maui</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/EGoverde/Mvvm.Nucleus.Maui</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">

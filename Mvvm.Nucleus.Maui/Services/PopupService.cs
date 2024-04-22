@@ -12,6 +12,12 @@ public class PopupService : IPopupService
 
     private readonly IServiceProvider _serviceProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PopupService"/> class.
+    /// </summary>
+    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+    /// <param name="logger">The <see cref="ILogger"/>.</param>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
     public PopupService(NucleusMvvmOptions nucleusMvvmOptions, ILogger<PopupService> logger, IServiceProvider serviceProvider)
     {
         _nucleusMvvmOptions = nucleusMvvmOptions;
@@ -19,36 +25,51 @@ public class PopupService : IPopupService
         _serviceProvider = serviceProvider;
     }
 
+    /// <inheritdoc/>
     public Task<object?> ShowPopupAsync<TPopup>() where TPopup : Popup
     {
         return CreateAndShowPopupAsync(typeof(TPopup));
     }
 
+    /// <inheritdoc/>
     public Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultResult = default) where TPopup : Popup
     {
         return ConvertResultAsync(CreateAndShowPopupAsync(typeof(TPopup)), defaultResult);
     }
 
+    /// <inheritdoc/>
     public Task<object?> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : Popup
     {
         return CreateAndShowPopupAsync(typeof(TPopup), navigationParameters, token);
     }
 
+    /// <inheritdoc/>
     public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : Popup
     {
         return ConvertResultAsync(CreateAndShowPopupAsync(typeof(TPopup), navigationParameters, token), defaultResult);
     }
 
+    /// <inheritdoc/>
     public Task<object?> ShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default)
     {
         return CreateAndShowPopupAsync(popupViewType, navigationParameters, token);
     }
 
+    /// <inheritdoc/>
     public Task<TResult?> ShowPopupAsync<TResult>(Type popupViewType, IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default)
     {
         return ConvertResultAsync(CreateAndShowPopupAsync(popupViewType, navigationParameters, token), defaultResult);
     }
 
+    /// <summary>
+    /// Creates a Popup through <see cref="CreatePopup(Type)"/> and wires up the various events. If a viewmodel registration exists it is created
+    /// and set as BindingContext as well. Finally it is displayed through the current active <see cref="Page"/>.
+    /// </summary>
+    /// <param name="popupViewType">The <see cref="Type"/> of the Popup.</param>
+    /// <param name="navigationParameters"></param>
+    /// <param name="token"></param>
+    /// <returns>The result of the <see cref="Popup"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if a <see cref="Type"/> was given that is not a <see cref="Popup"/>.</exception>
     protected virtual async Task<object?> CreateAndShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters = default, CancellationToken token = default)
     {
         var popup = CreatePopup(popupViewType);
@@ -146,6 +167,11 @@ public class PopupService : IPopupService
         return await NucleusMvvmCore.Current.CurrentPage.ShowPopupAsync(popup, token);
     }
 
+    /// <summary>
+    /// Creates a <see cref="Popup"/> from the given <see cref="Type"/>. If not registed in IoC it is created directly.
+    /// </summary>
+    /// <param name="popupViewType"></param>
+    /// <returns></returns>
     protected virtual Popup CreatePopup(Type popupViewType)
     {
         var view = _serviceProvider.GetService(popupViewType);
@@ -159,10 +185,17 @@ public class PopupService : IPopupService
         return (Popup)ActivatorUtilities.CreateInstance(_serviceProvider, popupViewType);
     }
 
+    /// <summary>
+    /// Attempts to cast the result of the <see cref="Popup"/> to the expected <see cref="Type"/>.
+    /// </summary>
+    /// <typeparam name="TResult">The expected result <see cref="Type"/>.</typeparam>
+    /// <param name="resultTask">The <see cref="Task"/> that returns the result.</param>
+    /// <param name="defaultResult">The result to return if an unexpected value was found.</param>
+    /// <returns>The casted result, or the default value if invalid.</returns>
     protected virtual async Task<TResult?> ConvertResultAsync<TResult>(Task<object?> resultTask, TResult? defaultResult)
     {
         var result = await resultTask;
-        
+
         if (result == null)
         {
             _logger.LogInformation($"Return value from popup is null, using the default result (if given).");

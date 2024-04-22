@@ -6,10 +6,11 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Highlighted features
 
-- Navigation from ViewModels (Shell or Modeless*) through INavigationService.
+- Navigation from ViewModels (using Shell*) through INavigationService.
 - Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
+- Displaying Popups through IPopupService.
 - Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
-- ViewModels events (e.a. Appearing, Navigation, Initialization) through interfaces.
+- ViewModels and Popup events (e.a. Appearing, Navigation, Initialization) through interfaces.
 - Flexibility in Views and ViewModels, no base classes are required.
 
 \* See [Limitations / Planned features](#limitations--planned-features)

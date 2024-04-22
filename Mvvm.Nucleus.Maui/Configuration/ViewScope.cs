@@ -1,9 +1,8 @@
-﻿namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui;
+
+public enum ViewScope
 {
-    public enum ViewScope
-	{
-		Transient = 0,
-		Scoped = 1,
-		Singleton = 2
-	}
+	Transient = 0,
+	Scoped = 1,
+	Singleton = 2
 }

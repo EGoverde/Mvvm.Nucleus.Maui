@@ -1,34 +1,33 @@
 ﻿using CommunityToolkit.Maui.Views;
 
-namespace Mvvm.Nucleus.Maui
+namespace Mvvm.Nucleus.Maui;
+
+public class PopupMapping
 {
-    public class PopupMapping
+    internal PopupMapping(Type popupViewType)
     {
-        internal PopupMapping(Type popupViewType)
-        {
-            PopupViewType = popupViewType;
-        }
+        PopupViewType = popupViewType;
+    }
 
-        internal PopupMapping(Type popupViewType, Type popupViewModelType)
-        {
-            PopupViewType = popupViewType;
-            PopupViewModelType = popupViewModelType;
-        }
+    internal PopupMapping(Type popupViewType, Type popupViewModelType)
+    {
+        PopupViewType = popupViewType;
+        PopupViewModelType = popupViewModelType;
+    }
 
-        public Type PopupViewType { get; }
+    public Type PopupViewType { get; }
 
-        public Type? PopupViewModelType { get; }
+    public Type? PopupViewModelType { get; }
 
-        public bool IsWithoutViewModel => PopupViewModelType == null;
+    public bool IsWithoutViewModel => PopupViewModelType == null;
 
-        internal static PopupMapping Create<TPopupView, TPopupViewModel>() where TPopupView : Popup
-        {
-            return new PopupMapping(typeof(TPopupView), typeof(TPopupViewModel));
-        }
+    internal static PopupMapping Create<TPopupView, TPopupViewModel>() where TPopupView : Popup
+    {
+        return new PopupMapping(typeof(TPopupView), typeof(TPopupViewModel));
+    }
 
-        internal static PopupMapping Create<TPopupView>() where TPopupView : Popup
-        {
-            return new PopupMapping(typeof(TPopupView));
-        }
+    internal static PopupMapping Create<TPopupView>() where TPopupView : Popup
+    {
+        return new PopupMapping(typeof(TPopupView));
     }
 }

@@ -1,11 +1,10 @@
-﻿namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui;
+
+public interface IPageLifecycleAware
 {
-    public interface IPageLifecycleAware
-	{
-        void OnAppearing();
+    void OnAppearing();
 
-        void OnDisappearing();
+    void OnDisappearing();
 
-        void OnFirstAppearing();
-    }
+    void OnFirstAppearing();
 }

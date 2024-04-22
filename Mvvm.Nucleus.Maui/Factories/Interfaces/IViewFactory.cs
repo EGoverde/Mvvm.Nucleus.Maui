@@ -1,11 +1,30 @@
-﻿namespace Mvvm.Nucleus.Maui
+﻿namespace Mvvm.Nucleus.Maui;
+
+/// <summary>
+/// The <see cref="IViewFactory"/> is called when MAUI creates views and is used to wire up events and viewmodels.
+/// </summary>
+public interface IViewFactory
 {
-    public interface IViewFactory
-    {
-        T? CreateView<T>() where T : Element;
+    /// <summary>
+    /// Creates a requested View through IoC.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="Type"/> of view to create.</typeparam>
+    /// <returns>The created view.</returns>
+    T? CreateView<T>() where T : Element;
 
-        object CreateView(Type viewType);
+    /// <summary>
+    /// Creates a requested View through IoC.
+    /// </summary>
+    /// <param name="viewType">The <see cref="Type"/> of view to create.</param>
+    /// <returns>The created view.</returns>
+    object CreateView(Type viewType);
 
-        object ConfigureView(Element element);
-    }
+    /// <summary>
+    /// Applies a behavior to a given view that handles the various events, as well as creates and attaches the viewmodel.
+    /// If a View is resolved that is not a <see cref="Page"/> it attempts to register the behavior at its parent, so it will
+    /// also receive its events.
+    /// </summary>
+    /// <param name="element">The view.</param>
+    /// <returns>The configured view.</returns>
+    object ConfigureView(Element element);
 }
