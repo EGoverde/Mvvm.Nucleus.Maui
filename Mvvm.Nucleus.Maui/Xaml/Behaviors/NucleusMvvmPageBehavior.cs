@@ -2,6 +2,10 @@
 
 namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="NucleusMvvmPageBehavior"/> is a <see cref="Behavior"/> added to all views created by Nucleus
+/// which will register the various events used by the interfaces.
+/// </summary>
 public class NucleusMvvmPageBehavior : Behavior
 {
     private bool _isAppearedBefore;
@@ -12,12 +16,24 @@ public class NucleusMvvmPageBehavior : Behavior
 
     private bool _isNavigatedFrom;
 
+    /// <summary>
+    /// The <see cref="Page"/> this behavior is attached to and which events are used.
+    /// </summary>
     public Page? Page { get; set; }
 
+    /// <summary>
+    /// The <see cref="Element"/> this behavior is handling. This is usually the same as the <see cref="Page"/>, but not
+    /// necessarily so (in case a subview has been created).
+    /// </summary>
     public Element? Element { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the <see cref="Page"/> or <see cref="Element"/> this behavior is attached to
+    /// should be destroyed after the NavigatedFrom event is triggered.
+    /// </summary>
     public bool DestroyAfterNavigatedFrom { get; set; }
 
+    /// <inheritdoc/>
     protected override void OnAttachedTo(BindableObject bindable)
     {
         base.OnAttachedTo(bindable);
@@ -30,6 +46,7 @@ public class NucleusMvvmPageBehavior : Behavior
         Page!.NavigatingFrom += PageNavigatingFrom!;
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachingFrom(BindableObject bindable)
     {
         base.OnDetachingFrom(bindable);

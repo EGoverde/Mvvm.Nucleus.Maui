@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="AppBuilderExtensions"/> holds the <see cref="MauiAppBuilder"/> extension for Nucleus.
+/// </summary>
 public static class AppBuilderExtensions
 {
     /// <summary>
