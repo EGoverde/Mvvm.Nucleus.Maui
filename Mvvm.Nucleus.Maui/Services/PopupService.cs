@@ -4,6 +4,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="PopupService"/> is the default implementation for <see cref="IPopupService"/>.
+/// It can be customized through inheritence and registering the service before initializing Nucleus.
+/// </summary>
 public class PopupService : IPopupService
 {
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;

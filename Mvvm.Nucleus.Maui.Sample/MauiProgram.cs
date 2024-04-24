@@ -32,7 +32,7 @@ public static class MauiProgram
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.
 				options.OnInitialized(serviceProvider => Console.WriteLine("OnInitialized"));
 
-				// This is called when Nucleus MVVM is initialzed and the first navigation has finished.
+				// This is called when Nucleus MVVM is initialized and the first navigation has finished.
 				options.OnAppStart(serviceProvider => Console.WriteLine("OnAppStart"));
 
 				// Some additional configuration is available.

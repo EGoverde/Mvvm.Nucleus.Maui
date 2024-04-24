@@ -1,5 +1,10 @@
 ﻿namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="NucleusMvvmOptions"/> contains all the relevant configuration values set during initialization
+/// of Nucleus. Currently no additional IoC registrations can be done after initialization, but the changing of
+/// the configuration values is supported.
+/// </summary>
 public class NucleusMvvmOptions
 {
     internal Action<DependencyOptions>? RegisterTypes { get; set; }

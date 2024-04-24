@@ -2,6 +2,10 @@
 
 namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="ViewFactory"/> is the default implementation for <see cref="IViewFactory"/>.
+/// It can be customized through inheritence and registering the service before initializing Nucleus.
+/// </summary>
 public class ViewFactory : IViewFactory
 {
     private readonly ILogger _logger;

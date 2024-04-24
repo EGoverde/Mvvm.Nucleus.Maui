@@ -1,5 +1,9 @@
 ﻿namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="DictionaryExtensions"/> contains extensions for interacting with the navigation parameters.
+/// It can be used for any <see cref="IDictionary{TKey, TValue}"/> that holds strings and objects.
+/// </summary>
 public static class DictionaryExtensions
 {
     /// <summary>

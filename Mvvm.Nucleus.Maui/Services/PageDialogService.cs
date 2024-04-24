@@ -1,5 +1,9 @@
 ﻿namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="PageDialogService"/> is the default implementation for <see cref="IPageDialogService"/>.
+/// It can be customized through inheritence and registering the service before initializing Nucleus.
+/// </summary>
 public class PageDialogService : IPageDialogService
 {
     /// <inheritdoc/>

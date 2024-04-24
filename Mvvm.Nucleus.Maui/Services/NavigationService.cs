@@ -2,6 +2,10 @@
 
 namespace Mvvm.Nucleus.Maui;
 
+/// <summary>
+/// The <see cref="NavigationService"/> is the default implementation for <see cref="INavigationService"/>.
+/// It can be customized through inheritence and registering the service before initializing Nucleus.
+/// </summary>
 public class NavigationService : INavigationService
 {
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;
@@ -10,8 +14,10 @@ public class NavigationService : INavigationService
 
     private IList<Page> _transientPagesOnNavigating = new List<Page>();
 
+    /// <inheritdoc/>
     public bool IsNavigating { get; protected set; }
 
+    /// <inheritdoc/>
     public Uri CurrentRoute => Shell.Current.CurrentState.Location;
 
     /// <summary>
