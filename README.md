@@ -6,14 +6,12 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Highlighted features
 
-- Navigation from ViewModels (using Shell*) through INavigationService.
+- Navigation from ViewModels through INavigationService (using [Shell](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/)).
 - Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
 - Displaying Popups through IPopupService.
 - Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
 - ViewModels and Popup events (e.a. Appearing, Navigation, Initialization) through interfaces.
 - Flexibility in Views and ViewModels, no base classes are required.
-
-\* See [Limitations / Planned features](#limitations--planned-features)
 
 ## Getting started
 
@@ -134,11 +132,8 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 
 ## Limitations / Planned features
 
-- Currently Shell is the only supported navigation type, but groundworks have been laid for a 'modeless' implementation.
-- Currently Shell is automatically setup as the MainPage without any customization options for a startup flow.
-- There is limited support for 'modal' presentation in Shell, this logic might be removed in favor of a modeless-specific implementation.
-- Limited logic for passing events from a page to its children is there, but a more complete concept would be nice.
-- More complete documentation, especially in the form of XML comments in the code.
+- Shell is automatically setup as the MainPage without any customization options for a startup flow.
+- Initial logic for subviews recieving page events has been added, but is not a fully supported concept yet. 
 
 ## Support
 

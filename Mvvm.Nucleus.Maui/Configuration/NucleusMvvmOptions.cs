@@ -21,11 +21,6 @@ public class NucleusMvvmOptions
     public IReadOnlyCollection<PopupMapping> PopupMappings => DependencyOptions.PopupMappings;
 
     /// <summary>
-    /// Gets the <see cref="NavigationType"/>. Currently only <see cref="NavigationType.Shell"/> is supported.
-    /// </summary>
-    public NavigationType NavigationType { get; } = NavigationType.Shell;
-
-    /// <summary>
     /// Gets or sets a value indicating whether to automatically add query parameters during navigation to the navigation parameters dictionary.
     /// </summary>
     public bool AddQueryParametersToDictionary { get; set; } = true;

@@ -35,18 +35,9 @@ public static class AppBuilderExtensions
         builder.Services.TryAddTransient<Shell, TShell>();
         builder.Services.AddSingleton<NucleusMvvmCore>();
         builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
+        builder.Services.TryAddSingleton<INavigationService, NavigationService>();
         builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
         builder.Services.TryAddSingleton<IPopupService, PopupService>();
-
-        switch(nucleusMvvmOptions.NavigationType)
-        {
-            case NavigationType.Shell:
-                builder.Services.TryAddSingleton<INavigationService, NavigationServiceShell>();
-                break;
-            case NavigationType.Modeless:
-                builder.Services.TryAddSingleton<INavigationService, NavigationServiceShell>();
-                break;
-        }
 
         builder.Services.AddSingleton<IApplication>(serviceProvider =>
         {
@@ -114,8 +105,7 @@ public static class AppBuilderExtensions
                     break;
             }
 
-            if (nucleusMvvmOptions.NavigationType == NavigationType.Shell &&
-                viewMapping.RegistrationType == ViewRouteType.GlobalRoute)
+            if (viewMapping.RegistrationType == ViewRouteType.GlobalRoute)
             {
                 Routing.RegisterRoute(viewMapping.Route, viewMapping.ViewType);
             }

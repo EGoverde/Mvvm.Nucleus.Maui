@@ -2,11 +2,11 @@
 
 namespace Mvvm.Nucleus.Maui;
 
-public class NavigationServiceShell : INavigationService
+public class NavigationService : INavigationService
 {
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;
 
-    private readonly ILogger<NavigationServiceShell> _logger;
+    private readonly ILogger<NavigationService> _logger;
 
     private IList<Page> _transientPagesOnNavigating = new List<Page>();
 
@@ -15,11 +15,11 @@ public class NavigationServiceShell : INavigationService
     public Uri CurrentRoute => Shell.Current.CurrentState.Location;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NavigationServiceShell"/> class.
+    /// Initializes a new instance of the <see cref="NavigationService"/> class.
     /// </summary>
     /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public NavigationServiceShell(NucleusMvvmOptions nucleusMvvmOptions, ILogger<NavigationServiceShell> logger)
+    public NavigationService(NucleusMvvmOptions nucleusMvvmOptions, ILogger<NavigationService> logger)
     {
         _nucleusMvvmOptions = nucleusMvvmOptions;
         _logger = logger;
