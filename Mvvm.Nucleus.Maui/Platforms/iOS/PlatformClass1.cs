@@ -1,6 +1,8 @@
 ﻿namespace Mvvm.Nucleus.Maui;
 
-// All the code in this file is only included on iOS.
+/// <summary>
+/// All the code in this file is only included on iOS.
+/// </summary>
 public class PlatformClass1
 {
 }
