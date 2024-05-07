@@ -111,6 +111,16 @@ public static class AppBuilderExtensions
             }
         }
 
+        foreach (var popupMapping in nucleusMvvmOptions.PopupMappings)
+        {
+            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupMapping.PopupViewType);
+
+            if (!popupMapping.IsWithoutViewModel)
+            {
+                mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewModelType!, popupMapping.PopupViewModelType!);
+            }
+        }
+
         mauiAppBuilder.Services.AddSingleton(nucleusMvvmOptions);
     }
 }

@@ -151,7 +151,6 @@ public class NucleusMvvmPageBehavior : Behavior
                 $"Destroying Element '{Element.GetType().Name}'." :
                 $"Destroying Page '{Page?.GetType().Name}'.");
 
-
             var element = Element != null ? Element : Page;
             (element?.BindingContext as IDestructible)?.Destroy();
 
