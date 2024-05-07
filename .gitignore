@@ -38,6 +38,7 @@ bld/
 #wwwroot
 
 .nuget/
+.meteor/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/

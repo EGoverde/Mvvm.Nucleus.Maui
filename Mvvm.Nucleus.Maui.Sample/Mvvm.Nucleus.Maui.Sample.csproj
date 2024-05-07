@@ -16,7 +16,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Mvvm.Nucleus.Maui.Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
-		<MauiVersion>8.0.14</MauiVersion>
+		<MauiVersion>8.0.21</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -65,15 +65,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Mvvm.Nucleus.Maui\Mvvm.Nucleus.Maui.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Views/NavigationTab.xaml.cs">
-	    <DependentUpon>NavigationTab.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views/PopupTab.xaml.cs">
-	    <DependentUpon>PopupTab.xaml</DependentUpon>
-	  </Compile>
 	</ItemGroup>
 
 </Project>
