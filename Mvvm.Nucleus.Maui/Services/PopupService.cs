@@ -82,6 +82,8 @@ public class PopupService : IPopupService
             throw new InvalidOperationException($"Nucleus failed to create a popup of type '{popupViewType}'");
         }
 
+        var currentPage = NucleusMvvmCore.Current.CurrentPage;
+
         object? bindingContext = null;
 
         var popupMapping = _nucleusMvvmOptions.PopupMappings.FirstOrDefault(x => x.PopupViewType == popupViewType);
@@ -121,6 +123,15 @@ public class PopupService : IPopupService
                     {
                         destructiblePopup.Destroy();
                     }
+
+#if IOS || MACCATALYST
+                    // Fixes a leak in the Community Toolkit Popup, see: https://github.com/CommunityToolkit/Maui/issues/1676
+                    if (currentPage?.GetVisualTreeDescendants()?.LastOrDefault(x => x is ContentPage contentPage && contentPage.Content == (sender as Popup)?.Content) is ContentPage popupContentPage)
+                    {
+                        popupContentPage.Parent = null;
+                        popupContentPage.Content = null;
+                    }
+#endif
 
                     popup.Parent = null;
                     popup.BindingContext = null;
@@ -168,7 +179,7 @@ public class PopupService : IPopupService
             }
         }
 
-        return await NucleusMvvmCore.Current.CurrentPage.ShowPopupAsync(popup, token);
+        return await currentPage.ShowPopupAsync(popup, token);
     }
 
     /// <summary>
