@@ -147,21 +147,26 @@ public class NucleusMvvmPageBehavior : Behavior
 
         if (DestroyAfterNavigatedFrom)
         {
-            NucleusMvvmCore.Current.Logger?.LogInformation(Element != null ?
-                $"Destroying Element '{Element.GetType().Name}'." :
-                $"Destroying Page '{Page?.GetType().Name}'.");
-
             var element = Element != null ? Element : Page;
             (element?.BindingContext as IDestructible)?.Destroy();
 
-            if (Page?.Behaviors != null)
+            (element as IDestructible)?.Destroy();
+
+            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPageOnDestroy)
             {
-                Page.Behaviors.Remove(this);
-            }
-            
-            if (element != null)
-            {
-                element!.BindingContext = null;
+                NucleusMvvmCore.Current.Logger?.LogInformation(Element != null ?
+                $"Deconstructing Element '{Element.GetType().Name}'." :
+                $"Deconstructing Page '{Page?.GetType().Name}'.");
+
+                if (Page?.Behaviors != null)
+                {
+                    Page.Behaviors.Remove(this);
+                }
+                
+                if (element != null)
+                {
+                    element!.BindingContext = null;
+                }
             }
         }
     }

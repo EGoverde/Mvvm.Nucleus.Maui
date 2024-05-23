@@ -39,7 +39,8 @@ public static class MauiProgram
 				options.AddQueryParametersToDictionary = true; // Default: True. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
 				options.AlwaysDisableNavigationAnimation = true; // Default: False. IIf set the `isAnimated` flag while navigating will always be ignored and no animations will be used.
 				options.UseShellNavigationQueryParameters = true; // Default: True. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
-				options.UsePageDestructionOnNavigation = true; // Default True. Attempts to unload behaviors and unset bindingcontext of pages when they are popped, as well as triggers the `IDestructible` interface.
+				options.UseDeconstructPageOnDestroy = true; // Default True. Unload behaviors and unset bindingcontext of pages when they are popped.
+				options.UseDeconstructPopupOnDestroy = true; // Default True. Unset the bindingcontext and parent of popups when they are dismissed
 				options.IgnoreNavigationWhenInProgress = true; // Default: False. If set when trying to navigate using the `INavigationService` while `IsNavigating` is `true` requests will be ignored.
 
             })

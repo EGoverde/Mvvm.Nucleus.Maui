@@ -293,25 +293,19 @@ public class NavigationService : INavigationService
 
         IsNavigating = true;
 
-        if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
-        {
-            _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
-        }
+        _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
     }
 
     private void ShellNavigated(object sender, ShellNavigatedEventArgs e)
     {
         _logger.LogInformation($"Shell Navigated '{e.Current?.Location}' ({e.Source}).");
 
-        if (_nucleusMvvmOptions.UsePageDestructionOnNavigation)
-        {
-            var pagesAfterNavigating = GetTransientPagesFromNavigationStack();
-            var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
+        var pagesAfterNavigating = GetTransientPagesFromNavigationStack();
+        var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
 
-            _transientPagesOnNavigating!.Clear();
+        _transientPagesOnNavigating!.Clear();
 
-            DestroyPages(GetPagesToDestroy(e, pagesBeforeNavigating, pagesAfterNavigating));
-        }
+        DestroyPages(GetPagesToDestroy(e, pagesBeforeNavigating, pagesAfterNavigating));
     
         IsNavigating = false;
     }

@@ -42,9 +42,9 @@ Within the options the following additional settings can be changed:
 - `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
 - `AlwaysDisableNavigationAnimation`: Default `false`. If set no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
 - `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while it is already busy requests will be ignored.
-- `UsePageDestructionOnNavigation`: Default `true`. Attempts to unload behaviors and unset bindingcontext of pages when they are popped, as well as triggers the `IDestructible` interface.
 - `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
-- `UsePopupDestructionAfterClose`: Default `true`. Unset the bindingcontext and parent of popups when they are closed, as well as triggers the `IDestructible` interface.
+- `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
+- `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
@@ -92,7 +92,7 @@ Note that above parameters allow for modal presentation in Shell including deepe
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, for example by asking for confirmation.
-- `IDestructible`: Requires `UsePageDestructionOnNavigation`. Triggered when `transient` pages are removed from the stack.
+- `IDestructible`: Triggered when `transient` pages are removed from the stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
 - `IPageLifecycleAware`: Appearing and disappearing events from the view.
@@ -114,7 +114,7 @@ Using the `IPopupAware` the ViewModel can receive a reference to the popup, whic
 - `IPopupAware`: Allows access to the Popup using a WeakReference. *ViewModel-Only.*
 - `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
 - `IPopupLifeCycleAware`: Events on opening and closing the popup. *ViewModel-Only.*
-- `IDestructible`: Requires `UsePopupDestructionAfterClose`. Triggered when the popup is closed.
+- `IDestructible`: Triggered when the popup is closed.
 
 ## Migrating from Prism
 

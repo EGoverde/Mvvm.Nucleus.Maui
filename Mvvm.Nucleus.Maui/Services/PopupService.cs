@@ -112,26 +112,19 @@ public class PopupService : IPopupService
                     popupViewModel.OnClosed();
                 }
 
-                if (_nucleusMvvmOptions.UsePopupDestructionAfterClose)
+                if (popup.BindingContext is IDestructible destructibleViewModel)
                 {
-                    if (popup.BindingContext is IDestructible destructibleViewModel)
-                    {
-                        destructibleViewModel.Destroy();
-                    }
+                    destructibleViewModel.Destroy();
+                }
 
-                    if (popup is IDestructible destructiblePopup)
-                    {
-                        destructiblePopup.Destroy();
-                    }
+                if (popup is IDestructible destructiblePopup)
+                {
+                    destructiblePopup.Destroy();
+                }
 
-#if IOS || MACCATALYST
-                    // Fixes a leak in the Community Toolkit Popup, see: https://github.com/CommunityToolkit/Maui/issues/1676
-                    if (currentPage?.GetVisualTreeDescendants()?.LastOrDefault(x => x is ContentPage contentPage && contentPage.Content == (sender as Popup)?.Content) is ContentPage popupContentPage)
-                    {
-                        popupContentPage.Parent = null;
-                        popupContentPage.Content = null;
-                    }
-#endif
+                if (_nucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+                {
+                    _logger?.LogInformation($"Deconstructing Popup '{popup.GetType().Name}'.");
 
                     popup.Parent = null;
                     popup.BindingContext = null;

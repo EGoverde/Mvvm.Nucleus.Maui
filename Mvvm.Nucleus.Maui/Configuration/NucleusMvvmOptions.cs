@@ -42,13 +42,17 @@ public class NucleusMvvmOptions
 
     /// <summary>
     /// Gets or sets a value indicating whether to 'destroy' pages after they are no longer in the navigation stack.
+    /// This will clear behaviors and the binding context to prevent possible memory issues. Regardless of the value,
+    /// the IDestructible interface will still be called.
     /// </summary>
-    public bool UsePageDestructionOnNavigation { get; set; } = true;
+    public bool UseDeconstructPageOnDestroy { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether to 'destroy' popups after they are dismissed.
+    /// Gets or sets a value indicating whether to 'destroy' popups after they are dismissed. This will clear the parent
+    /// and binding context to prevent possible memory issues. Regardless of the value, the IDestructible interface will
+    /// still be called.
     /// </summary>
-    public bool UsePopupDestructionAfterClose {get; set; } = true;
+    public bool UseDeconstructPopupOnDestroy {get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether to use <see cref="ShellNavigationQueryParameters"/> when navigating (see MAUI documentation).

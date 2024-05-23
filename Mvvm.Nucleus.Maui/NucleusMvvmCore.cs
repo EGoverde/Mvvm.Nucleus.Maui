@@ -15,6 +15,8 @@ public class NucleusMvvmCore
 
     internal ILogger<NucleusMvvmCore>? Logger { get; }
 
+    internal NucleusMvvmOptions NucleusMvvmOptions { get; }
+
     internal IDictionary<string, object> NavigationParameters
     {
         get => _navigationParameters;
@@ -91,11 +93,13 @@ public class NucleusMvvmCore
     /// </summary>
     /// <param name="application">The <see cref="Application"/>.</param>
     /// <param name="viewFactory">The <see cref="IViewFactory"/>.</param>
+    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public NucleusMvvmCore(Application application, IViewFactory viewFactory, ILogger<NucleusMvvmCore> logger)
+    public NucleusMvvmCore(Application application, IViewFactory viewFactory, NucleusMvvmOptions nucleusMvvmOptions, ILogger<NucleusMvvmCore> logger)
     {
         Application = application;
         ViewFactory = viewFactory;
+        NucleusMvvmOptions = nucleusMvvmOptions;
         Logger = logger;
     }
 
