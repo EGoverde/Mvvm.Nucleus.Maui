@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -241,6 +242,8 @@ public class NavigationService : INavigationService
     private async void ShellNavigating(object sender, ShellNavigatingEventArgs e)
     {
         var isCanceled = false;
+
+        ShellNavigatingDeferral? shellNavigatingDeferralToken = null;
         
         if (e.CanCancel && (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
         {
@@ -269,7 +272,7 @@ public class NavigationService : INavigationService
                 var confirmNavigationAsync =  currentBindingContext as IConfirmNavigationAsync;
                 if (confirmNavigationAsync != null)
                 {
-                    var token = e.GetDeferral();
+                    shellNavigatingDeferralToken = e.GetDeferral();
                     
                     var confirm = await confirmNavigationAsync.CanNavigateAsync(navigationDirection, NucleusMvvmCore.Current.NavigationParameters);
                     if (!confirm)
@@ -277,23 +280,20 @@ public class NavigationService : INavigationService
                         isCanceled = true;
                         e.Cancel();
                     }
-
-                    token.Complete();
                 }
             }
         }
 
-        if (isCanceled)
+        _logger.LogInformation(isCanceled ? "Shell Navigation Canceled." : $"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
+
+        if (!isCanceled)
         {
-            _logger?.LogInformation($"Shell Navigation Canceled.");
-            return;
+            _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
+
+            IsNavigating = true;
         }
 
-        _logger.LogInformation($"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
-
-        IsNavigating = true;
-
-        _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
+        shellNavigatingDeferralToken?.Complete();
     }
 
     private void ShellNavigated(object sender, ShellNavigatedEventArgs e)

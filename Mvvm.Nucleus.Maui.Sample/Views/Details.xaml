@@ -80,6 +80,10 @@
         <Button
             Text="Navigate Backwards"
             Command="{Binding NavigateBackCommand}"/>
+
+        <Button
+            Text="Navigate Backwards (confirm)"
+            Command="{Binding NavigateBackWithConfirmCommand}"/>
         
          <Button
             Text="Navigate Backwards (twice)"

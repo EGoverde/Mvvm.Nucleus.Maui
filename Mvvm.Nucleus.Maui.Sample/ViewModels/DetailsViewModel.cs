@@ -4,9 +4,13 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class DetailsViewModel : ObservableObject, IInitializable
+public partial class DetailsViewModel : ObservableObject, IInitializable, IConfirmNavigationAsync
 {
     private readonly INavigationService _navigationService;
+
+    private readonly IPageDialogService _pageDialogService;
+
+    private bool _shouldConfirmNavigation;
 
     [ObservableProperty]
     private string _pageIdentifier;
@@ -20,9 +24,11 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [ObservableProperty]
     private string _onRefreshData = "-";
 
-    public DetailsViewModel(INavigationService navigationService)
+    public DetailsViewModel(INavigationService navigationService, IPageDialogService pageDialogService)
     {
         _navigationService = navigationService;
+        _pageDialogService = pageDialogService;
+
         _pageIdentifier = Guid.NewGuid().ToString();
     }
 
@@ -36,6 +42,18 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     {
         OnRefreshData = $"Triggered ({DateTime.Now:HH:mm:ss)})";
         SetNavigationParameterData(navigationParameters);
+    }
+
+    public async Task<bool> CanNavigateAsync(NavigationDirection navigationDirection, IDictionary<string, object> navigationParameters)
+    {
+        if (!_shouldConfirmNavigation)
+        {
+            return true;
+        }
+
+        _shouldConfirmNavigation = false;
+
+        return await _pageDialogService.DisplayAlertAsync("Please confirm", "Navigation has been requested, do you want to proceed?", "Confirm", "Cancel");
     }
 
     [RelayCommand]
@@ -71,6 +89,17 @@ public partial class DetailsViewModel : ObservableObject, IInitializable
     [RelayCommand]
     private async Task NavigateBackAsync()
     {
+        await _navigationService.NavigateBackAsync(new Dictionary<string, object>
+        {
+            { "Navigation", $"Popped from {PageIdentifier}."}
+        });
+    }
+
+    [RelayCommand]
+    private async Task NavigateBackWithConfirmAsync()
+    {
+        _shouldConfirmNavigation = true;
+
         await _navigationService.NavigateBackAsync(new Dictionary<string, object>
         {
             { "Navigation", $"Popped from {PageIdentifier}."}
