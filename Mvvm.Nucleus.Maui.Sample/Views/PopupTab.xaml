@@ -24,8 +24,8 @@
             Command="{Binding ShowAdvancedPopupCommand}"/>
 
         <Button
-            Text="Show Popup with NucleusPopupViewModel"
-            Command="{Binding ShowNucleusPopupCommand}"/>
+            Text="Show Popup with background thread"
+            Command="{Binding ShowBackgroundThreadPopupCommand}"/>
 
     </VerticalStackLayout>
     

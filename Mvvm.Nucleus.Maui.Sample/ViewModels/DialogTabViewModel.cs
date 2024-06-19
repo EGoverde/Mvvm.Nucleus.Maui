@@ -44,4 +44,14 @@ public partial class DialogTabViewModel : ObservableObject
 
         await _pageDialogService.DisplayAlertAsync("Alert", $"You choose {input} as input.", "Okay");
     }
+
+    [RelayCommand]
+    private void DisplayBackgroundThreadAlert()
+    {
+        Task.Run(async () =>
+        {
+            var text = $"IsMainThread = {MainThread.IsMainThread}";
+            await _pageDialogService.DisplayAlertAsync("Alert", $"This is an alert triggered from another thread ({text})", "Okay");
+        });
+    }
 }

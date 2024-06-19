@@ -73,6 +73,20 @@ public partial class NavigationTabViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void NavigateFromBackgroundThread()
+    {
+        Task.Run(async () =>
+        {
+            var text = $"IsMainThread = {MainThread.IsMainThread}";
+            
+            await _navigationService.NavigateAsync<Details>(new Dictionary<string, object>
+            {
+                { "Sample", text }
+            });
+        });
+    }
+
+    [RelayCommand]
     private async Task SwitchTabsAsync()
     {
         await _navigationService.NavigateAsync<PopupTab>();

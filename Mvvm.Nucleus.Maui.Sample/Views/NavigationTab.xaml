@@ -45,6 +45,10 @@
                 Command="{Binding NavigateWithQueryCommand}"/>
             
             <Button
+                Text="Navigation from background thread"
+                Command="{Binding NavigateFromBackgroundThreadCommand}"/>
+
+            <Button
                 Text="Switch Tabs"
                 Command="{Binding SwitchTabsCommand}"/>
             

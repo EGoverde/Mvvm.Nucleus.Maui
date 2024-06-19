@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -64,7 +63,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -95,7 +94,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = parameters;
 
-        return Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -114,7 +113,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        return Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -151,7 +150,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -195,7 +194,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters));
+        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <summary>

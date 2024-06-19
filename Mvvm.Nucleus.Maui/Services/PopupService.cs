@@ -172,7 +172,7 @@ public class PopupService : IPopupService
             }
         }
 
-        return await currentPage.ShowPopupAsync(popup, token);
+        return await MainThread.InvokeOnMainThreadAsync(() => currentPage.ShowPopupAsync(popup, token));
     }
 
     /// <summary>

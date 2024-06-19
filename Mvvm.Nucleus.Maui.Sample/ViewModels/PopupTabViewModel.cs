@@ -41,17 +41,18 @@ public partial class PopupTabViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ShowNucleusPopupAsync()
+    private void ShowBackgroundThreadPopup()
     {
-        var navigationParameters = new Dictionary<string, object>
+        Task.Run(async () =>
         {
-            { "Text", "Text from navigation parameters." }
-        };
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "Text", $"IsMainThread = {MainThread.IsMainThread}" }
+            };
 
-        var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
+            var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
 
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+            await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        });
     }
-
-    
 }

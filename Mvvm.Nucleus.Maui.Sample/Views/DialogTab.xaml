@@ -25,6 +25,10 @@
                 Command="{Binding DisplayAlertCommand}"/>
 
             <Button
+                Text="Display Alert (background thread)"
+                Command="{Binding DisplayBackgroundThreadAlertCommand}"/>
+
+            <Button
                 Text="Display Confirm"
                 Command="{Binding DisplayConfirmCommand}"/>
 

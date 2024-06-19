@@ -6,7 +6,7 @@
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 		<UseMaui>true</UseMaui>
-  		<MauiVersion>8.0.21</MauiVersion>
+  		<MauiVersion>8.0.40</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -17,7 +17,7 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<EnableWindowsTargeting>True</EnableWindowsTargeting>
-		<Version>0.2.4</Version>
+		<Version>0.2.5</Version>
 		<PackageId>Mvvm.Nucleus.Maui</PackageId>
 		<Title>Nucleus MVVM for MAUI</Title>
 		<Description>MVVM Framework for MAUI mobile applications. Build on top of MAUI and the MVVM Community Toolkit.</Description>
@@ -36,8 +36,8 @@
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 	  <PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
-	  <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.40" />
-  	  <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.40" />
+	  <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+  	  <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
