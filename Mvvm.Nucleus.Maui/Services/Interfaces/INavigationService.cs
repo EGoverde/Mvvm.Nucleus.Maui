@@ -17,6 +17,11 @@ public interface INavigationService
     Uri CurrentRoute { get; }
 
     /// <summary>
+    /// Event that is called whenever <see cref="IsNavigating"/> changes.
+    /// </summary>
+    event EventHandler<bool>? IsNavigatingChanged;
+
+    /// <summary>
     /// Navigates to a given view and corresponding viewmodel.
     /// </summary>
     /// <typeparam name="TView">The <see cref="Type"/> of the view to navigate to.</typeparam>

@@ -7,18 +7,27 @@ namespace Mvvm.Nucleus.Maui;
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
 public class NavigationService : INavigationService
-{
+{    
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;
 
     private readonly ILogger<NavigationService> _logger;
 
     private IList<Page> _transientPagesOnNavigating = new List<Page>();
 
+    private bool _isNavigating;
+
     /// <inheritdoc/>
-    public bool IsNavigating { get; protected set; }
+    public virtual bool IsNavigating
+    { 
+        get => _isNavigating;
+        protected set => SetIsNavigating(value);
+    }
 
     /// <inheritdoc/>
     public Uri CurrentRoute => Shell.Current.CurrentState.Location;
+
+    /// <inheritdoc/>
+    public event EventHandler<bool>? IsNavigatingChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NavigationService"/> class.
@@ -63,7 +72,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -94,7 +103,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = parameters;
 
-        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        return HandleShellNavigationAsync(() => Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -113,7 +122,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        return HandleShellNavigationAsync(() => Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -150,7 +159,7 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
@@ -194,7 +203,34 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+    }
+
+    /// <summary>
+    /// Trigger the requested Shell logic on the UI thread, ensuring that 'IsNavigation' is reset in case
+    /// an <see cref="Exception"/> occurs during the execution.
+    /// </summary>
+    /// <param name="shellNavigationTask">A function that returns the navigation <see cref="Task"/>.</param>
+    /// <returns>An awaitable <see cref="Task"/>.</returns>
+    protected virtual async Task HandleShellNavigationAsync (Func<Task> shellNavigationTask)
+    {
+        if (ShouldIgnoreNavigationRequest())
+        {
+            return;
+        }
+
+        IsNavigating = true;
+
+        try
+        {
+            await shellNavigationTask();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed handling navigation request with exception: " + ex.Message);
+        }
+        
+        IsNavigating = false;
     }
 
     /// <summary>
@@ -288,9 +324,9 @@ public class NavigationService : INavigationService
         if (!isCanceled)
         {
             _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
-
-            IsNavigating = true;
         }
+        
+        IsNavigating = !isCanceled;
 
         shellNavigatingDeferralToken?.Complete();
     }
@@ -407,5 +443,22 @@ public class NavigationService : INavigationService
         }
 
         return false;
+    }
+
+    private void SetIsNavigating(bool value)
+    {
+        if (_isNavigating == value)
+        {
+            return;
+        }
+        
+        _isNavigating = value;
+        
+        IsNavigatingChanged?.Invoke(this, value);
+        
+        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
+        {
+            _logger?.LogInformation($"IsNavigating changed to '{_isNavigating}'." + (_isNavigating ? " Incoming navigation requests will be ignored." : string.Empty));
+        }
     }
 }
