@@ -8,8 +8,6 @@ namespace Mvvm.Nucleus.Maui;
 /// </summary>
 public class NavigationService : INavigationService
 {
-    private static DateTime _isNavigatingLastTriggeredUtc;
-
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;
 
     private readonly ILogger<NavigationService> _logger;
@@ -18,11 +16,13 @@ public class NavigationService : INavigationService
 
     private bool _isNavigating;
 
+    private static DateTime _isNavigatingLastTriggeredUtc;
+
     /// <summary>
     /// Gets the <see cref="object"/> used as a lock to ensure the <see cref="IsNavigating"/> 
     /// is never set or checked parallel. Only use this if you know what you're doing.
     /// </summary>
-    protected object IsNavigatingLock { get; }= new object();
+    protected object IsNavigatingLock { get; } = new object();
 
     /// <inheritdoc/>
     public virtual bool IsNavigating
@@ -278,38 +278,10 @@ public class NavigationService : INavigationService
     }
 
     /// <summary>
-    /// Set the value of <see cref="IsNavigating"/>. This will trigger <see cref="IsNavigatingChanged"/>.
-    /// Generally you should not set this value manually. In Nucleus this value is set and checked within a lock
-    /// using the <see cref="IsNavigatingLock"/> object, to ensure this never happens in parallel.
-    /// to ensure
-    /// </summary>
-    /// <param name="value"></param>
-    protected void SetIsNavigating(bool value)
-    {
-        if (_isNavigating == value)
-        {
-            return;
-        }
-        
-        _isNavigating = value;
-
-        if (_isNavigating)
-        {
-            _isNavigatingLastTriggeredUtc = DateTime.UtcNow;
-        }
-        
-        IsNavigatingChanged?.Invoke(this, value);
-        
-        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
-        {
-            _logger?.LogInformation($"IsNavigating changed to '{_isNavigating}'." + (_isNavigating ? " Incoming navigation requests will be ignored." : string.Empty));
-        }
-    }
-
-    /// <summary>
     /// This function checks if a navigation request should be processed, which depends on the configuration values
     /// <see cref="NucleusMvvmOptions.IgnoreNavigationWhenInProgress"/> and <see cref="NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds"/>.
-    /// Even when these values are configured, they can be bypassed by passing ''
+    /// Even when these values are configured, they can be bypassed by passing <see cref="NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest"/>
+    /// in the Navigation Parameters.
     /// </summary>
     /// <returns>A value indicating whether or not to ignore a navigation request.</returns>
     protected virtual bool SetIsNavigatingOrIgnoreRequest(IDictionary<string, object>? navigationParameters = null)
@@ -359,6 +331,28 @@ public class NavigationService : INavigationService
         }
 
         return isNavigationAllowed;
+    }
+
+    private void SetIsNavigating(bool value)
+    {
+        if (_isNavigating == value)
+        {
+            return;
+        }
+        
+        _isNavigating = value;
+
+        if (_isNavigating)
+        {
+            _isNavigatingLastTriggeredUtc = DateTime.UtcNow;
+        }
+        
+        IsNavigatingChanged?.Invoke(this, value);
+        
+        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
+        {
+            _logger?.LogInformation($"IsNavigating changed to '{_isNavigating}'." + (_isNavigating ? " Incoming navigation requests will be ignored." : string.Empty));
+        }
     }
 
     private async void ShellNavigating(object sender, ShellNavigatingEventArgs e)

@@ -16,7 +16,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Mvvm.Nucleus.Maui.Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
-		<MauiVersion>8.0.40</MauiVersion>
+		<MauiVersion>8.0.80</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>

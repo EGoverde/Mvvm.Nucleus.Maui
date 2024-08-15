@@ -98,6 +98,8 @@ Nucleus offers two features to improve the navigation behavior, both are enabled
 
 In specific cases you might want to bypass these restrictions, but not disable them fully. In those cases you can add `NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest` in the NavigationParameters and set it to true.
 
+Note that due to the nature of the `PopupService` there is no logic for avoiding multiple triggers, as it always expects a return object.
+
 ### Navigation interfaces
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
