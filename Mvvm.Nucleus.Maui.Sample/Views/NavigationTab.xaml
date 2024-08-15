@@ -49,6 +49,10 @@
                 Command="{Binding NavigateFromBackgroundThreadCommand}"/>
 
             <Button
+                Text="Navigation ignoring multiple requests"
+                Command="{Binding NavigateMultipleTriggersCommand}"/>
+
+            <Button
                 Text="Switch Tabs"
                 Command="{Binding SwitchTabsCommand}"/>
             

@@ -38,7 +38,12 @@ public class NucleusMvvmOptions
     /// <summary>
     /// Gets or sets a value indicating whether to ignore navigation requests when the <see cref="INavigationService"/> is already navigating.
     /// </summary>
-    public bool IgnoreNavigationWhenInProgress { get; set; } = false;
+    public bool IgnoreNavigationWhenInProgress { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value in milliseconds when navigation requests should be ignored shortly after one has been initiated.
+    /// </summary>
+    public int IgnoreNavigationWithinMilliseconds { get; set; } = 250;
 
     /// <summary>
     /// Gets or sets a value indicating whether to 'destroy' pages after they are no longer in the navigation stack.

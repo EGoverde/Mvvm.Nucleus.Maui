@@ -87,6 +87,13 @@ public partial class NavigationTabViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void NavigateMultipleTriggers()
+    {
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
+    }
+
+    [RelayCommand]
     private async Task SwitchTabsAsync()
     {
         await _navigationService.NavigateAsync<PopupTab>();

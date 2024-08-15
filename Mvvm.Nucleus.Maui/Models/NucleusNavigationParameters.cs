@@ -14,4 +14,11 @@ public static class NucleusNavigationParameters
     /// Allows to wrap a page in a <see cref="NavigationPage"/> before presenting, which is used for modal presentation.
     /// </summary>
     public const string WrapInNavigationPage = "WrapInNavigationPage";
+
+    /// <summary>
+    /// When set this will make a navigation request always process, even though it would otherwise be ignored
+    /// due to <see cref="NucleusMvvmOptions.IgnoreNavigationWhenInProgress"/> or
+    /// <see cref="NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds"/>.
+    /// </summary>
+    public const string DoNotIgnoreThisNavigationRequest = "DoNotIgnoreThisNavigationRequest";
 }

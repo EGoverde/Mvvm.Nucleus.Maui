@@ -14,11 +14,28 @@ public class NavigationService : INavigationService
 
     private IList<Page> _transientPagesOnNavigating = new List<Page>();
 
+    private bool _isNavigating;
+
+    private static DateTime _isNavigatingLastTriggeredUtc;
+
+    /// <summary>
+    /// Gets the <see cref="object"/> used as a lock to ensure the <see cref="IsNavigating"/> 
+    /// is never set or checked parallel. Only use this if you know what you're doing.
+    /// </summary>
+    protected object IsNavigatingLock { get; } = new object();
+
     /// <inheritdoc/>
-    public bool IsNavigating { get; protected set; }
+    public virtual bool IsNavigating
+    { 
+        get => _isNavigating;
+        private set => SetIsNavigating(value);
+    }
 
     /// <inheritdoc/>
     public Uri CurrentRoute => Shell.Current.CurrentState.Location;
+
+    /// <inheritdoc/>
+    public event EventHandler<bool>? IsNavigatingChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NavigationService"/> class.
@@ -35,21 +52,21 @@ public class NavigationService : INavigationService
     }
 
     /// <inheritdoc/>
-    public Task NavigateAsync<TView>()
+    public async Task NavigateAsync<TView>()
     {
-        return NavigateAsync<TView>(null);
+        await NavigateAsync<TView>(null);
     }
 
     /// <inheritdoc/>
-    public Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+    public async Task NavigateAsync<TView>(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        return NavigateAsync(typeof(TView), navigationParameters, isAnimated);
+        await NavigateAsync(typeof(TView), navigationParameters, isAnimated);
     }
 
     /// <inheritdoc/>
     public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
     {
-        if (ShouldIgnoreNavigationRequest())
+        if (!SetIsNavigatingOrIgnoreRequest())
         {
             return;
         }
@@ -63,15 +80,15 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(viewMapping.Route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
-    public virtual Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
+    public virtual async Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
     {
-        if (ShouldIgnoreNavigationRequest())
+        if (!SetIsNavigatingOrIgnoreRequest())
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var parameters = GetOrCreateNavigationParameters(navigationParameters);
@@ -94,38 +111,38 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = parameters;
 
-        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(route, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
-    public Task NavigateBackAsync()
+    public async Task NavigateBackAsync()
     {
-        return NavigateBackAsync(null);
+        await NavigateBackAsync(null);
     }
 
     /// <inheritdoc/>
-    public virtual Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
+    public virtual async Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (ShouldIgnoreNavigationRequest())
+        if (!SetIsNavigatingOrIgnoreRequest())
         {
-            return Task.CompletedTask;
+            return;
         }
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        return MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync("..", GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
-    public Task CloseModalAsync()
+    public async Task CloseModalAsync()
     {
-        return CloseModalAsync(null);
+        await CloseModalAsync(null);
     }
 
     /// <inheritdoc/>
     public virtual async Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (ShouldIgnoreNavigationRequest())
+        if (!SetIsNavigatingOrIgnoreRequest())
         {
             return;
         }
@@ -150,19 +167,19 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
     }
 
     /// <inheritdoc/>
-    public Task CloseAllModalAsync()
+    public async Task CloseAllModalAsync()
     {
-        return CloseAllModalAsync(null);
+        await CloseAllModalAsync(null);
     }
 
     /// <inheritdoc/>
     public virtual async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (ShouldIgnoreNavigationRequest())
+        if (!SetIsNavigatingOrIgnoreRequest())
         {
             return;
         }
@@ -194,7 +211,29 @@ public class NavigationService : INavigationService
 
         NucleusMvvmCore.Current.NavigationParameters = GetOrCreateNavigationParameters(navigationParameters);
 
-        await MainThread.InvokeOnMainThreadAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+        await HandleShellNavigationAsync(() => Shell.Current.GoToAsync(navigationPath, GetIsAnimated(isAnimated), GetOrCreateShellNavigationQueryParameters(NucleusMvvmCore.Current.NavigationParameters)));
+    }
+
+    /// <summary>
+    /// Trigger the requested Shell logic on the UI thread, ensuring that 'IsNavigation' is reset in case
+    /// an <see cref="Exception"/> occurs during the execution.
+    /// </summary>
+    /// <param name="shellNavigationTask">A function that returns the navigation <see cref="Task"/>.</param>
+    /// <returns>An awaitable <see cref="Task"/>.</returns>
+    protected virtual async Task HandleShellNavigationAsync (Func<Task> shellNavigationTask)
+    {
+        IsNavigating = true;
+
+        try
+        {
+            await shellNavigationTask();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed handling navigation request with exception: " + ex.Message);
+        }
+        
+        IsNavigating = false;
     }
 
     /// <summary>
@@ -235,6 +274,84 @@ public class NavigationService : INavigationService
             {
                 nucleusMvvmPageBehavior.DestroyAfterNavigatedFrom = true;
             }
+        }
+    }
+
+    /// <summary>
+    /// This function checks if a navigation request should be processed, which depends on the configuration values
+    /// <see cref="NucleusMvvmOptions.IgnoreNavigationWhenInProgress"/> and <see cref="NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds"/>.
+    /// Even when these values are configured, they can be bypassed by passing <see cref="NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest"/>
+    /// in the Navigation Parameters.
+    /// </summary>
+    /// <returns>A value indicating whether or not to ignore a navigation request.</returns>
+    protected virtual bool SetIsNavigatingOrIgnoreRequest(IDictionary<string, object>? navigationParameters = null)
+    {
+        if ((!_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && _nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds <= 0) ||
+            navigationParameters?.ContainsKey(NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest) == true &&
+            navigationParameters[NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest] is bool value && value)
+        {
+            IsNavigating = true;
+            return true;
+        }
+
+        var isNavigationAllowed = false;
+        var isNavigationTooSoon = false;
+
+        var isNavigatingLastTriggeredUtc = _isNavigatingLastTriggeredUtc;
+        
+        lock (IsNavigatingLock)
+        {
+            if (!IsNavigating)
+            {
+                IsNavigating = true;
+                isNavigationAllowed = true;
+                
+                _isNavigatingLastTriggeredUtc = DateTime.UtcNow;
+            }
+
+            if (!_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
+            {
+                isNavigationAllowed = true;
+            }
+        }
+
+        if (_nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds >= 0 && isNavigatingLastTriggeredUtc != default && isNavigationAllowed)
+        {
+            isNavigationTooSoon = (DateTime.UtcNow - isNavigatingLastTriggeredUtc).TotalMilliseconds < _nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds;
+            isNavigationAllowed = !isNavigationTooSoon;
+        }
+
+        if (!isNavigationAllowed)
+        {
+            var detailsMessage = isNavigationTooSoon ?
+                $"Ignoring this navigation request as it is within {_nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds}ms since the previous one. You can change this value in {nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds)}." :
+                $"Ignoring this navigation request as another request is already in progress. You can change this value in {nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWhenInProgress)}.";
+
+            _logger?.LogWarning(detailsMessage);
+        }
+
+        return isNavigationAllowed;
+    }
+
+    private void SetIsNavigating(bool value)
+    {
+        if (_isNavigating == value)
+        {
+            return;
+        }
+        
+        _isNavigating = value;
+
+        if (_isNavigating)
+        {
+            _isNavigatingLastTriggeredUtc = DateTime.UtcNow;
+        }
+        
+        IsNavigatingChanged?.Invoke(this, value);
+        
+        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
+        {
+            _logger?.LogInformation($"IsNavigating changed to '{_isNavigating}'." + (_isNavigating ? " Incoming navigation requests will be ignored." : string.Empty));
         }
     }
 
@@ -288,9 +405,9 @@ public class NavigationService : INavigationService
         if (!isCanceled)
         {
             _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
-
-            IsNavigating = true;
         }
+        
+        IsNavigating = !isCanceled;
 
         shellNavigatingDeferralToken?.Complete();
     }
@@ -366,11 +483,6 @@ public class NavigationService : INavigationService
         return result;
     }
 
-    private bool GetIsAnimated(bool isAnimated)
-    {
-        return _nucleusMvvmOptions.AlwaysDisableNavigationAnimation ? false : isAnimated;
-    }
-
     private IList<Page> GetTransientPagesFromNavigationStack()
     {
         var result = new List<Page>(NucleusMvvmCore.Current.Shell?.CurrentPage?.Navigation?.NavigationStack?.Skip(1) ?? new List<Page>());
@@ -397,15 +509,8 @@ public class NavigationService : INavigationService
         return result;
     }
 
-    private bool ShouldIgnoreNavigationRequest()
+    private bool GetIsAnimated(bool isAnimated)
     {
-        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && IsNavigating)
-        {
-            _logger.LogWarning($"Ignoring this navigation request as we're already navigating. You can change this setting in the MauiProgram initialization.");
-
-            return true;
-        }
-
-        return false;
+        return _nucleusMvvmOptions.AlwaysDisableNavigationAnimation ? false : isAnimated;
     }
 }
