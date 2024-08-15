@@ -36,12 +36,13 @@ public static class MauiProgram
 				options.OnAppStart(serviceProvider => Console.WriteLine("OnAppStart"));
 
 				// Some additional configuration is available.
-				options.AddQueryParametersToDictionary = true; // Default: True. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
-				options.AlwaysDisableNavigationAnimation = true; // Default: False. IIf set the `isAnimated` flag while navigating will always be ignored and no animations will be used.
-				options.UseShellNavigationQueryParameters = true; // Default: True. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
-				options.UseDeconstructPageOnDestroy = true; // Default True. Unload behaviors and unset bindingcontext of pages when they are popped.
-				options.UseDeconstructPopupOnDestroy = true; // Default True. Unset the bindingcontext and parent of popups when they are dismissed
-				options.IgnoreNavigationWhenInProgress = true; // Default: False. If set when trying to navigate using the `INavigationService` while `IsNavigating` is `true` requests will be ignored.
+				options.AddQueryParametersToDictionary = true; // Default `true`. If set, query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
+				options.AlwaysDisableNavigationAnimation = true; // Default `false`. If set, no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
+				options.UseShellNavigationQueryParameters = true; // Default `true`. If set navigation parameters are passed to Shell as the one-time-use.
+				options.UseDeconstructPageOnDestroy = true; // Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
+				options.UseDeconstructPopupOnDestroy = true; // Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
+				options.IgnoreNavigationWhenInProgress = true; // Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
+				options.IgnoreNavigationWithinMilliseconds = 250; // Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
 
             })
 			.ConfigureFonts(fonts =>

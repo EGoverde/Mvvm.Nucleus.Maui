@@ -39,10 +39,11 @@ An optional `NucleusViewModel` is included to have some boilerplate events like 
 
 Within the options the following additional settings can be changed:
 
-- `AddQueryParametersToDictionary`: Default `true`. If set query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
-- `AlwaysDisableNavigationAnimation`: Default `false`. If set no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
-- `IgnoreNavigationWhenInProgress`: Default `false`. If set when trying to navigate using the `INavigationService` while it is already busy requests will be ignored.
-- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
+- `AddQueryParametersToDictionary`: Default `true`. If set, query parameters (e.a. `route?key=val`) are automatically added to the navigation parameter dictionary.
+- `AlwaysDisableNavigationAnimation`: Default `false`. If set, no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
+- `IgnoreNavigationWhenInProgress`: Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
+- `IgnoreNavigationWithinMilliseconds`: Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
+- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use.`ShellNavigationQueryParameters`.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
 
@@ -77,7 +78,7 @@ Values can be retrieved using regular `IDictionary` methods, but additionally th
 - `NavigationParameters.GetValueOrDefault<T>(key, defaultValue)`
 - `NavigationParameters.GetStructOrDefault<T>(key, defaultValue)`
 
-If using Shell these parameters can also be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see [Getting started](#getting-started)).
+These parameters can also be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see [Getting started](#getting-started)).
 
 ### Modal navigation
 
@@ -86,7 +87,16 @@ When navigating Nucleus will look for certain parameters in the navigation param
 - `NucleusNavigationParameters.NavigatingPresentationMode`: Expects a [PresentationMode](https://learn.microsoft.com/en-us/dotnet/api/microsoft.maui.controls.presentationmode?) that will be added to the page.
 - `NucleusNavigationParameters.WrapInNavigationPage`: Wraps a NavigationPage around the target, allowing for deeper navigation within a modal page.
 
-Note that above parameters allow for modal presentation in Shell including deeper navigation (see the Sample Project in the repository). However this appears an underdeveloped area of Shell and might not be stable. See 
+Note that above parameters allow for modal presentation in Shell including deeper navigation (see the Sample Project in the repository). However this appears an underdeveloped area of Shell and might not be stable.
+
+### Avoiding double navigation
+
+On slower devices it is a common issue that users are able to trigger multiple navigation requests by pressing a button one more than once,
+either too quickly or while waiting for the navigation to start. When using the CommunityToolkit `(Async)RelayCommand` this problem is reduced, as the Command will be disabled while it's processing. But since a navigation Task returns before it has finished navigating, it can still occur.
+
+Nucleus offers two features to improve the navigation behavior, both are enabled by default. These are `IgnoreNavigationWhenInProgress` and `IgnoreNavigationWithinMilliseconds`, see [Configuration].
+
+In specific cases you might want to bypass these restrictions, but not disable them fully. In those cases you can add `NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest` in the NavigationParameters and set it to true.
 
 ### Navigation interfaces
 

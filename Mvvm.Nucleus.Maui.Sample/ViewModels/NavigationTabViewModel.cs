@@ -21,9 +21,10 @@ public partial class NavigationTabViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task NavigateByRouteAsync()
+    private void NavigateByRoute()
     {
-        await _navigationService.NavigateToRouteAsync(nameof(Details));
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
     }
 
     [RelayCommand]
