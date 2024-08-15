@@ -21,10 +21,9 @@ public partial class NavigationTabViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void NavigateByRoute()
+    private async Task NavigateByRouteAsync()
     {
-        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
-        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
+        await _navigationService.NavigateToRouteAsync(nameof(Details));
     }
 
     [RelayCommand]
@@ -85,6 +84,13 @@ public partial class NavigationTabViewModel : ObservableObject
                 { "Sample", text }
             });
         });
+    }
+
+    [RelayCommand]
+    private void NavigateMultipleTriggers()
+    {
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
+        _ = _navigationService.NavigateToRouteAsync(nameof(Details));
     }
 
     [RelayCommand]
