@@ -15,15 +15,16 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Getting started
 
-Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` (in MauiProgram.cs) and `MainPage = new AppShell()` (in App.xaml.cs) and configure Nucleus using the options:
 
                 builder
                 .UseNucleusMvvm<App, AppShell>(options =>
                 {
-                    options.RegisterTypes(dependencyOptions => 
+                    options.RegisterTypes(dependencyOptions =>
+                    {
                         dependencyOptions.RegisterShellView<MyAbsoluteView, MyAbsoluteViewModel>("//MyAbsoluteView");
                         dependencyOptions.RegisterView<MyGlobalView, MyGlobalViewModel>("//MyGlobalView");
-                    );
+                    });
                 })
                 .Etc..
 
