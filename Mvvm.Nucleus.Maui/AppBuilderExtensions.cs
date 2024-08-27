@@ -33,6 +33,7 @@ public static class AppBuilderExtensions
 
         builder.Services.TryAddSingleton<Application, TApp>();
         builder.Services.TryAddTransient<Shell, TShell>();
+        builder.Services.TryAddSingleton<IWindowCreator, NucleusWindowCreator>();
         builder.Services.AddSingleton<NucleusMvvmCore>();
         builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
         builder.Services.TryAddSingleton<INavigationService, NavigationService>();
@@ -42,15 +43,8 @@ public static class AppBuilderExtensions
         builder.Services.AddSingleton<IApplication>(serviceProvider =>
         {
             var nucleusMvvmCore = serviceProvider.GetRequiredService<NucleusMvvmCore>();
-            nucleusMvvmCore.Initialize(serviceProvider);
 
-            var nucleusMvvmOptions = serviceProvider.GetRequiredService<NucleusMvvmOptions>();
-            nucleusMvvmOptions.OnInitialized?.Invoke(serviceProvider);
-
-            var shell = serviceProvider.GetRequiredService<Shell>();
             var application = nucleusMvvmCore.Application;
-
-            application.MainPage = shell;
             application.PageAppearing += OnApplicationAppearing;
 
             return application;
