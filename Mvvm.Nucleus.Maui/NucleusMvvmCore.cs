@@ -17,6 +17,8 @@ public class NucleusMvvmCore
 
     internal NucleusMvvmOptions NucleusMvvmOptions { get; }
 
+    internal static bool IsInitialized => _current != null;
+
     internal IDictionary<string, object> NavigationParameters
     {
         get => _navigationParameters;
@@ -70,8 +72,8 @@ public class NucleusMvvmCore
     /// </summary>
     public Shell? Shell
     {
-        get => _shell ?? throw new InvalidOperationException("NucleusMvvm could not detect a Shell. Set the MainPage to a Shell before using any Shell-related function, such as navigating.");
-        private set => RegisterShell(value);
+        get => _shell ?? throw new InvalidOperationException("NucleusMvvm could not detect a Shell.");
+        internal set => RegisterShell(value);
     }
 
     /// <summary>
@@ -80,13 +82,18 @@ public class NucleusMvvmCore
     public Window? Window
     {
         get => _window ?? throw new InvalidOperationException("NucleusMvvm could not detect a Window.");
-        private set => RegisterWindow(value);
+        internal set => RegisterWindow(value);
     }
+
+    /// <summary>
+    /// Gets the current 'MainPage' from the <see cref="Window"/>. This is a read-only alternative to the deprecated 'Application.Current.MainPage'.
+    /// </summary>
+    public Page MainPage => _window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect a MainPage.");
 
     /// <summary>
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
     /// </summary>
-    public Page CurrentPage => GetCurrentPage(Application.Current?.MainPage ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
+    public Page CurrentPage => GetCurrentPage(MainPage ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
@@ -106,17 +113,7 @@ public class NucleusMvvmCore
     internal void Initialize(IServiceProvider serviceProvider)
     {
         Current = this;
-
         ServiceProvider = serviceProvider;
-
-        Application.PropertyChanged += (sender, e) =>
-        {
-            if (e.PropertyName == nameof(Application.MainPage))
-            {
-                Shell = (sender as Application)?.MainPage as Shell;
-                Window = (sender as Application)?.MainPage?.Window;
-            }
-        };
     }
 
     internal async void RunTaskInVoidAndTrackException(Func<Task> task, Action? onFinished = null, [CallerMemberName] string callerName = "")
