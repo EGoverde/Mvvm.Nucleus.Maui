@@ -95,7 +95,7 @@ Note that above parameters allow for modal presentation in Shell including deepe
 On slower devices it is a common issue that users are able to trigger multiple navigation requests by pressing a button one more than once,
 either too quickly or while waiting for the navigation to start. When using the CommunityToolkit `(Async)RelayCommand` this problem is reduced, as the Command will be disabled while it's processing. But since a navigation Task returns before it has finished navigating, it can still occur.
 
-Nucleus offers two features to improve the navigation behavior, both are enabled by default. These are `IgnoreNavigationWhenInProgress` and `IgnoreNavigationWithinMilliseconds`, see [Configuration].
+Nucleus offers two features to improve the navigation behavior, both are enabled by default. These are `IgnoreNavigationWhenInProgress` and `IgnoreNavigationWithinMilliseconds`, see [Configuration](#configuration).
 
 In specific cases you might want to bypass these restrictions, but not disable them fully. In those cases you can add `NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest` in the NavigationParameters and set it to true.
 
