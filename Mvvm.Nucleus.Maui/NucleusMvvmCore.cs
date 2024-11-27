@@ -78,8 +78,8 @@ public class NucleusMvvmCore
     }
 
     /// <summary>
-    /// Gets the <see cref="Window"/>. This will be created through the default Nucleus <see cref="WindowCreator"/>, unless overriden. Proper multi-window
-    /// support is not yet available, so only one <see cref="Window"/> will ever be created.
+    /// Gets the <see cref="Window"/>. This will be created through the service registered in <see cref="IWindowCreator"/>. Proper multi-window
+    /// support is not yet available, so by default only one <see cref="Window"/> will be registered and acted upon.
     /// </summary>
     public Window? Window
     {
