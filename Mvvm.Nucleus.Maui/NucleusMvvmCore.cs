@@ -18,6 +18,8 @@ public class NucleusMvvmCore
 
     internal NucleusMvvmOptions NucleusMvvmOptions { get; }
 
+    internal static bool IsInitialized => _current != null;
+
     internal IDictionary<string, object> NavigationParameters
     {
         get => _navigationParameters;
@@ -71,8 +73,8 @@ public class NucleusMvvmCore
     /// </summary>
     public Shell? Shell
     {
-        get => _shell ?? throw new InvalidOperationException("NucleusMvvm could not detect a Shell. Set the MainPage to a Shell before using any Shell-related function, such as navigating.");
-        private set => RegisterShell(value);
+        get => _shell ?? throw new InvalidOperationException("NucleusMvvm could not detect a Shell.");
+        internal set => RegisterShell(value);
     }
 
     /// <summary>
@@ -84,6 +86,11 @@ public class NucleusMvvmCore
         get => _window ?? throw new InvalidOperationException("NucleusMvvm could not detect a Window.");
         internal set => RegisterWindow(value);
     }
+
+    /// <summary>
+    /// Gets the current 'MainPage' from the <see cref="Window"/>. This is a read-only alternative to the deprecated 'Application.Current.MainPage'.
+    /// </summary>
+    public Page MainPage => _window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect a MainPage.");
 
     /// <summary>
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
@@ -176,8 +183,6 @@ public class NucleusMvvmCore
 
             Logger?.LogInformation("Set or updated NucleusMvvm Window reference.");
         }
-
-        Shell = window?.Page as Shell;
     }
 
     private void OnAppStopped(object sender, EventArgs e)
