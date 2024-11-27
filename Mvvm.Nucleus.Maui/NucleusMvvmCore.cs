@@ -86,7 +86,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
     /// </summary>
-    public Page CurrentPage => GetCurrentPage(Application.Current?.MainPage ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
+    public Page CurrentPage => GetCurrentPage(Windows[0].Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.

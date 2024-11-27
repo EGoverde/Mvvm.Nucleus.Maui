@@ -43,7 +43,7 @@ Within the options the following additional settings can be changed:
 - `AlwaysDisableNavigationAnimation`: Default `false`. If set, no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
 - `IgnoreNavigationWhenInProgress`: Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
 - `IgnoreNavigationWithinMilliseconds`: Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
-- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use.`ShellNavigationQueryParameters`.
+- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
 
