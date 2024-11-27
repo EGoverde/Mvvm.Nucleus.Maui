@@ -144,7 +144,7 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 
 ## Limitations / Planned features
 
-- Shell is automatically setup as the MainPage without any customization options for a startup flow.
+- There's no support yet for multiple Windows, a single Window with Shell will be created.
 - Initial logic for subviews recieving page events has been added, but is not a fully supported concept yet. 
 
 ## Support

@@ -38,6 +38,7 @@ public static class AppBuilderExtensions
         builder.Services.TryAddSingleton<INavigationService, NavigationService>();
         builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
         builder.Services.TryAddSingleton<IPopupService, PopupService>();
+        builder.Services.AddSingleton<IWindowCreator, WindowCreator>();
 
         builder.Services.AddSingleton<IApplication>(serviceProvider =>
         {
@@ -47,10 +48,7 @@ public static class AppBuilderExtensions
             var nucleusMvvmOptions = serviceProvider.GetRequiredService<NucleusMvvmOptions>();
             nucleusMvvmOptions.OnInitialized?.Invoke(serviceProvider);
 
-            var shell = serviceProvider.GetRequiredService<Shell>();
             var application = nucleusMvvmCore.Application;
-
-            application.MainPage = shell;
             application.PageAppearing += OnApplicationAppearing;
 
             return application;

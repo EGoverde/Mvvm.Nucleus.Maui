@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
@@ -75,18 +76,19 @@ public class NucleusMvvmCore
     }
 
     /// <summary>
-    /// Gets the current <see cref="Window"/>. This property will automatically be updated if a new <see cref="Window"/> is presented.
+    /// Gets the <see cref="Window"/>. This will be created through the default Nucleus <see cref="WindowCreator"/>, unless overriden. Proper multi-window
+    /// support is not yet available, so only one <see cref="Window"/> will ever be created.
     /// </summary>
     public Window? Window
     {
         get => _window ?? throw new InvalidOperationException("NucleusMvvm could not detect a Window.");
-        private set => RegisterWindow(value);
+        internal set => RegisterWindow(value);
     }
 
     /// <summary>
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
     /// </summary>
-    public Page CurrentPage => GetCurrentPage(Windows[0].Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
+    public Page CurrentPage => GetCurrentPage(Window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
@@ -106,17 +108,7 @@ public class NucleusMvvmCore
     internal void Initialize(IServiceProvider serviceProvider)
     {
         Current = this;
-
         ServiceProvider = serviceProvider;
-
-        Application.PropertyChanged += (sender, e) =>
-        {
-            if (e.PropertyName == nameof(Application.MainPage))
-            {
-                Shell = (sender as Application)?.MainPage as Shell;
-                Window = (sender as Application)?.MainPage?.Window;
-            }
-        };
     }
 
     internal async void RunTaskInVoidAndTrackException(Func<Task> task, Action? onFinished = null, [CallerMemberName] string callerName = "")
@@ -170,6 +162,8 @@ public class NucleusMvvmCore
         {
             _window.Stopped -= OnAppStopped!;
             _window.Resumed -= OnAppResumed!;
+            _window.PropertyChanged -= OnWindowPropertyChanged!;
+
         }
 
         _window = window;
@@ -178,9 +172,12 @@ public class NucleusMvvmCore
         {
             window.Stopped += OnAppStopped!;
             window.Resumed += OnAppResumed!;
+            window.PropertyChanged += OnWindowPropertyChanged!;
 
             Logger?.LogInformation("Set or updated NucleusMvvm Window reference.");
         }
+
+        Shell = window?.Page as Shell;
     }
 
     private void OnAppStopped(object sender, EventArgs e)
@@ -203,6 +200,14 @@ public class NucleusMvvmCore
     private void OnShellNavigated(object sender, ShellNavigatedEventArgs e)
     {
         ShellNavigated?.Invoke(sender, e);
+    }
+
+    private void OnWindowPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Window.Page))
+        {
+            Shell = (sender as Window)?.Page as Shell;
+        }
     }
 
     private Page GetCurrentPage(Page page)
