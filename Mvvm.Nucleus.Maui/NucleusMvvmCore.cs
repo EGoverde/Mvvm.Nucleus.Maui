@@ -170,7 +170,6 @@ public class NucleusMvvmCore
             _window.Stopped -= OnAppStopped!;
             _window.Resumed -= OnAppResumed!;
             _window.PropertyChanged -= OnWindowPropertyChanged!;
-
         }
 
         _window = window;
