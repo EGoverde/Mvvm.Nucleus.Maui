@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
@@ -77,7 +78,8 @@ public class NucleusMvvmCore
     }
 
     /// <summary>
-    /// Gets the current <see cref="Window"/>. This property will automatically be updated if a new <see cref="Window"/> is presented.
+    /// Gets the <see cref="Window"/>. This will be created through the default Nucleus <see cref="WindowCreator"/>, unless overriden. Proper multi-window
+    /// support is not yet available, so only one <see cref="Window"/> will ever be created.
     /// </summary>
     public Window? Window
     {
@@ -93,7 +95,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
     /// </summary>
-    public Page CurrentPage => GetCurrentPage(MainPage ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
+    public Page CurrentPage => GetCurrentPage(Window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
@@ -167,6 +169,7 @@ public class NucleusMvvmCore
         {
             _window.Stopped -= OnAppStopped!;
             _window.Resumed -= OnAppResumed!;
+            _window.PropertyChanged -= OnWindowPropertyChanged!;
         }
 
         _window = window;
@@ -175,6 +178,7 @@ public class NucleusMvvmCore
         {
             window.Stopped += OnAppStopped!;
             window.Resumed += OnAppResumed!;
+            window.PropertyChanged += OnWindowPropertyChanged!;
 
             Logger?.LogInformation("Set or updated NucleusMvvm Window reference.");
         }
@@ -200,6 +204,14 @@ public class NucleusMvvmCore
     private void OnShellNavigated(object sender, ShellNavigatedEventArgs e)
     {
         ShellNavigated?.Invoke(sender, e);
+    }
+
+    private void OnWindowPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Window.Page))
+        {
+            Shell = (sender as Window)?.Page as Shell;
+        }
     }
 
     private Page GetCurrentPage(Page page)

@@ -43,7 +43,7 @@ Within the options the following additional settings can be changed:
 - `AlwaysDisableNavigationAnimation`: Default `false`. If set, no animations will be used during navigating, regardless of `isAnimated` (only when using the `INavigationService`).
 - `IgnoreNavigationWhenInProgress`: Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
 - `IgnoreNavigationWithinMilliseconds`: Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
-- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use.`ShellNavigationQueryParameters`.
+- `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
 
@@ -144,7 +144,7 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 
 ## Limitations / Planned features
 
-- Shell is automatically setup as the MainPage without any customization options for a startup flow.
+- There's no support yet for multiple Windows, a single Window with Shell will be created.
 - Initial logic for subviews recieving page events has been added, but is not a fully supported concept yet. 
 
 ## Support

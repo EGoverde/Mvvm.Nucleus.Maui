@@ -33,8 +33,8 @@ public class NucleusWindowCreator : IWindowCreator
         var shell = _serviceProvider.GetRequiredService<Shell>();
         var window = new Window(shell);
 
-        NucleusMvvmCore.Current.Shell = shell;
         NucleusMvvmCore.Current.Window = window;
+        NucleusMvvmCore.Current.Shell = shell;
 
         return window;
     }
