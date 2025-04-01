@@ -226,7 +226,7 @@ public class NavigationService : INavigationService
 
         try
         {
-            await shellNavigationTask();
+            await MainThread.InvokeOnMainThreadAsync(shellNavigationTask);
         }
         catch (Exception ex)
         {
