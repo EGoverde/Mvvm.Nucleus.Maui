@@ -360,23 +360,21 @@ public class NavigationService : INavigationService
         var isCanceled = false;
 
         ShellNavigatingDeferral? shellNavigatingDeferralToken = null;
+
+        NucleusMvvmCore.Current.NavigationParameters[NucleusNavigationParameters.ShellNavigationSource] = e.Source;
+        NucleusMvvmCore.Current.NavigationParameters[Compatibility.CompatibilityNavigationParameters.NavigationMode] =
+            e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot ? Compatibility.NavigationMode.Back : Compatibility.NavigationMode.New;
         
-        if (e.CanCancel && (e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
+        if (e.CanCancel && (_nucleusMvvmOptions.UseConfirmNavigationForAllNavigationRequests || e.Source == ShellNavigationSource.Pop || e.Source == ShellNavigationSource.PopToRoot || e.Source == ShellNavigationSource.Push))
         {
             var currentBindingContext = NucleusMvvmCore.Current.Shell?.CurrentPage?.BindingContext;
-            var navigationDirection = default(NavigationDirection);
-
-            switch(e.Source)
+            var navigationDirection = e.Source switch
             {
-                case ShellNavigationSource.Pop:
-                case ShellNavigationSource.PopToRoot:
-                    navigationDirection = NavigationDirection.Back;
-                    break;
-                case ShellNavigationSource.Push:
-                    navigationDirection = NavigationDirection.Forwards;
-                    break;
-            }
-
+                ShellNavigationSource.Pop or ShellNavigationSource.PopToRoot => NavigationDirection.Back,
+                ShellNavigationSource.Push => NavigationDirection.Forwards,
+                _ => NavigationDirection.Other,
+            };
+            
             var confirmNavigation = currentBindingContext as IConfirmNavigation;
             if (confirmNavigation != null && !confirmNavigation.CanNavigate(navigationDirection, NucleusMvvmCore.Current.NavigationParameters))
             {

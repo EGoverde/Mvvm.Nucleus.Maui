@@ -1,7 +1,7 @@
-﻿namespace Mvvm.Nucleus.Maui;
+﻿namespace Mvvm.Nucleus.Maui.Compatibility;
 
 /// <summary>
-/// The <see cref="NavigationParameters"/> is a compatibility class for navigation parameters.
+/// The <see cref="NavigationParameters"/> is a compatibility class for Prism's NavigationParameters.
 /// It differs from <see cref="IDictionary{TKey, TValue}"/> in that accessing a key that is not set will return
 /// a default value, rather than throw an <see cref="Exception"/>.
 /// </summary>

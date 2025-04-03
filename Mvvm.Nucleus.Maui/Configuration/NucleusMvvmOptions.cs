@@ -63,4 +63,11 @@ public class NucleusMvvmOptions
     /// Gets or sets a value indicating whether to use <see cref="ShellNavigationQueryParameters"/> when navigating (see MAUI documentation).
     /// </summary>
     public bool UseShellNavigationQueryParameters {get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to trigger <see cref="IConfirmNavigation"/> or <see cref="IConfirmNavigationAsync"/>
+    /// for requests that are neither a <see cref="ShellNavigationSource.Push"/>, <see cref="ShellNavigationSource.Pop"/>,
+    /// or <see cref="ShellNavigationSource.PopToRoot"/> request.
+    /// </summary>
+    public bool UseConfirmNavigationForAllNavigationRequests { get; set; } = false;
 }

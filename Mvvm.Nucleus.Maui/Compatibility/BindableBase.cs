@@ -2,10 +2,11 @@
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Mvvm.Nucleus.Maui;
+namespace Mvvm.Nucleus.Maui.Compatibility;
 
 /// <summary>
 /// The <see cref="BindableBase"/> is a compatibility class containing additional functions for bindings.
+/// It matches most of the functionality of Prism's BindableBase class.
 /// </summary>
 public class BindableBase : ObservableObject
 {

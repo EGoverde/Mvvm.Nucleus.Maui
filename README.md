@@ -46,6 +46,7 @@ Within the options the following additional settings can be changed:
 - `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
+- `UseConfirmNavigationForAllNavigationRequests`: Default 'false'. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
@@ -67,8 +68,6 @@ Views and their ViewModels need to be registered in `MauiProgram.cs`. Pages defi
 
 Any pages not defined witin `AppShell.xaml` are known as *global routes* and can be pushed from any page. You can register these simply as `RegisterView<MyGlobalView, MyGlobalViewModel>()`, as by default they will get their name as route. You can however supply a custom one. Routes always have to be unique, or the registration will fail.
 
-*Note that in Shell pages on the root-level (e.a. //home) will be reused after the intial navigation, even if set to `Transient`. See [this issue](https://github.com/dotnet/maui/issues/9300)*
-
 ### Passing data
 
 When navigating an `IDictionary<string, object>` can be passed to the `INavigationService`, which will be passed to the `Init` and `Refresh` or various `Navigated` events. The dictionary will only be passed once and it will never be null. In routes query string parameters are supported as well (e.a. `?myValue=value`), but not the recommended approach.
@@ -79,6 +78,8 @@ Values can be retrieved using regular `IDictionary` methods, but additionally th
 - `NavigationParameters.GetStructOrDefault<T>(key, defaultValue)`
 
 These parameters can also be used as described in the [MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/navigation#pass-data), including accessing them through `IQueryAttributable` and `QueryProperty`. By default the values will be wrapped inside `ShellNavigationQueryParameters`, but this can be turned off in the Nucleus MVVM options (see [Getting started](#getting-started)).
+
+Additional data is included by Nucleus through the navigation parameters for advances use-cases, notably through the extension `GetShellNavigationSource`.
 
 ### Modal navigation
 
@@ -103,7 +104,7 @@ Note that due to the nature of the `PopupService` there is no logic for avoiding
 ### Navigation interfaces
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
-- `IConfirmNavigation(Async)`: Allows to interupt the navigation, for example by asking for confirmation.
+- `IConfirmNavigation(Async)`: Allows to interupt the navigation, by default limited to Pop and Push events (see [Configuration]).
 - `IDestructible`: Triggered when `transient` pages are removed from the stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
@@ -132,13 +133,19 @@ Using the `IPopupAware` the ViewModel can receive a reference to the popup, whic
 
 [Prism](https://prismlibrary.com/docs/maui/index.html) is a popular library offering the same (and quite a few more) features as this library. Nucleus MVVM aims to be a simpler alternative, only adding quality-of-life MVVM features as a layer on top of [MAUI](https://github.com/dotnet/maui). This should result in an easy to maintain library able to use the latest MAUI features.
 
-Some compatibility classes have been included to simplify migration for projects limited to simple navigation and MVVM functionality. Nucleus MVVM is a much simpler library however, so when using more advanced Prism features this might require significant rework. Included are:
+Some compatibility classes have been included to simplify migration for projects limited to simple navigation and MVVM functionality. Nucleus MVVM is a much simpler library however, so when using more advanced Prism features this might require significant rework. This functionality has been added to the *Mvvm.Nucleus.Maui.Compatibility* namespace.
+
+Included are:
 
 - Interfaces for similar ViewModels events (e.a. `IPageLifecycleAware`) are mostly kept identical to Prism.
-- BindableBase class has been created to add some missing functions to `ObservableObject`.
-- NavigationParameters class has been added as a named `IDictionary<string, object>`.
+- `BindableBase` class has been created to add some missing functions to `ObservableObject`.
+- `NavigationParameters` class has been added as a named `IDictionary<string, object>`.
+- `IsBackNavigation` and `GetNavigationMode` extensions (see below for more details).
 
-Note that the `NavigationParameter` compatibility class (and Prism implementation) differs from IDictionary in that it returns null when accessing a non-existing key (e.a. navigationParameters["nonKey"]). See [Passing data](#passing-data).
+The `NavigationParameters` compatibility class differs from IDictionary in that it returns null when accessing a non-existing key (e.a. navigationParameters["nonKey"]). This is how it works in Prism. You are recommended to use an IDictionary for passing data, but can use this class if you did not check if keys exist in your recieving ViewModels. See [Passing data](#passing-data).
+
+Also note that the compatibility `NavigationMode` and `IsBackNavigation` and `GetNavigationMode` methods do not translate well to advanced shell navigation, such as switching tabs or navigating multiple levels at once. It is recommended to use `IInitializable(Async)` for handling a return to a Page or ViewModel,
+or using `GetShellNavigationSource` for advanced cases.
 
 Contrary to Prism, dependency injection in Nucleus uses the default Microsoft implementation, which means that apart from registering Views/ViewModels, any other registration should be done through the usual `Services.AddSingleton<>` and similar.
 
