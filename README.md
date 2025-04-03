@@ -4,17 +4,9 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 [![NuGet version (Mvvm.Nucleus.Maui)](https://img.shields.io/nuget/v/Mvvm.Nucleus.Maui.svg?style=flat-square)](https://www.nuget.org/packages/Mvvm.Nucleus.Maui/)
 
-## Highlighted features
-
-- Navigation from ViewModels through INavigationService (using [Shell](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/)).
-- Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
-- Displaying Popups through IPopupService.
-- Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
-- ViewModels and Popup events (e.a. Appearing, Navigation, Initialization) through interfaces.
-- Flexibility in Views and ViewModels, no base classes are required.
-
 ## Index
 
+- [Highlighted features](#highlighted-features)
 - [Getting started](#getting-started)
     - [Configuration](#configuration)
 - [Services](#services)
@@ -28,6 +20,16 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 - [Migrating from Prism](#migrating-from-prism)
 - [Limitations and plans](#limitations-and-plans)
 - [Support](#support)
+
+## Highlighted features
+
+- Navigation from ViewModels through INavigationService (using [Shell](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/)).
+- Displaying Alerts, Dialogs and ActionSheets through IPageDialogService.
+- Displaying Popups through IPopupService.
+- Automatic creation and assigning of ViewModels and Views (using a [Behavior](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/behaviors)).
+- ViewModels and Popup events (e.a. Appearing, Navigation, Initialization) through interfaces.
+- Flexibility in Views and ViewModels, no base classes are required.
+- Basic [Prism compatibility](#migrating-from-prism) for migrating an existing codebase.
 
 ## Getting started
 
