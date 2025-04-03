@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable
+public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable
 {
     public WeakReference<Popup>? Popup { get; set; }
 

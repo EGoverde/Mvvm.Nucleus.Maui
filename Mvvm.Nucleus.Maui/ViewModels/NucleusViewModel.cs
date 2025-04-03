@@ -57,7 +57,7 @@ public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChan
 /// <summary>
 /// An optional ViewModel that can be inherited to have commonly used functions and properties.
 /// </summary>
-public abstract class NucleusViewModel : BindableBase, INucleusViewModel
+public abstract class NucleusViewModel : Compatibility.BindableBase, INucleusViewModel
 {
     private bool _isInitializing;
 

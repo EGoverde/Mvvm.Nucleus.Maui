@@ -32,7 +32,7 @@ public interface INucleusPopupViewModel : INotifyPropertyChanged, INotifyPropert
 /// <summary>
 /// An optional ViewModel that can be inherited to have commonly used functions and properties.
 /// </summary>
-public abstract partial class NucleusPopupViewModel : BindableBase, INucleusPopupViewModel
+public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase, INucleusPopupViewModel
 {
     private bool _isInitializing;
 
