@@ -5,102 +5,106 @@
              x:Class="Mvvm.Nucleus.Maui.Sample.Details"
              x:DataType="local:DetailsViewModel"
              Title="Details">
-    
-    <VerticalStackLayout
-        Spacing="10"
-        Margin="40">
 
-        <Label 
-            Text="Welcome to the details page."
-            VerticalOptions="Center" 
-            HorizontalOptions="Center"
-            Style="{StaticResource Headline}" />
-
-        <Label>
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="View Identifier: " FontAttributes="Bold" />
-                    <Span
-                        x:Name="ViewIdentifierSpan"
-                        Text="{Binding PageIdentifier}"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+    <ScrollView>
         
-        <Label>
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="Page Identifier: " FontAttributes="Bold" />
-                    <Span Text="{Binding PageIdentifier}"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+        <VerticalStackLayout
+            Spacing="10"
+            Margin="40">
 
-        <Label>
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="Parameters: " FontAttributes="Bold" />
-                    <Span Text="{Binding NavigationParameterData}"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+            <Label 
+                Text="Welcome to the details page."
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                Style="{StaticResource Headline}" />
 
-        <Label>
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="OnInit: " FontAttributes="Bold" />
-                    <Span Text="{Binding OnInitData}"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
-    
-        <Label>
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="OnRefresh: " FontAttributes="Bold" />
-                    <Span Text="{Binding OnRefreshData}"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="View Identifier: " FontAttributes="Bold" />
+                        <Span
+                            x:Name="ViewIdentifierSpan"
+                            Text="{Binding PageIdentifier}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Page Identifier: " FontAttributes="Bold" />
+                        <Span Text="{Binding PageIdentifier}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
 
-        <ContentView />
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Parameters: " FontAttributes="Bold" />
+                        <Span Text="{Binding NavigationParameterData}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
 
-        <Button
-            Text="Show More Details (Regular)"
-            Command="{Binding NavigatePushCommand}"/>
-
-        <Button
-            Text="Show More Details (Modal)"
-            Command="{Binding NavigateModalCommand}"/>
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="OnInit: " FontAttributes="Bold" />
+                        <Span Text="{Binding OnInitData}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
         
-        <Button
-            Text="Show More Details (Modal + Stack)"
-            Command="{Binding NavigateModalWithNavigationStackCommand}"/>
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="OnRefresh: " FontAttributes="Bold" />
+                        <Span Text="{Binding OnRefreshData}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
 
-        <Button
-            Text="Navigate Backwards"
-            Command="{Binding NavigateBackCommand}"/>
+            <ContentView />
 
-        <Button
-            Text="Navigate Backwards (confirm)"
-            Command="{Binding NavigateBackWithConfirmCommand}"/>
-        
-         <Button
-            Text="Navigate Backwards (twice)"
-            Command="{Binding NavigateBackTwiceCommand}"/>
+            <Button
+                Text="Show More Details (Regular)"
+                Command="{Binding NavigatePushCommand}"/>
 
-        <Button
-            Text="Close Current Modal (if any)"
-            Command="{Binding CloseModalCommand}"/>
+            <Button
+                Text="Show More Details (Modal)"
+                Command="{Binding NavigateModalCommand}"/>
+            
+            <Button
+                Text="Show More Details (Modal + Stack)"
+                Command="{Binding NavigateModalWithNavigationStackCommand}"/>
 
-        <Button
-            Text="Close All Modals (if any)"
-            Command="{Binding CloseAllModalCommand}"/>
+            <Button
+                Text="Navigate Backwards"
+                Command="{Binding NavigateBackCommand}"/>
 
-        <Button
-            Text="Navigate to Intro (change root)"
-            Command="{Binding NavigateToIntroCommand}"/>
+            <Button
+                Text="Navigate Backwards (confirm)"
+                Command="{Binding NavigateBackWithConfirmCommand}"/>
+            
+            <Button
+                Text="Navigate Backwards (twice)"
+                Command="{Binding NavigateBackTwiceCommand}"/>
 
-    </VerticalStackLayout>
+            <Button
+                Text="Close Current Modal (if any)"
+                Command="{Binding CloseModalCommand}"/>
+
+            <Button
+                Text="Close All Modals (if any)"
+                Command="{Binding CloseAllModalCommand}"/>
+
+            <Button
+                Text="Navigate to Intro (change root)"
+                Command="{Binding NavigateToIntroCommand}"/>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
 
 </ContentPage>

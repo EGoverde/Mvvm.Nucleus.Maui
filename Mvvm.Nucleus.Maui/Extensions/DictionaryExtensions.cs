@@ -41,4 +41,21 @@ public static class DictionaryExtensions
 
         return dictionary[key] is T ? (T)dictionary[key]! : fallback;
     }
+
+    /// <summary>
+    /// Gets the <see cref="ShellNavigationSource"/> from the dictionary. This is a value automatically added to navigation
+    /// parameters during navigation. If the value is not present or is of a unexpected <see cref="Type"/>, it will return
+    /// <see cref="ShellNavigationSource.Unknown"/>.
+    /// </summary>
+    /// <param name="dictionary">The dictionary.</param>
+    /// <returns>The <see cref="ShellNavigationSource"/>.</returns>
+    public static ShellNavigationSource GetShellNavigationSource(this IDictionary<string, object> dictionary)
+    {
+        if (dictionary.TryGetValue(NucleusNavigationParameters.ShellNavigationSource, out var value) && value is ShellNavigationSource source)
+        {
+            return source;
+        }
+
+        return ShellNavigationSource.Unknown;
+    }
 }

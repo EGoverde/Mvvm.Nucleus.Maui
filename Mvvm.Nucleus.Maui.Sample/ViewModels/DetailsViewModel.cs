@@ -140,7 +140,10 @@ public partial class DetailsViewModel : ObservableObject, IInitializable, IConfi
     {
         var stringBuilder = new StringBuilder();
 
-        var parameters = navigationParameters.Where(x => x.Key != NucleusNavigationParameters.NavigatingPresentationMode && x.Key != NucleusNavigationParameters.WrapInNavigationPage);
+        var parameters = navigationParameters.Where(x =>
+            x.Key != NucleusNavigationParameters.NavigatingPresentationMode &&
+            x.Key != NucleusNavigationParameters.WrapInNavigationPage &&
+            x.Key != Compatibility.CompatibilityNavigationParameters.NavigationMode);
 
         foreach (var navigationParameter in parameters)
         {
@@ -150,7 +153,7 @@ public partial class DetailsViewModel : ObservableObject, IInitializable, IConfi
             }
             else
             {
-                stringBuilder.AppendLine($"{navigationParameter.Key} : {navigationParameter.Value}");
+                stringBuilder.Append($", {navigationParameter.Key} : {navigationParameter.Value}");
             }
         }
 

@@ -21,4 +21,11 @@ public static class NucleusNavigationParameters
     /// <see cref="NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds"/>.
     /// </summary>
     public const string DoNotIgnoreThisNavigationRequest = "DoNotIgnoreThisNavigationRequest";
+
+    /// <summary>
+    /// This key is automatically added to the parameters during navigation and holds the value of the
+    /// <see cref="Microsoft.Maui.Controls.ShellNavigationSource"/> property. Do not access the key
+    /// directly, but through <see cref="DictionaryExtensions.GetShellNavigationSource(IDictionary{string, object})"/>.
+    /// </summary>
+    public const string ShellNavigationSource = "ShellNavigationSource";
 }
