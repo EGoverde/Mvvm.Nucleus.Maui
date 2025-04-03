@@ -13,6 +13,22 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 - ViewModels and Popup events (e.a. Appearing, Navigation, Initialization) through interfaces.
 - Flexibility in Views and ViewModels, no base classes are required.
 
+## Index
+
+- [Getting started](#getting-started)
+    - [Configuration](#configuration)
+- [Services](#services)
+- [Navigation](#navigation)
+    - [Passing data](#passing-data)
+    - [Modal navigation](#modal-navigation)
+    - [Avoiding double navigation](#avoiding-double-navigation)
+    - [Navigation interfaces](#navigation-interfaces)
+- [Popups](#popups)
+    - [Popup interfaces](#popup-interfaces)
+- [Migrating from Prism](#migrating-from-prism)
+- [Limitations and plans](#limitations-and-plans)
+- [Support](#support)
+
 ## Getting started
 
 Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
@@ -148,7 +164,7 @@ The `NavigationMode` and `IsBackNavigation` and `GetNavigationMode` methods are 
 
 Contrary to Prism, dependency injection in Nucleus uses the default Microsoft implementation, which means that apart from registering Views/ViewModels, any other registration should be done through the usual `Services.AddSingleton<>` and similar.
 
-## Limitations / Planned features
+## Limitations and plans
 
 - There's no support yet for multiple Windows, a single Window with Shell will be created.
 - Initial logic for subviews recieving page events has been added, but is not a fully supported concept yet. 
