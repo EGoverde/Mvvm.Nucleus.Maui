@@ -19,7 +19,7 @@ public static class CompatibilityExtensions
     /// <summary>
     /// Compatbility extension for Prism. This extension is used to determine if the navigation is a back navigation
     /// or a navigation to a new page. This is a compatibility value and is not recommended to use other than for migrating
-    /// a codebase from Prism. <see cref=""/> 
+    /// a codebase from Prism.
     /// </summary>
     /// <param name="parameters">The parameters.</param>
     /// <returns>A value indicating the type of navigation that occurred (or will occur).</returns>
