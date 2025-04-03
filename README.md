@@ -44,9 +44,9 @@ Within the options the following additional settings can be changed:
 - `IgnoreNavigationWhenInProgress`: Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
 - `IgnoreNavigationWithinMilliseconds`: Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
 - `UseShellNavigationQueryParameters`: Default `true`. If set navigation parameters are passed to Shell as the one-time-use `ShellNavigationQueryParameters`.
+- `UseConfirmNavigationForAllNavigationRequests`: Default `false`. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
-- `UseConfirmNavigationForAllNavigationRequests`: Default 'false'. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
@@ -142,10 +142,9 @@ Included are:
 - `NavigationParameters` class has been added as a named `IDictionary<string, object>`.
 - `IsBackNavigation` and `GetNavigationMode` extensions (see below for more details).
 
-The `NavigationParameters` compatibility class differs from IDictionary in that it returns null when accessing a non-existing key (e.a. navigationParameters["nonKey"]). This is how it works in Prism. You are recommended to use an IDictionary for passing data, but can use this class if you did not check if keys exist in your recieving ViewModels. See [Passing data](#passing-data).
+The `NavigationParameters` compatibility class differs from IDictionary in that it returns null when accessing a non-existing key, which is how it works in Prism. It's here to ensure that if you have code that expects this logic, it will continue to work as expected.
 
-Also note that the compatibility `NavigationMode` and `IsBackNavigation` and `GetNavigationMode` methods do not translate well to advanced shell navigation, such as switching tabs or navigating multiple levels at once. It is recommended to use `IInitializable(Async)` for handling a return to a Page or ViewModel,
-or using `GetShellNavigationSource` for advanced cases.
+The `NavigationMode` and `IsBackNavigation` and `GetNavigationMode` methods are included to ease migration, but the concept does not translate well for advanced cases, such as navigating multiple levels at once. It is recommended to use `IInitializable(Async)` for handling a return to a Page or ViewModel, or using `GetShellNavigationSource` when dealing with complex logic.
 
 Contrary to Prism, dependency injection in Nucleus uses the default Microsoft implementation, which means that apart from registering Views/ViewModels, any other registration should be done through the usual `Services.AddSingleton<>` and similar.
 
