@@ -35,7 +35,8 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     {
         if (Popup != null && Popup.TryGetTarget(out Popup? popup) && popup != null)
         {
-            await popup.CloseAsync(result);
+            // await popup.CloseAsync(result);
+            await popup.CloseAsync();
         }
     }
 }

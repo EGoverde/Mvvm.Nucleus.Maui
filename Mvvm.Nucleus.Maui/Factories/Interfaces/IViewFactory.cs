@@ -8,13 +8,6 @@ public interface IViewFactory
     /// <summary>
     /// Creates a requested View through IoC.
     /// </summary>
-    /// <typeparam name="T">The <see cref="Type"/> of view to create.</typeparam>
-    /// <returns>The created view.</returns>
-    T? CreateView<T>() where T : Element;
-
-    /// <summary>
-    /// Creates a requested View through IoC.
-    /// </summary>
     /// <param name="viewType">The <see cref="Type"/> of view to create.</param>
     /// <returns>The created view.</returns>
     object CreateView(Type viewType);

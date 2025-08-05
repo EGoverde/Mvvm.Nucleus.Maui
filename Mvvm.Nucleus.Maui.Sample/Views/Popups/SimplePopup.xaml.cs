@@ -8,8 +8,8 @@ public partial class SimplePopup : Popup, IPopupInitializable
 	{
 		InitializeComponent();
 
-		ResultWhenUserTapsOutsideOfPopup = "Dismissed using tap.";
-        CloseButton.Clicked += (obj, e) => Close("Closed using Button.");
+		// ResultWhenUserTapsOutsideOfPopup = "Dismissed using tap.";
+        // CloseButton.Clicked += (obj, e) => Close("Closed using Button.");
 	}
 
     public void Init(IDictionary<string, object> navigationParameters)

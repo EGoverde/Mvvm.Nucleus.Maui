@@ -110,10 +110,12 @@ public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase
     [RelayCommand]
     protected virtual async Task CloseAsync(object? result = null)
     {
-        if (GetPopup() is Popup popup)
-        {
-            await popup.CloseAsync(result);
-        }
+        await Task.CompletedTask;
+
+        // if (GetPopup() is Popup popup)
+        // {
+        //     await popup.CloseAsync(result);
+        // }
     }
 
     /// <summary>

@@ -26,12 +26,6 @@ public class ViewFactory : IViewFactory
     }
 
     /// <inheritdoc/>
-    public T? CreateView<T>() where T : Element
-    {
-        return CreateView(typeof(T)) as T;
-    }
-
-    /// <inheritdoc/>
     public object CreateView(Type viewType)
     {
         var view = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
@@ -50,12 +44,7 @@ public class ViewFactory : IViewFactory
             .ViewMappings
             .FirstOrDefault(x => x.ViewType == element.GetType());
 
-        var setBindingContext = viewMapping != null &&
-            element.BindingContext == null &&
-            (!element.IsSet(NucleusMvvm.NucleusConfigureViewProperty) ||
-            (element.GetValue(NucleusMvvm.NucleusConfigureViewProperty) is bool nucleusConfigureView && nucleusConfigureView));
-
-        if (setBindingContext)
+        if (viewMapping != null && element.BindingContext == null)
         {
             element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, viewMapping!.ViewModelType);
         }
@@ -76,7 +65,7 @@ public class ViewFactory : IViewFactory
 
             PresentationMode? presentationMode = null;
             var wrapNavigationPage = false;
-            
+
             if (navigationParameters.ContainsKey(NucleusNavigationParameters.NavigatingPresentationMode) &&
                 navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode] is PresentationMode)
             {

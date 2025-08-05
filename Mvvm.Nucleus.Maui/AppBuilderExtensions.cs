@@ -72,11 +72,11 @@ public static class AppBuilderExtensions
     {
         foreach (var viewMapping in nucleusMvvmOptions.ViewMappings)
         {
-            Func<IServiceProvider, object> viewResolver = serviceProvider =>
+            object viewResolver(IServiceProvider serviceProvider)
             {
                 var viewFactory = serviceProvider.GetRequiredService<IViewFactory>();
                 return viewFactory.CreateView(viewMapping.ViewType);
-            };
+            }
 
             switch (viewMapping.RegistrationScope)
             {
