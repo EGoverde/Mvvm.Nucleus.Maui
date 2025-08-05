@@ -1,24 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
+using CommunityToolkit.Maui.Views;
+using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
-/// The <see cref="ViewFactory"/> is the default implementation for <see cref="IViewFactory"/>.
+/// The <see cref="PopupViewFactory"/> is the default implementation for <see cref="IPopupViewFactory"/>.
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
-public class ViewFactory : IViewFactory
+public class PopupViewFactory : IPopupViewFactory
 {
     private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly NucleusMvvmOptions _nucleusMvvmOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ViewFactory"/> class.
+    /// Initializes a new instance of the <see cref="PopupViewFactory"/> class.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
     /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    public ViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions)
+    public PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
@@ -40,60 +41,23 @@ public class ViewFactory : IViewFactory
     /// <inheritdoc/>
     public object ConfigureView(Element element)
     {
-        var viewMapping = _nucleusMvvmOptions
-            .ViewMappings
-            .FirstOrDefault(x => x.ViewType == element.GetType());
+        var popupMapping = _nucleusMvvmOptions
+            .PopupMappings
+            .FirstOrDefault(x => x.PopupViewType == element.GetType());
 
-        if (viewMapping != null && element.BindingContext == null)
+        if (popupMapping != null && !popupMapping.IsWithoutViewModel && element.BindingContext == null)
         {
-            element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, viewMapping!.ViewModelType);
+            element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
         }
 
-        if (element is Window || element is Shell)
+        if (element is Popup popup)
         {
-            return element;
-        }
-
-        if (element is Page page)
-        {
-            if (!page.Behaviors.Any(x => x is NucleusMvvmPageBehavior))
-            {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page });
-            }
-
-            var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object>();
-
-            PresentationMode? presentationMode = null;
-            var wrapNavigationPage = false;
-
-            if (navigationParameters.TryGetValue(NucleusNavigationParameters.NavigatingPresentationMode, out object? valueAsPresentationMode) && valueAsPresentationMode is PresentationMode)
-            {
-                presentationMode = (PresentationMode)valueAsPresentationMode!;
-            }
-
-            if (navigationParameters.TryGetValue(NucleusNavigationParameters.WrapInNavigationPage, out object? valueAsBool) && valueAsBool is bool)
-            {
-                wrapNavigationPage = (bool)valueAsBool!;
-            }
-
-            if (presentationMode != null)
-            {
-                Shell.SetPresentationMode(page, presentationMode.Value);
-            }
-
-            if (wrapNavigationPage == true)
-            {
-                element = new NavigationPage(page);
-
-                if (presentationMode != null)
-                {
-                    Shell.SetPresentationMode(element, presentationMode.Value);
-                }
-            }
+            // Already a popup.
         }
         else
         {
-            ListenToParentChanges(element);
+            // Needs to be addded to a popup.
+            // ListenToParentChanges(element);
         }
 
         return element;

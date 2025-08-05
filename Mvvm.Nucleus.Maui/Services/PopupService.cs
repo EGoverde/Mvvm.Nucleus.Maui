@@ -54,6 +54,8 @@ public class PopupService : IPopupService
     /// <inheritdoc/>
     public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : Popup
     {
+        var popupView = _serviceProvider.GetRequiredService<TPopup>();
+        NucleusMvvmCore.Current.Shell!.ShowPopup(popupView);
         return Task.FromResult<TResult?>(default);
     }
 

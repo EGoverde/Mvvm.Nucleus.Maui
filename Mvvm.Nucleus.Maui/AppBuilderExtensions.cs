@@ -36,6 +36,7 @@ public static class AppBuilderExtensions
         builder.Services.TryAddSingleton<IWindowCreator, NucleusWindowCreator>();
         builder.Services.AddSingleton<NucleusMvvmCore>();
         builder.Services.TryAddSingleton<IViewFactory, ViewFactory>();
+        builder.Services.TryAddSingleton<IPopupViewFactory, PopupViewFactory>();
         builder.Services.TryAddSingleton<INavigationService, NavigationService>();
         builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
         builder.Services.TryAddSingleton<IPopupService, PopupService>();
@@ -107,7 +108,13 @@ public static class AppBuilderExtensions
 
         foreach (var popupMapping in nucleusMvvmOptions.PopupMappings)
         {
-            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupMapping.PopupViewType);
+            object popupViewResolver(IServiceProvider serviceProvider)
+            {
+                var viewFactory = serviceProvider.GetRequiredService<IPopupViewFactory>();
+                return viewFactory.CreateView(popupMapping.PopupViewType);
+            }
+
+            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupViewResolver);
 
             if (!popupMapping.IsWithoutViewModel)
             {
