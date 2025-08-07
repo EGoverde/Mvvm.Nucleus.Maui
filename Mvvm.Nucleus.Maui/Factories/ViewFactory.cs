@@ -93,15 +93,15 @@ public class ViewFactory : IViewFactory
         }
         else
         {
-            ListenToParentChanges(element);
+            ViewFactory.ListenToParentChanges(element);
         }
 
         return element;
     }
 
-    private void ListenToParentChanges(Element createdElement)
+    private static void ListenToParentChanges(Element element)
     {
-        void OnParentChanged(object sender, EventArgs args)
+        static void OnParentChanged(object sender, EventArgs args)
         {
             if (sender is not Element element)
             {
@@ -118,14 +118,14 @@ public class ViewFactory : IViewFactory
 
             if (rootElement is Page page)
             {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = createdElement });
+                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
                 return;
             }
 
             rootElement.ParentChanged += OnParentChanged!;
         }
 
-        createdElement.ParentChanged += OnParentChanged!;
+        element.ParentChanged += OnParentChanged!;
     }
 
     private static Element? GetRootElement(Element element)

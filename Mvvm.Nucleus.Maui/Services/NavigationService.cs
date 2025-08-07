@@ -499,7 +499,7 @@ public class NavigationService : INavigationService
 
         var nonTransientPageTypes = _nucleusMvvmOptions
             .ViewMappings
-            .Where(x => x.RegistrationScope != ViewScope.Transient)
+            .Where(x => x.RegistrationScope != ServiceLifetime.Transient)
             .Select(x => x.ViewType);
 
         result = result.Where(x => x != null && !nonTransientPageTypes.Contains(x.GetType())).ToList();

@@ -30,40 +30,32 @@ public class PopupViewFactory : IPopupViewFactory
     public object CreateView(Type viewType)
     {
         var view = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
-        if (view is not Element element)
+        if (view is not ContentView contentView)
         {
             return view;
         }
 
-        return ConfigureView(element);
+        return ConfigureView(contentView);
     }
 
     /// <inheritdoc/>
-    public object ConfigureView(Element element)
+    public object ConfigureView(ContentView contentView)
     {
         var popupMapping = _nucleusMvvmOptions
             .PopupMappings
-            .FirstOrDefault(x => x.PopupViewType == element.GetType());
+            .FirstOrDefault(x => x.PopupViewType == contentView.GetType());
 
-        if (popupMapping != null && !popupMapping.IsWithoutViewModel && element.BindingContext == null)
+        if (popupMapping != null && !popupMapping.IsWithoutViewModel && contentView.BindingContext == null)
         {
-            element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
+            contentView.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
         }
+        
+        ListenToParentChanges(contentView);
 
-        if (element is Popup popup)
-        {
-            // Already a popup.
-        }
-        else
-        {
-            // Needs to be addded to a popup.
-            // ListenToParentChanges(element);
-        }
-
-        return element;
+        return contentView;
     }
 
-    private void ListenToParentChanges(Element createdElement)
+    private void ListenToParentChanges(Element element)
     {
         void OnParentChanged(object sender, EventArgs args)
         {
@@ -80,16 +72,21 @@ public class PopupViewFactory : IPopupViewFactory
                 return;
             }
 
+            if (rootElement is Popup popup)
+            {
+                Console.WriteLine("Popup found, adding behavior.");
+            }
+
             if (rootElement is Page page)
             {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = createdElement });
+                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
                 return;
             }
 
             rootElement.ParentChanged += OnParentChanged!;
         }
 
-        createdElement.ParentChanged += OnParentChanged!;
+        element.ParentChanged += OnParentChanged!;
     }
 
     private static Element? GetRootElement(Element element)

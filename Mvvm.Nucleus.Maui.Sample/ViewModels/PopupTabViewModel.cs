@@ -6,12 +6,14 @@ namespace Mvvm.Nucleus.Maui.Sample;
 public partial class PopupTabViewModel : ObservableObject
 {
     private readonly IPopupService _popupService;
+    private readonly CommunityToolkit.Maui.IPopupService _communityToolkitPopupService;
     private readonly IPageDialogService _pageDialogService;
 
-    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService)
+    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService)
     {
         _popupService = popupService;
         _pageDialogService = pageDialogService;
+        _communityToolkitPopupService = communityToolkitPopupService;
     }
 
     [RelayCommand]
@@ -34,6 +36,8 @@ public partial class PopupTabViewModel : ObservableObject
         {
             { "Text", "Text from navigation parameters." }
         };
+
+        await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
 
         var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
 

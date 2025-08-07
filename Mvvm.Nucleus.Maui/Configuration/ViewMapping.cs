@@ -5,7 +5,7 @@
 /// </summary>
 public class ViewMapping
 {
-    internal ViewMapping(Type viewType, Type viewModelType, string? route, ViewRouteType registrationType, ViewScope registrationScope)
+    internal ViewMapping(Type viewType, Type viewModelType, string? route, ViewRouteType registrationType, ServiceLifetime registrationScope)
     {
         ViewType = viewType;
         ViewModelType = viewModelType;
@@ -35,11 +35,11 @@ public class ViewMapping
     public ViewRouteType RegistrationType { get; }
 
     /// <summary>
-    /// The <see cref="ViewScope"/> of this registration.
+    /// The <see cref="ServiceLifetime"/> of this registration.
     /// </summary>
-    public ViewScope RegistrationScope { get; }
+    public ServiceLifetime RegistrationScope { get; }
 
-    internal static ViewMapping Create<TView, TViewModel>(string? route, ViewRouteType registrationType, ViewScope registrationScope)
+    internal static ViewMapping Create<TView, TViewModel>(string? route, ViewRouteType registrationType, ServiceLifetime registrationScope)
     {
         return new ViewMapping(typeof(TView), typeof(TViewModel), route, registrationType, registrationScope);
     }

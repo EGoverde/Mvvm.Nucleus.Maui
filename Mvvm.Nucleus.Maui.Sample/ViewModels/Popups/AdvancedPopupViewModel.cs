@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable
+public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable, IPageLifecycleAware
 {
     public WeakReference<Popup>? Popup { get; set; }
 
@@ -38,5 +38,20 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
             // await popup.CloseAsync(result);
             await popup.CloseAsync();
         }
+    }
+
+    public void OnAppearing()
+    {
+        PopupState = "OnAppearing";
+    }
+
+    public void OnDisappearing()
+    {
+        PopupState = "OnDisappearing";
+    }
+
+    public void OnFirstAppearing()
+    {
+        PopupState = "OnFirstAppearing";
     }
 }
