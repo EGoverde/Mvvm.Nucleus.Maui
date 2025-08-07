@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Reflection;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Mvvm.Nucleus.Maui;
@@ -61,7 +62,7 @@ public static class AppBuilderExtensions
             application.PageAppearing -= OnApplicationAppearing;
         }
 
-        if (NucleusMvvmCore.Current.ServiceProvider is IServiceProvider serviceProvider && 
+        if (NucleusMvvmCore.Current.ServiceProvider is IServiceProvider serviceProvider &&
             serviceProvider.GetRequiredService<NucleusMvvmOptions>() is NucleusMvvmOptions nucleusMvvmOptions &&
             nucleusMvvmOptions.OnAppStart != null)
         {
@@ -79,32 +80,18 @@ public static class AppBuilderExtensions
                 return viewFactory.CreateView(viewMapping.ViewType);
             }
 
-            switch (viewMapping.RegistrationScope)
-            {
-                case ViewScope.Scoped:
-                    mauiAppBuilder.Services
-                        .AddScoped(viewMapping.ViewType, viewResolver)
-                        .TryAddScoped(viewMapping.ViewModelType);
-                    break;
-
-                case ViewScope.Singleton:
-                    mauiAppBuilder.Services
-                        .AddSingleton(viewMapping.ViewType, viewResolver)
-                        .TryAddSingleton(viewMapping.ViewModelType);
-                    break;
-                case ViewScope.Transient:
-                default:
-                    mauiAppBuilder.Services
-                        .AddTransient(viewMapping.ViewType, viewResolver)
-                        .TryAddTransient(viewMapping.ViewModelType);
-                    break;
-            }
+            mauiAppBuilder.Services.Add(new ServiceDescriptor(viewMapping.ViewType, viewResolver, viewMapping.RegistrationScope));
+            mauiAppBuilder.Services.TryAdd(new ServiceDescriptor(viewMapping.ViewModelType, viewResolver, viewMapping.RegistrationScope));
 
             if (viewMapping.RegistrationType == ViewRouteType.GlobalRoute)
             {
                 Routing.RegisterRoute(viewMapping.Route, viewMapping.ViewType);
             }
         }
+
+        // MethodInfo? registerScopedPopup = null;
+        // MethodInfo? registerSingletonPopup = null;
+        MethodInfo? registerTransientPopup = null;
 
         foreach (var popupMapping in nucleusMvvmOptions.PopupMappings)
         {
@@ -114,14 +101,29 @@ public static class AppBuilderExtensions
                 return viewFactory.CreateView(popupMapping.PopupViewType);
             }
 
-            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupViewResolver);
-
-            if (!popupMapping.IsWithoutViewModel)
+            if (popupMapping.PopupViewModelType != null)
             {
+                registerTransientPopup ??= GetAddPopupExtensionMethod(nameof(ServiceCollectionExtensions.AddTransientPopup));
+                registerTransientPopup?
+                    .MakeGenericMethod(popupMapping.PopupViewType, popupMapping.PopupViewModelType)
+                    .Invoke(mauiAppBuilder.Services, [mauiAppBuilder.Services]);
+
+                mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewType);
+                mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewModelType);
+                
                 mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewModelType!, popupMapping.PopupViewModelType!);
             }
+
+            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupViewResolver);
         }
 
         mauiAppBuilder.Services.AddSingleton(nucleusMvvmOptions);
+    }
+
+    private static MethodInfo? GetAddPopupExtensionMethod(string methodName, int genericArgumentCount = 2)
+    {
+        return typeof(ServiceCollectionExtensions)
+            .GetMethods()?
+            .FirstOrDefault(x => x.Name == methodName && x.GetGenericArguments().Length == genericArgumentCount);
     }
 }
