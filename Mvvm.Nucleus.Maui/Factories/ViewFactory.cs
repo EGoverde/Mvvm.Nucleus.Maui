@@ -93,7 +93,7 @@ public class ViewFactory : IViewFactory
         }
         else
         {
-            ViewFactory.ListenToParentChanges(element);
+            ListenToParentChanges(element);
         }
 
         return element;

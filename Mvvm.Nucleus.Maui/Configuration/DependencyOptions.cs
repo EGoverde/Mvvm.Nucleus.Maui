@@ -63,11 +63,11 @@ public class DependencyOptions
     /// <summary>
     /// Registers a <see cref="Popup"/> and ViewModel. To register a <see cref="Popup"/> without a ViewModel use <see cref="RegisterPopup{TPopupView}(ServiceLifetime)"/>.
     /// </summary>
-    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="ContentView"/>.</typeparam>
+    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
     /// <typeparam name="TPopupViewModel">The <see cref="Type"/> of the ViewModel.</typeparam>
     /// <exception cref="ArgumentException">Thrown if a registration already exists for a given <see cref="Popup"/>.</exception>
     public void RegisterPopup<TPopupView, TPopupViewModel>(ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TPopupView : ContentView
+        where TPopupView : View
         where TPopupViewModel : notnull
     {
         var popupViewType = typeof(TPopupView);
@@ -85,10 +85,10 @@ public class DependencyOptions
     /// <summary>
     /// Registers a <see cref="Popup"/>. To register a <see cref="Popup"/> with a ViewModel use <see cref="RegisterPopup{TPopupView, TPopupViewModel}(ServiceLifetime)"/>.
     /// </summary>
-    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="ContentView"/>.</typeparam>
+    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
     /// <exception cref="ArgumentException">Thrown if a registration already exists for a given <see cref="Popup"/>.</exception>
     public void RegisterPopup<TPopupView>(ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TPopupView : ContentView
+        where TPopupView : View
     {
         var popupViewType = typeof(TPopupView);
 

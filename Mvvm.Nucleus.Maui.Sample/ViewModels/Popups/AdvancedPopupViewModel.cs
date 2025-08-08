@@ -4,9 +4,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware, IPopupLifecycleAware, IPopupInitializable, IPageLifecycleAware
+public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupInitializable, IPageLifecycleAware
 {
-    public WeakReference<Popup>? Popup { get; set; }
+    public WeakReference<AdvancedPopup>? Popup { get; set; }
 
     [ObservableProperty]
     private string _popupText = string.Empty;
@@ -33,10 +33,9 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     [RelayCommand]
     private async Task CloseAsync(object? result = null)
     {
-        if (Popup != null && Popup.TryGetTarget(out Popup? popup) && popup != null)
+        if (Popup != null && Popup.TryGetTarget(out AdvancedPopup? popup) && popup != null)
         {
-            // await popup.CloseAsync(result);
-            await popup.CloseAsync();
+            await popup.CloseAsync(result);
         }
     }
 

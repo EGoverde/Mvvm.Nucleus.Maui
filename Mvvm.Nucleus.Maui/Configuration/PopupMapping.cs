@@ -35,12 +35,12 @@ public class PopupMapping
     /// </summary>
     public ServiceLifetime ServiceLifetime { get; }
 
-    internal static PopupMapping Create<TPopupView, TPopupViewModel>(ServiceLifetime serviceLifetime) where TPopupView : ContentView
+    internal static PopupMapping Create<TPopupView, TPopupViewModel>(ServiceLifetime serviceLifetime) where TPopupView : View
     {
         return new PopupMapping(typeof(TPopupView), typeof(TPopupViewModel), serviceLifetime);
     }
 
-    internal static PopupMapping Create<TPopupView>(ServiceLifetime serviceLifetime) where TPopupView : ContentView
+    internal static PopupMapping Create<TPopupView>(ServiceLifetime serviceLifetime) where TPopupView : View
     {
         return new PopupMapping(typeof(TPopupView), serviceLifetime);
     }

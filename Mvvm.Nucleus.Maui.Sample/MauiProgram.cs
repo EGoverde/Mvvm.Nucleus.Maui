@@ -44,8 +44,7 @@ public static class MauiProgram
 				options.IgnoreNavigationWhenInProgress = true; // Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
 				options.IgnoreNavigationWithinMilliseconds = 250; // Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
 				options.UseConfirmNavigationForAllNavigationRequests = false; // Default 'false'. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
-				options.UseCommunityToolkitPopupService = false; // Default 'true'. If set to false, the CommunityToolkit PopupService will not work properly, but performance might be better.
-    /// its own implementation and performance might be better.
+				options.UseCommunityToolkitPopupService = true; // Default 'true'. If set to false, the CommunityToolkit.Maui.IPopupService will not work properly, but performance might be better.
 
             })
 			.ConfigureFonts(fonts =>

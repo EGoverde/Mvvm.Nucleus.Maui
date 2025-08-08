@@ -268,7 +268,7 @@ public class NavigationService : INavigationService
             var pageNucleusBehaviors = page.Behaviors?
                 .Where(x => x is NucleusMvvmPageBehavior)?
                 .Select(x => (NucleusMvvmPageBehavior)x)
-                .ToList() ?? new List<NucleusMvvmPageBehavior>();
+                .ToList() ?? [];
             
             foreach (var nucleusMvvmPageBehavior in pageNucleusBehaviors)
             {
@@ -497,12 +497,14 @@ public class NavigationService : INavigationService
             }
         }
 
-        var nonTransientPageTypes = _nucleusMvvmOptions
+        // Now only destroying pages registered as transient through Nucleus. This will not destroy pages that are registered as Singleton or Scoped,
+        // as well as skip pages not made by Nucleus, such as the PopupPage.
+        var transientPageTypes = _nucleusMvvmOptions
             .ViewMappings
-            .Where(x => x.ServiceLifetime != ServiceLifetime.Transient)
+            .Where(x => x.ServiceLifetime == ServiceLifetime.Transient)
             .Select(x => x.ViewType);
 
-        result = result.Where(x => x != null && !nonTransientPageTypes.Contains(x.GetType())).ToList();
+        result = result.Where(x => x != null && transientPageTypes.Contains(x.GetType())).ToList();
 
         return result;
     }

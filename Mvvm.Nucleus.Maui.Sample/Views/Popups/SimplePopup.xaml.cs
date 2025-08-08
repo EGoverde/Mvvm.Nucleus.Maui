@@ -1,8 +1,6 @@
-using CommunityToolkit.Maui.Views;
-
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class SimplePopup : Popup, IPopupInitializable
+public partial class SimplePopup : ContentView, IPopupInitializable
 {
 	public SimplePopup()
 	{

@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="Mvvm.Nucleus.Maui.Sample.AdvancedPopup"
-             x:DataType="local:AdvancedPopupViewModel">
+             x:DataType="local:AdvancedPopupViewModel"
+             x:TypeArguments="system:Object">
 
     <VerticalStackLayout>
 

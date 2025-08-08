@@ -147,9 +147,9 @@ public class NucleusMvvmPageBehavior : Behavior
 
         if (DestroyAfterNavigatedFrom)
         {
-            var element = Element != null ? Element : Page;
-            (element?.BindingContext as IDestructible)?.Destroy();
+            var element = Element ?? Page;
 
+            (element?.BindingContext as IDestructible)?.Destroy();
             (element as IDestructible)?.Destroy();
 
             if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPageOnDestroy)

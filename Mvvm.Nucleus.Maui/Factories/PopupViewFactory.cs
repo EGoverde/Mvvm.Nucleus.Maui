@@ -49,15 +49,20 @@ public class PopupViewFactory : IPopupViewFactory
         {
             contentView.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
         }
-        
+
+        if (contentView is Popup popup)
+        {
+            popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = contentView });
+        }
+
         ListenToParentChanges(contentView);
 
         return contentView;
     }
 
-    private void ListenToParentChanges(Element element)
+    private static void ListenToParentChanges(Element element)
     {
-        void OnParentChanged(object sender, EventArgs args)
+        static void OnParentChanged(object sender, EventArgs args)
         {
             if (sender is not Element element)
             {
@@ -74,7 +79,7 @@ public class PopupViewFactory : IPopupViewFactory
 
             if (rootElement is Popup popup)
             {
-                Console.WriteLine("Popup found, adding behavior.");
+                popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = element });
             }
 
             if (rootElement is Page page)

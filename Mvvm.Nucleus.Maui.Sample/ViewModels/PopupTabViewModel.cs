@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
@@ -37,9 +38,11 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
+        var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
 
-        var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'", "Okay");
+
+        var result = await _popupService.ShowPopupAsync<AdvancedPopup, object?>(navigationParameters);
 
         await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
     }
