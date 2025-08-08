@@ -45,7 +45,7 @@ public class PopupViewFactory : IPopupViewFactory
             .PopupMappings
             .FirstOrDefault(x => x.PopupViewType == contentView.GetType());
 
-        if (popupMapping != null && !popupMapping.IsWithoutViewModel && contentView.BindingContext == null)
+        if (popupMapping != null && popupMapping.PopupViewModelType != null && contentView.BindingContext == null)
         {
             contentView.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
         }

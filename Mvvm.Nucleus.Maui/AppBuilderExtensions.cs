@@ -80,8 +80,8 @@ public static class AppBuilderExtensions
                 return viewFactory.CreateView(viewMapping.ViewType);
             }
 
-            mauiAppBuilder.Services.Add(new ServiceDescriptor(viewMapping.ViewType, viewResolver, viewMapping.RegistrationScope));
-            mauiAppBuilder.Services.TryAdd(new ServiceDescriptor(viewMapping.ViewModelType, viewResolver, viewMapping.RegistrationScope));
+            mauiAppBuilder.Services.Add(new ServiceDescriptor(viewMapping.ViewType, viewResolver, viewMapping.ServiceLifetime));
+            mauiAppBuilder.Services.TryAdd(new ServiceDescriptor(viewMapping.ViewModelType, viewResolver, viewMapping.ServiceLifetime));
 
             if (viewMapping.RegistrationType == ViewRouteType.GlobalRoute)
             {
@@ -89,8 +89,8 @@ public static class AppBuilderExtensions
             }
         }
 
-        // MethodInfo? registerScopedPopup = null;
-        // MethodInfo? registerSingletonPopup = null;
+        MethodInfo? registerScopedPopup = null;
+        MethodInfo? registerSingletonPopup = null;
         MethodInfo? registerTransientPopup = null;
 
         foreach (var popupMapping in nucleusMvvmOptions.PopupMappings)
@@ -103,18 +103,38 @@ public static class AppBuilderExtensions
 
             if (popupMapping.PopupViewModelType != null)
             {
-                registerTransientPopup ??= GetAddPopupExtensionMethod(nameof(ServiceCollectionExtensions.AddTransientPopup));
-                registerTransientPopup?
-                    .MakeGenericMethod(popupMapping.PopupViewType, popupMapping.PopupViewModelType)
-                    .Invoke(mauiAppBuilder.Services, [mauiAppBuilder.Services]);
+                if (nucleusMvvmOptions.UseCommunityToolkitPopupService)
+                {
+                    MethodInfo? registerPopup = null;
 
-                mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewType);
-                mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewModelType);
-                
-                mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewModelType!, popupMapping.PopupViewModelType!);
+                    switch (popupMapping.ServiceLifetime)
+                    {
+                        case ServiceLifetime.Scoped:
+                            registerScopedPopup ??= GetAddPopupExtensionMethod(nameof(ServiceCollectionExtensions.AddScopedPopup));
+                            registerPopup = registerScopedPopup;
+                            break;
+                        case ServiceLifetime.Singleton:
+                            registerSingletonPopup ??= GetAddPopupExtensionMethod(nameof(ServiceCollectionExtensions.AddSingletonPopup));
+                            registerPopup = registerSingletonPopup;
+                            break;
+                        default:
+                            registerTransientPopup ??= GetAddPopupExtensionMethod(nameof(ServiceCollectionExtensions.AddTransientPopup));
+                            registerPopup = registerTransientPopup;
+                            break;
+                    }
+
+                    registerPopup?
+                        .MakeGenericMethod(popupMapping.PopupViewType, popupMapping.PopupViewModelType)
+                        .Invoke(mauiAppBuilder.Services, [mauiAppBuilder.Services]);
+
+                    mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewType);
+                    mauiAppBuilder.Services.RemoveAll(popupMapping.PopupViewModelType);
+                }
+
+                mauiAppBuilder.Services.Add(new ServiceDescriptor(popupMapping.PopupViewModelType!, popupMapping.PopupViewModelType!, popupMapping.ServiceLifetime));
             }
 
-            mauiAppBuilder.Services.AddTransient(popupMapping.PopupViewType, popupViewResolver);
+            mauiAppBuilder.Services.Add(new ServiceDescriptor(popupMapping.PopupViewType, popupViewResolver, popupMapping.ServiceLifetime));
         }
 
         mauiAppBuilder.Services.AddSingleton(nucleusMvvmOptions);

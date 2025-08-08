@@ -23,9 +23,9 @@ public class DependencyOptions
     /// <typeparam name="TView">The <see cref="Type"/> of the View.</typeparam>
     /// <typeparam name="TViewModel">The <see cref="Type"/> of the ViewModel.</typeparam>
     /// <param name="route">The route. If not set it uses the name of the View.</param>
-    /// <param name="registrationScope">The <see cref="ServiceLifetime"/> to be used.</param>
+    /// <param name="serviceLifetime">The <see cref="ServiceLifetime"/> to be used.</param>
     /// <exception cref="ArgumentException">Thrown if a registration conflicts with an already existing registration.</exception>
-    public void RegisterView<TView, TViewModel>(string? route = null, ServiceLifetime registrationScope = ServiceLifetime.Transient)
+    public void RegisterView<TView, TViewModel>(string? route = null, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         where TView : NavigableElement
         where TViewModel : notnull
     {
@@ -36,7 +36,7 @@ public class DependencyOptions
             route = viewType.Name;
         }
 
-        RegisterView<TView, TViewModel>(route, ViewRouteType.GlobalRoute, registrationScope);
+        RegisterView<TView, TViewModel>(route, ViewRouteType.GlobalRoute, serviceLifetime);
     }
 
     /// <summary>
@@ -46,9 +46,9 @@ public class DependencyOptions
     /// <typeparam name="TView">The <see cref="Type"/> of the View.</typeparam>
     /// <typeparam name="TViewModel">The <see cref="Type"/> of the ViewModel.</typeparam>
     /// <param name="absoluteRoute">The route. This should match the route set in Shell.xaml.</param>
-    /// <param name="registrationScope">The <see cref="ServiceLifetime"/> to be used.</param>
+    /// <param name="serviceLifetime">The <see cref="ServiceLifetime"/> to be used.</param>
     /// <exception cref="ArgumentException">Thrown if a registration conflicts with an already existing registration.</exception>
-    public void RegisterShellView<TView, TViewModel>(string absoluteRoute, ServiceLifetime registrationScope = ServiceLifetime.Transient)
+    public void RegisterShellView<TView, TViewModel>(string absoluteRoute, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         where TView : NavigableElement
         where TViewModel : notnull
     {
@@ -57,17 +57,17 @@ public class DependencyOptions
             throw new ArgumentException("This function is for Shell absolute routes and requires a route starting with '//'. They should also be registered in your AppShell.xaml. Use RegisterView for Global Routes.");
         }
 
-        RegisterView<TView, TViewModel>(absoluteRoute, ViewRouteType.AbsoluteRoute, registrationScope);
+        RegisterView<TView, TViewModel>(absoluteRoute, ViewRouteType.AbsoluteRoute, serviceLifetime);
     }
 
     /// <summary>
-    /// Registers a <see cref="Popup"/> and ViewModel. To register a <see cref="Popup"/> without a ViewModel use <see cref="RegisterPopup{TPopupView}()"/>.
+    /// Registers a <see cref="Popup"/> and ViewModel. To register a <see cref="Popup"/> without a ViewModel use <see cref="RegisterPopup{TPopupView}(ServiceLifetime)"/>.
     /// </summary>
-    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="ContentView"/>.</typeparam>
     /// <typeparam name="TPopupViewModel">The <see cref="Type"/> of the ViewModel.</typeparam>
     /// <exception cref="ArgumentException">Thrown if a registration already exists for a given <see cref="Popup"/>.</exception>
-    public void RegisterPopup<TPopupView, TPopupViewModel>()
-        where TPopupView : Popup
+    public void RegisterPopup<TPopupView, TPopupViewModel>(ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        where TPopupView : ContentView
         where TPopupViewModel : notnull
     {
         var popupViewType = typeof(TPopupView);
@@ -79,16 +79,16 @@ public class DependencyOptions
             throw new ArgumentException($"Registration for Popup '{popupViewType}' already found.");
         }
 
-        _popupMappings.Add(PopupMapping.Create<TPopupView, TPopupViewModel>());
+        _popupMappings.Add(PopupMapping.Create<TPopupView, TPopupViewModel>(serviceLifetime));
     }
 
     /// <summary>
-    /// Registers a <see cref="Popup"/>. To register a <see cref="Popup"/> with a ViewModel use <see cref="RegisterPopup{TPopupView, TPopupViewModel}()"/>.
+    /// Registers a <see cref="Popup"/>. To register a <see cref="Popup"/> with a ViewModel use <see cref="RegisterPopup{TPopupView, TPopupViewModel}(ServiceLifetime)"/>.
     /// </summary>
-    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TPopupView">The <see cref="Type"/> of the <see cref="Popup"/> or <see cref="ContentView"/>.</typeparam>
     /// <exception cref="ArgumentException">Thrown if a registration already exists for a given <see cref="Popup"/>.</exception>
-    public void RegisterPopup<TPopupView>()
-        where TPopupView : Popup
+    public void RegisterPopup<TPopupView>(ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        where TPopupView : ContentView
     {
         var popupViewType = typeof(TPopupView);
 
@@ -98,10 +98,10 @@ public class DependencyOptions
             throw new ArgumentException($"Registration for Popup '{popupViewType}' already found.");
         }
 
-        _popupMappings.Add(PopupMapping.Create<TPopupView>());
+        _popupMappings.Add(PopupMapping.Create<TPopupView>(serviceLifetime));
     }
 
-    private void RegisterView<TView, TViewModel>(string? route, ViewRouteType registrationType, ServiceLifetime registrationScope)
+    private void RegisterView<TView, TViewModel>(string? route, ViewRouteType registrationType, ServiceLifetime serviceLifetime)
     {
         var viewType = typeof(TView);
         var viewModelType = typeof(TViewModel);
@@ -122,6 +122,6 @@ public class DependencyOptions
             throw new ArgumentException($"Registration for View '{viewType}' already found with a different ViewModel.");
         }
 
-        _viewMappings.Add(ViewMapping.Create<TView, TViewModel>(route, registrationType, registrationScope));
+        _viewMappings.Add(ViewMapping.Create<TView, TViewModel>(route, registrationType, serviceLifetime));
     }
 }
