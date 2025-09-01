@@ -80,8 +80,10 @@ public class NucleusMvvmOptions
     public bool UseConfirmNavigationForAllNavigationRequests { get; set; } = false;
 
     /// <summary>
-    /// Gets or sets a value indicating whether to register popups for the <see cref="CommunityToolkit.Maui.IPopupService"/>. This uses reflection
-    /// and may affect startup performance, but allows the use of the CommunityToolkit popup service on top of the <see cref="IPopupService"/> .
+    /// Gets or sets a value indicating whether to register popups for the <see cref="CommunityToolkit.Maui.IPopupService"/>, as well as partially
+    /// override the implementation so that it works with the <see cref="IPopupInitializable"/> and <see cref="IPopupInitializableAsync"/> features.
+    /// This uses reflection and may affect startup performance, but allows the use of the CommunityToolkit popup service on top of the
+    /// <see cref="IPopupService"/>.
     /// Default value is `true`.
     /// </summary>
     public bool UseCommunityToolkitPopupService { get; set; } = true;
