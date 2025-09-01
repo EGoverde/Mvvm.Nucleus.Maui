@@ -1,6 +1,4 @@
-using System.Reflection;
 using CommunityToolkit.Maui.Views;
-using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -10,6 +8,8 @@ namespace Mvvm.Nucleus.Maui;
 /// </summary>
 public class NucleusMvvmPopupBehavior() : Behavior
 {
+    private bool _isInitializedBefore;
+
     /// <summary>
     /// The <see cref="Popup"/> this behavior is attached to and which events are used.
     /// </summary>
@@ -64,41 +64,73 @@ public class NucleusMvvmPopupBehavior() : Behavior
     }
     private void OnPopupOpened(object? sender, EventArgs e)
     {
-        if (GetBindingContext() is IPopupLifecycleAware popupLifecycleAware)
+        var bindingContext = GetBindingContext();
+
+        if (bindingContext is IPopupLifecycleAware popupLifecycleAware)
         {
             popupLifecycleAware.OnOpened();
         }
+
+        var isInitializedBefore = _isInitializedBefore;
+        _isInitializedBefore = true;
+
+        if (bindingContext is IInitializable initializable)
+        {
+            if (!isInitializedBefore)
+            {
+                initializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+            else
+            {
+                initializable.Refresh(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+        }
+
+        if (bindingContext is IInitializableAsync initializableAsync)
+        {
+            if (!isInitializedBefore)
+            {
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
+            }
+            else
+            {
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.RefreshAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
+            }
+        }
+
+        NucleusMvvmCore.Current.AppResumed += AppResumed!;
+        NucleusMvvmCore.Current.AppStopped += AppStopped!;
     }
 
     private void OnPopupClosed(object? sender, EventArgs e)
     {
+        NucleusMvvmCore.Current.AppResumed -= AppResumed!;
+        NucleusMvvmCore.Current.AppStopped -= AppStopped!;
+
         if (GetBindingContext() is IPopupLifecycleAware popupLifecycleAware)
         {
             popupLifecycleAware.OnClosed();
         }
     }
 
+    private void AppResumed(object sender, EventArgs e)
+    {
+        if (GetBindingContext() is IApplicationLifecycleAware applicationLifecycleAware)
+        {
+            applicationLifecycleAware.OnResume();
+        }
+    }
+
+    private void AppStopped(object sender, EventArgs e)
+    {
+        if (GetBindingContext() is IApplicationLifecycleAware applicationLifecycleAware)
+        {
+            applicationLifecycleAware.OnSleep();
+        }
+    }
+
     private object? GetBindingContext()
     {
         return Element != null ? Element.BindingContext : Popup?.BindingContext;
-    }
-
-    private static bool IsSubclassOfGeneric(Type genericType, Type? typeToCheck, out Type? typeArgument)
-    {
-        typeArgument = null;
-
-        while (typeToCheck != null && typeToCheck != typeof(Popup))
-        {
-            var currentDefinition = typeToCheck.IsGenericType ? typeToCheck.GetGenericTypeDefinition() : typeToCheck;
-            if (currentDefinition == genericType)
-            {
-                typeArgument = typeToCheck.GenericTypeArguments.First();
-                return true;
-            }
-
-            typeToCheck = typeToCheck?.BaseType;
-        }
-
-        return false;
     }
 }

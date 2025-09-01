@@ -4,8 +4,15 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupInitializable, IPageLifecycleAware
+public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IInitializableAsync, IPopupInitializable, IPageLifecycleAware
 {
+    public AdvancedPopupViewModel(CommunityToolkit.Maui.IPopupService popupService)
+    {
+        _popupService = popupService;
+    }
+
+    private readonly CommunityToolkit.Maui.IPopupService _popupService;
+
     public WeakReference<AdvancedPopup>? Popup { get; set; }
 
     [ObservableProperty]
@@ -39,6 +46,15 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
         }
     }
 
+    [RelayCommand]
+    private async Task OpenCascadingPopupAsync()
+    {
+        await _popupService.ShowPopupAsync<AdvancedPopup>(Shell.Current, null, new Dictionary<string, object>
+        {
+            { "Text", $"Cascading Popup: {Guid.NewGuid()}" }
+        });
+    }
+
     public void OnAppearing()
     {
         PopupState = "OnAppearing";
@@ -52,5 +68,18 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     public void OnFirstAppearing()
     {
         PopupState = "OnFirstAppearing";
+    }
+
+    public Task InitAsync(IDictionary<string, object> navigationParameters)
+    {
+        PopupText = navigationParameters.GetValueOrDefault<string>("Text") ?? "Sample Text";
+        PopupState = "Initialized";
+        
+        return Task.CompletedTask;
+    }
+
+    public Task RefreshAsync(IDictionary<string, object> navigationParameters)
+    {
+        return Task.CompletedTask;
     }
 }

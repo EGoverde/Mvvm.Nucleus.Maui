@@ -38,13 +38,15 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
+        _ = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current, null, shellParameters: navigationParameters);
 
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'", "Okay");
+        // var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
 
-        var result = await _popupService.ShowPopupAsync<AdvancedPopup, object?>(navigationParameters);
+        // await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'", "Okay");
 
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        // var result = await _popupService.ShowPopupAsync<AdvancedPopup, object?>(navigationParameters);
+
+        // await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
     }
 
     [RelayCommand]

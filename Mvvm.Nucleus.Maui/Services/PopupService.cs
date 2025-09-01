@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
@@ -9,13 +7,13 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="PopupService"/> is the default implementation for <see cref="IPopupService"/>.
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
-public class PopupService : IPopupService
+public partial class PopupService
 {
     private readonly ILogger<PopupService> _logger;
 
     private readonly IServiceProvider _serviceProvider;
 
-    private readonly CommunityToolkit.Maui.IPopupService _popupService;
+    private readonly CommunityToolkit.Maui.IPopupService _ctPopupService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PopupService"/> class.
@@ -27,78 +25,84 @@ public class PopupService : IPopupService
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _popupService = popupService;
+        _ctPopupService = popupService;
     }
 
     /// <inheritdoc/>
-    public Task<IPopupResult> ShowPopupAsync<TPopup>() where TPopup : View
+    public Task<IPopupResult> ShowPopupAsync<T>(Page page, CommunityToolkit.Maui.IPopupOptions? options = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        return ShowPopupAsync<TPopup>(null);
+        return _ctPopupService.ShowPopupAsync<T>(page, options, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultResult = default) where TPopup : View
+    public Task<IPopupResult> ShowPopupAsync<T>(INavigation navigation, CommunityToolkit.Maui.IPopupOptions? options = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        return ShowPopupAsync<TPopup, TResult>(null, defaultResult);
+        return _ctPopupService.ShowPopupAsync<T>(navigation, options, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public async Task<IPopupResult> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : View
+    public Task<IPopupResult> ShowPopupAsync<T>(Shell shell, CommunityToolkit.Maui.IPopupOptions? options, IDictionary<string, object>? shellParameters = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        IPopupResult result;
-
-        if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseCommunityToolkitPopupService)
-        {
-            result = await _popupService.ShowPopupAsync<TPopup>(NucleusMvvmCore.Current.Shell!, cancellationToken: token);
-        }
-        else
-        {
-            var popupView = _serviceProvider.GetRequiredService<TPopup>();
-            result = await NucleusMvvmCore.Current.Shell!.ShowPopupAsync(popupView, token: token);
-        }
-
-        return result;
+        return _ctPopupService.ShowPopupAsync<T>(shell, options, shellParameters, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public async Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : View
+    public Task<IPopupResult<TResult>> ShowPopupAsync<T, TResult>(Page page, CommunityToolkit.Maui.IPopupOptions? options = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        IPopupResult<TResult> result;
-
-        if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseCommunityToolkitPopupService)
-        {
-            result = await _popupService.ShowPopupAsync<TPopup, TResult>(NucleusMvvmCore.Current.Shell!, cancellationToken: token);
-        }
-        else
-        {
-            var popupView = _serviceProvider.GetRequiredService<TPopup>();
-            result = await NucleusMvvmCore.Current.Shell!.ShowPopupAsync<TResult>(popupView, token: token);
-        }
-
-        return result.Result ?? defaultResult;
+        return _ctPopupService.ShowPopupAsync<T, TResult>(page, options, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public async Task<IPopupResult> ShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default)
+    public Task<IPopupResult<TResult>> ShowPopupAsync<T, TResult>(INavigation navigation, CommunityToolkit.Maui.IPopupOptions? options = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        if (_serviceProvider.GetRequiredService(popupViewType) is not View popupView)
-        {
-            throw new InvalidOperationException($"Nucleus failed to create a popup of type '{popupViewType}'");
-        }
-
-        return await NucleusMvvmCore.Current.Shell!.ShowPopupAsync(popupView, token: token);
+        return _ctPopupService.ShowPopupAsync<T, TResult>(navigation, options, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public async Task<TResult?> ShowPopupAsync<TResult>(Type popupViewType, IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default)
+    public Task<IPopupResult<TResult>> ShowPopupAsync<T, TResult>(Shell shell, CommunityToolkit.Maui.IPopupOptions? options = null, IDictionary<string, object>? shellParameters = null, CancellationToken cancellationToken = default) where T : notnull
     {
-        if (_serviceProvider.GetRequiredService(popupViewType) is not View popupView)
-        {
-            throw new InvalidOperationException($"Nucleus failed to create a popup of type '{popupViewType}'");
-        }
+        return _ctPopupService.ShowPopupAsync<T, TResult>(shell, options, shellParameters, cancellationToken);
+    }
 
-        var result = await NucleusMvvmCore.Current.Shell!.ShowPopupAsync<TResult>(popupView, token: token);
+    /// <inheritdoc/>
+    public Task<IPopupResult> ClosePopupAsync(Page page, CancellationToken cancellationToken = default)
+    {
+        return _ctPopupService.ClosePopupAsync(page, cancellationToken);
+    }
 
-        return result.Result ?? defaultResult;
+    /// <inheritdoc/>
+    public Task<IPopupResult<T>> ClosePopupAsync<T>(Page page, T result, CancellationToken cancellationToken = default)
+    {
+        return _ctPopupService.ClosePopupAsync(page, result, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task<IPopupResult> ClosePopupAsync(INavigation navigation, CancellationToken cancellationToken = default)
+    {
+        return _ctPopupService.ClosePopupAsync(navigation, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task<IPopupResult<T>> ClosePopupAsync<T>(INavigation navigation, T result, CancellationToken cancellationToken = default)
+    {
+        return _ctPopupService.ClosePopupAsync(navigation, result, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public void ShowPopup<T>(Page page, CommunityToolkit.Maui.IPopupOptions? options = null) where T : notnull
+    {
+        _ctPopupService.ShowPopup<T>(page, options);
+    }
+
+    /// <inheritdoc/>
+    public void ShowPopup<T>(INavigation navigation, CommunityToolkit.Maui.IPopupOptions? options = null) where T : notnull
+    {
+        _ctPopupService.ShowPopup<T>(navigation, options);
+    }
+
+    /// <inheritdoc/>
+    public void ShowPopup<T>(Shell shell, CommunityToolkit.Maui.IPopupOptions? options = null, IDictionary<string, object>? shellParameters = null) where T : notnull
+    {
+        _ctPopupService.ShowPopup<T>(shell, options, shellParameters);
     }
 }

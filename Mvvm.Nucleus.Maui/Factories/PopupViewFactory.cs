@@ -80,11 +80,6 @@ public class PopupViewFactory : IPopupViewFactory
             if (rootElement is Popup popup)
             {
                 popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = element });
-            }
-
-            if (rootElement is Page page)
-            {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
                 return;
             }
 

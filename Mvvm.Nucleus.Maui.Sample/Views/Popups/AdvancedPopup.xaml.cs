@@ -1,8 +1,8 @@
-using CommunityToolkit.Maui.Views;
+using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopup : Popup<object?>
+public partial class AdvancedPopup : CommunityToolkitV1Popup
 {
 	public AdvancedPopup()
 	{

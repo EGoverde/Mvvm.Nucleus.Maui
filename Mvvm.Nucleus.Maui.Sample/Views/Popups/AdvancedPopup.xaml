@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<compatibility:CommunityToolkitV1Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
+             xmlns:compatibility="clr-namespace:Mvvm.Nucleus.Maui.Compatibility;assembly=Mvvm.Nucleus.Maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="Mvvm.Nucleus.Maui.Sample.AdvancedPopup"
-             x:DataType="local:AdvancedPopupViewModel"
-             x:TypeArguments="system:Object">
+             x:DataType="local:AdvancedPopupViewModel">
 
     <VerticalStackLayout>
 
@@ -19,6 +19,11 @@
             Margin="20,0,20,20"/>
 
         <Button
+            Text="Open Another Popup"
+            Command="{Binding OpenCascadingPopupCommand}"
+            Margin="20,0,20,20" />
+
+        <Button
             Text="Close Popup"
             Command="{Binding CloseCommand}"
             CommandParameter="Closed using ICommand."
@@ -26,4 +31,4 @@
 
     </VerticalStackLayout>
 
-</toolkit:Popup>
+</compatibility:CommunityToolkitV1Popup>

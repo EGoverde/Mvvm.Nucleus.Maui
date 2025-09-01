@@ -14,6 +14,8 @@ public class NucleusMvvmCore
 
     private IDictionary<string, object> _navigationParameters = new Dictionary<string, object>();
 
+    private IDictionary<string, object> _popupNavigationParameters = new Dictionary<string, object>();
+
     internal ILogger<NucleusMvvmCore>? Logger { get; }
 
     internal NucleusMvvmOptions NucleusMvvmOptions { get; }
@@ -25,13 +27,19 @@ public class NucleusMvvmCore
         get => _navigationParameters;
         set => _navigationParameters = value ?? new Dictionary<string, object>();
     }
+    
+    internal IDictionary<string, object> PopupNavigationParameters
+    {
+        get => _popupNavigationParameters;
+        set => _popupNavigationParameters = value ?? new Dictionary<string, object>();
+    }
 
     /// <summary>
     /// Gets the instance of Nucleus. It needs to have finishing initializing before it can be used.
     /// </summary>
     public static NucleusMvvmCore Current
     {
-        get =>  _current ?? throw new InvalidOperationException("NucleusMvvm has not yet been initialized.");
+        get => _current ?? throw new InvalidOperationException("NucleusMvvm has not yet been initialized.");
         private set => _current = value;
     }
 
