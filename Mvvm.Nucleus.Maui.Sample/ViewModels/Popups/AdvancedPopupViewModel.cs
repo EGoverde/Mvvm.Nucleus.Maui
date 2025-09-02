@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
@@ -38,11 +37,11 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     }
 
     [RelayCommand]
-    private async Task CloseAsync(object? result = null)
+    private async Task CloseAsync(string? result = null)
     {
         if (Popup != null && Popup.TryGetTarget(out AdvancedPopup? popup) && popup != null)
         {
-            await popup.CloseAsync(result);
+            await (result != null ? popup.CloseAsync(result) : popup.CloseAsync());
         }
     }
 

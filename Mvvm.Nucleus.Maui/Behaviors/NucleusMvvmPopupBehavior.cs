@@ -36,16 +36,16 @@ public class NucleusMvvmPopupBehavior() : Behavior
         if (bindingContext != null)
         {
             var popupType = Popup!.GetType();
-            
-            var matchingGenericInterface = typeof(IPopupAware<>).MakeGenericType(popupType);
-            if (matchingGenericInterface.IsAssignableFrom(bindingContext.GetType()))
+
+            var matchingGenericInterfaceForPopupAware = typeof(IPopupAware<>).MakeGenericType(popupType);
+            if (matchingGenericInterfaceForPopupAware.IsAssignableFrom(bindingContext.GetType()))
             {
                 var weakReference = typeof(WeakReference<>)
                     .MakeGenericType(popupType)
                     .GetConstructor([popupType])?
                     .Invoke([Popup!]);
 
-                var propertyInfo = matchingGenericInterface.GetProperty("Popup");
+                var propertyInfo = matchingGenericInterfaceForPopupAware.GetProperty("Popup");
                 propertyInfo?.SetValue(bindingContext, weakReference);
             }
         }

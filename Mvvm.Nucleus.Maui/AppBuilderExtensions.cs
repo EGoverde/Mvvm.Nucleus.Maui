@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -16,14 +17,15 @@ public static class AppBuilderExtensions
     /// <typeparam name="TShell">The <see cref="Type"/> of the subclass of <see cref="Shell"/> for this app.</typeparam>
     /// <param name="builder">The <see cref="MauiAppBuilder"/>.</param>
     /// <param name="options">The <see cref="Action"/> that uses <see cref="NucleusMvvmOptions"/> to configure Nucleus.</param>
+    /// <param name="communityToolkitOptions">The <see cref="Action"/> that uses <see cref="Options"/> to configure CommunityToolkit.Maui.</param>
     /// <returns>The configured <see cref="MauiAppBuilder"/>.</returns>
-    public static MauiAppBuilder UseNucleusMvvm<TApp, TShell>(this MauiAppBuilder builder, Action<NucleusMvvmOptions>? options = null)
+    public static MauiAppBuilder UseNucleusMvvm<TApp, TShell>(this MauiAppBuilder builder, Action<NucleusMvvmOptions>? options = null, Action<Options>? communityToolkitOptions = null)
         where TApp : Application
         where TShell : Shell
     {
         builder
             .UseMauiApp<TApp>()
-            .UseMauiCommunityToolkit();
+            .UseMauiCommunityToolkit(communityToolkitOptions);
 
         var nucleusMvvmOptions = new NucleusMvvmOptions();
         options?.Invoke(nucleusMvvmOptions);
@@ -40,6 +42,16 @@ public static class AppBuilderExtensions
         builder.Services.TryAddSingleton<IPopupViewFactory, PopupViewFactory>();
         builder.Services.TryAddSingleton<INavigationService, NavigationService>();
         builder.Services.TryAddSingleton<IPageDialogService, PageDialogService>();
+
+        if (nucleusMvvmOptions.UseCommunityToolkitPopupServiceCompatibility)
+        {
+            builder.Services.RemoveAll<CommunityToolkit.Maui.IPopupService>();
+            builder.Services.AddSingleton<CommunityToolkit.Maui.IPopupService, PopupService>();
+        }
+
+        builder.Services.AddSingleton<CommunityToolkit.Maui.Services.PopupService>();
+        builder.Services.AddSingleton<CommunityToolkitV1PopupService>();
+
         builder.Services.TryAddSingleton<IPopupService, PopupService>();
 
         builder.Services.AddSingleton<IApplication>(serviceProvider =>
@@ -95,15 +107,9 @@ public static class AppBuilderExtensions
 
         foreach (var popupMapping in nucleusMvvmOptions.PopupMappings)
         {
-            object popupViewResolver(IServiceProvider serviceProvider)
-            {
-                var viewFactory = serviceProvider.GetRequiredService<IPopupViewFactory>();
-                return viewFactory.CreateView(popupMapping.PopupViewType);
-            }
-
             if (popupMapping.PopupViewModelType != null)
             {
-                if (nucleusMvvmOptions.UseCommunityToolkitPopupService)
+                if (nucleusMvvmOptions.UseCommunityToolkitPopupServiceCompatibility)
                 {
                     MethodInfo? registerPopup = null;
 
@@ -132,6 +138,12 @@ public static class AppBuilderExtensions
                 }
 
                 mauiAppBuilder.Services.Add(new ServiceDescriptor(popupMapping.PopupViewModelType!, popupMapping.PopupViewModelType!, popupMapping.ServiceLifetime));
+            }
+
+            object popupViewResolver(IServiceProvider serviceProvider)
+            {
+                var viewFactory = serviceProvider.GetRequiredService<IPopupViewFactory>();
+                return viewFactory.CreateView(popupMapping.PopupViewType);
             }
 
             mauiAppBuilder.Services.Add(new ServiceDescriptor(popupMapping.PopupViewType, popupViewResolver, popupMapping.ServiceLifetime));

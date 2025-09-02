@@ -86,5 +86,5 @@ public class NucleusMvvmOptions
     /// <see cref="IPopupService"/>.
     /// Default value is `true`.
     /// </summary>
-    public bool UseCommunityToolkitPopupService { get; set; } = true;
+    public bool UseCommunityToolkitPopupServiceCompatibility { get; set; } = true;
 }

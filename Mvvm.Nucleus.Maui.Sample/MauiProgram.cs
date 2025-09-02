@@ -26,7 +26,7 @@ public static class MauiProgram
 
 					// These are popups, both with and without viewmodels. These can be used through IPopupService.
 					dependencyOptions.RegisterPopup<SimplePopup>();
-					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>();
+					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>(ServiceLifetime.Singleton);
 				});
 
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.
@@ -44,7 +44,7 @@ public static class MauiProgram
 				options.IgnoreNavigationWhenInProgress = true; // Default `true`. If set, when trying to navigate using the `INavigationService` while it is already busy will ignore other requests.
 				options.IgnoreNavigationWithinMilliseconds = 250; // Default `250`. If set, when trying to navigate using the `INavigationService` while a previous request was done within the given milliseconds will ignore other requests.
 				options.UseConfirmNavigationForAllNavigationRequests = false; // Default 'false'. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
-				options.UseCommunityToolkitPopupService = true; // Default 'true'. If set to false, the CommunityToolkit.Maui.IPopupService will not work properly, but performance might be better.
+				options.UseCommunityToolkitPopupServiceCompatibility = true; // Default 'true'. If set to false, the CommunityToolkit.Maui.IPopupService will not work properly, but performance might be better.
 
             })
 			.ConfigureFonts(fonts =>

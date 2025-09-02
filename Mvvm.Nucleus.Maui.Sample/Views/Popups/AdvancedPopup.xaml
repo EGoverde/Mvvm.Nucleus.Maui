@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<compatibility:CommunityToolkitV1Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
              xmlns:compatibility="clr-namespace:Mvvm.Nucleus.Maui.Compatibility;assembly=Mvvm.Nucleus.Maui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="Mvvm.Nucleus.Maui.Sample.AdvancedPopup"
+             x:TypeArguments="system:String"
              x:DataType="local:AdvancedPopupViewModel">
 
     <VerticalStackLayout>
 
         <Label
             Text="{Binding PopupState, StringFormat='State: {0}'}"
+            BackgroundColor="LightGray"
             Margin="20"/>
 
         <Label
             Text="{Binding PopupText}"
+            BackgroundColor="LightGray"
             Margin="20,0,20,20"/>
 
         <Button
@@ -31,4 +34,4 @@
 
     </VerticalStackLayout>
 
-</compatibility:CommunityToolkitV1Popup>
+</toolkit:Popup>

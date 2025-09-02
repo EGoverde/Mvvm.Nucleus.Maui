@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
@@ -25,9 +24,8 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        var result = await _popupService.ShowPopupAsync<SimplePopup, string>(navigationParameters);
-
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        await _popupService.ShowPopupAsync<SimplePopup>(navigationParameters);
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed'", "Okay");
     }
 
     [RelayCommand]
@@ -38,11 +36,11 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        _ = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current, null, shellParameters: navigationParameters);
+        // _ = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current, null, shellParameters: navigationParameters);
 
-        // var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current);
+        var popupResult = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
 
-        // await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'", "Okay");
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'", "Okay");
 
         // var result = await _popupService.ShowPopupAsync<AdvancedPopup, object?>(navigationParameters);
 
@@ -59,9 +57,7 @@ public partial class PopupTabViewModel : ObservableObject
                 { "Text", $"IsMainThread = {MainThread.IsMainThread}" }
             };
 
-            var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
-
-            await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+            var result = await _popupService.ShowPopupAsync<SimplePopup>();
         });
     }
 }
