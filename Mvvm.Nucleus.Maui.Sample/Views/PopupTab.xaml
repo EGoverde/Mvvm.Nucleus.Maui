@@ -22,7 +22,7 @@
         <Button
             Text="Show Popup as Singleton"
             Command="{Binding ShowSingletonPopupCommand}"/>
-        
+
         <Button
             Text="Use CommunityToolkit.PopupService"
             Command="{Binding ShowCommunityToolkitPopupCommand}"/>
@@ -30,6 +30,10 @@
         <Button
             Text="Show Popup from background thread"
             Command="{Binding ShowBackgroundThreadPopupCommand}"/>
+
+        <Button
+            Text="Show Compatibility Popup"
+            Command="{Binding ShowCompatibilityPopupCommand}"/>
     
     </VerticalStackLayout>
 

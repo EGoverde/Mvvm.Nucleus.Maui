@@ -27,6 +27,7 @@ public static class MauiProgram
 					dependencyOptions.RegisterPopup<SimplePopup>();
 					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>();
 					dependencyOptions.RegisterPopup<SingletonPopup, SingletonPopupViewModel>(ServiceLifetime.Singleton);
+					dependencyOptions.RegisterPopup<LegacyPopup, LegacyPopupViewModel>();
 				});
 
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.

@@ -72,7 +72,7 @@ public class CommunityToolkitV1Popup : Popup<object?>
     
     private static void OnSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
 	{
-        if (bindable is CommunityToolkitV1Popup popup && newValue is Size size)
+        if (bindable is CommunityToolkitV1Popup popup && newValue is Size size && !size.IsZero)
         {
             popup.WidthRequest = size.Width;
             popup.HeightRequest = size.Height;

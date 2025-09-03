@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
@@ -8,12 +9,14 @@ public partial class PopupTabViewModel : ObservableObject
     private readonly IPopupService _popupService;
     private readonly CommunityToolkit.Maui.IPopupService _communityToolkitPopupService;
     private readonly IPageDialogService _pageDialogService;
+    private readonly CommunityToolkitV1PopupService _communityToolkitV1PopupService;
 
-    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService)
+    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService, CommunityToolkitV1PopupService communityToolkitV1PopupService)
     {
         _popupService = popupService;
         _pageDialogService = pageDialogService;
         _communityToolkitPopupService = communityToolkitPopupService;
+        _communityToolkitV1PopupService = communityToolkitV1PopupService;
     }
 
     [RelayCommand]
@@ -74,5 +77,13 @@ public partial class PopupTabViewModel : ObservableObject
 
             var result = await _popupService.ShowPopupAsync<SimplePopup>();
         });
+    }
+
+    [RelayCommand]
+    private async Task ShowCompatibilityPopupAsync()
+    {
+        var popupResult = await _communityToolkitV1PopupService.ShowPopupAsync<LegacyPopup, string>();
+        
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'.", "Okay");
     }
 }
