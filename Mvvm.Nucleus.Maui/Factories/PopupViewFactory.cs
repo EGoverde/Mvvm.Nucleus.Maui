@@ -54,13 +54,15 @@ public class PopupViewFactory : IPopupViewFactory
         {
             popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = view });
         }
-
-        ListenToParentChanges(view);
+        else
+        {
+            ListenToParentChanges(view);
+        }
 
         return view;
     }
 
-    private static void ListenToParentChanges(Element element)
+    internal static void ListenToParentChanges(Element element)
     {
         static void OnParentChanged(object sender, EventArgs args)
         {
@@ -69,13 +71,13 @@ public class PopupViewFactory : IPopupViewFactory
                 return;
             }
 
-            element.ParentChanged -= OnParentChanged!;
-
             var rootElement = GetRootElement(element.Parent);
             if (rootElement == null)
             {
                 return;
             }
+
+            element.ParentChanged -= OnParentChanged!;
 
             if (rootElement is Popup popup)
             {

@@ -98,10 +98,4 @@ public partial class NavigationTabViewModel : ObservableObject
     {
         await _navigationService.NavigateAsync<PopupTab>();
     }
-
-    [RelayCommand]
-    private async Task RestartAppAsync()
-    {
-        await _navigationService.NavigateAsync<Intro>();
-    }
 }

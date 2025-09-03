@@ -129,12 +129,6 @@ public partial class DetailsViewModel : ObservableObject, IInitializable, IConfi
     {
         await _navigationService.CloseAllModalAsync();
     }
-    
-    [RelayCommand]
-    private async Task NavigateToIntroAsync()
-    {
-        await _navigationService.NavigateAsync<Intro>();
-    }
 
     private void SetNavigationParameterData(IDictionary<string, object> navigationParameters)
     {

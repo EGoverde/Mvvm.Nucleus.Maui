@@ -15,7 +15,6 @@ public static class MauiProgram
 				{
 					// These are pages registered within the AppShell.xaml with 'Absolute' routes.
 					// It is important to match the given routes found in the XAML.
-					dependencyOptions.RegisterShellView<Intro, IntroViewModel>("//Intro");
 					dependencyOptions.RegisterShellView<NavigationTab, NavigationTabViewModel>("//Tabs/NavigationTab");
                 	dependencyOptions.RegisterShellView<PopupTab, PopupTabViewModel>("//Tabs/PopupTab");
 					dependencyOptions.RegisterShellView<DialogTab, DialogTabViewModel>("//Tabs/DialogTab");
@@ -26,7 +25,8 @@ public static class MauiProgram
 
 					// These are popups, both with and without viewmodels. These can be used through IPopupService.
 					dependencyOptions.RegisterPopup<SimplePopup>();
-					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>(ServiceLifetime.Transient);
+					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>();
+					dependencyOptions.RegisterPopup<SingletonPopup, SingletonPopupViewModel>(ServiceLifetime.Singleton);
 				});
 
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.

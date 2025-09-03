@@ -5,12 +5,12 @@ namespace Mvvm.Nucleus.Maui.Sample;
 
 public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupInitializable
 {
-    public AdvancedPopupViewModel(CommunityToolkit.Maui.IPopupService popupService)
+    public AdvancedPopupViewModel(IPopupService popupService)
     {
         _popupService = popupService;
     }
 
-    private readonly CommunityToolkit.Maui.IPopupService _popupService;
+    private readonly IPopupService _popupService;
 
     public WeakReference<AdvancedPopup>? Popup { get; set; }
 
@@ -23,22 +23,28 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     public void Init(IDictionary<string, object> navigationParameters)
     {
         PopupText = navigationParameters.GetValueOrDefault<string>("Text") ??  "Sample Text";
-        PopupState = "Initialized";
+        PopupState += ", Initialized";
     }
 
     public void OnOpened()
     {
-        PopupState = "Opened";
+        PopupState += ", Opened";
     }
 
     public void OnClosed()
     {
-        PopupState = "Closed";
+        PopupState += ", Closed";
     }
 
     [RelayCommand]
     private async Task CloseAsync(string? result = null)
     {
+        if (result?.Contains("IPopupService)") == true)
+        {
+            await _popupService.CloseMostRecentPopupAsync(result);
+            return;
+        }
+
         if (Popup != null && Popup.TryGetTarget(out AdvancedPopup? popup) && popup != null)
         {
             await (result != null ? popup.CloseAsync(result) : popup.CloseAsync());
@@ -48,7 +54,7 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
     [RelayCommand]
     private async Task OpenCascadingPopupAsync()
     {
-        await _popupService.ShowPopupAsync<AdvancedPopup>(Shell.Current, null, new Dictionary<string, object>
+        await _popupService.ShowPopupAsync<AdvancedPopup>(new Dictionary<string, object>
         {
             { "Text", $"Cascading Popup: {Guid.NewGuid()}" }
         });

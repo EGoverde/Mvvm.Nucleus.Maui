@@ -36,15 +36,30 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        // _ = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopupViewModel>(Shell.Current, null, shellParameters: navigationParameters);
-
         var popupResult = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
 
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'", "Okay");
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
+    }
 
-        // var result = await _popupService.ShowPopupAsync<AdvancedPopup, object?>(navigationParameters);
+    [RelayCommand]
+    private async Task ShowSingletonPopupAsync()
+    {
+        var popupResult = await _popupService.ShowPopupAsync<SingletonPopup>();
 
-        // await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
+    }
+
+    [RelayCommand]
+    private async Task ShowCommunityToolkitPopupAsync()
+    {
+        var navigationParameters = new Dictionary<string, object>
+        {
+            { "Text", "Text from navigation parameters." }
+        };
+
+        var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopup, string>(Shell.Current, shellParameters: navigationParameters);
+
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
     }
 
     [RelayCommand]

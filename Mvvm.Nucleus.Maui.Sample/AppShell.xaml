@@ -7,11 +7,6 @@
     Shell.FlyoutBehavior="Disabled"
     Title="Mvvm.Nucleus.Maui.Sample">
 
-    <ShellContent
-        Title="Intro"
-        ContentTemplate="{DataTemplate local:Intro}"
-        Route="Intro" />
-
     <TabBar Route="Tabs">
 
         <Tab Route="NavigationTab" Title="Navigation" Icon="atom.png">

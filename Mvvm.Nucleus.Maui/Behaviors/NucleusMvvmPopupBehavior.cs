@@ -27,9 +27,14 @@ public class NucleusMvvmPopupBehavior() : Behavior
 
         var bindingContext = GetBindingContext();
 
-        if (bindingContext is IPopupAware popupAware)
+        if (Element != Popup && Element is IPopupAware popupAwareElement)
         {
-            popupAware.Popup = new WeakReference<Popup>(Popup!);
+            popupAwareElement.Popup = new WeakReference<Popup>(Popup!);
+        }
+
+        if (bindingContext is IPopupAware popupAwareViewModel)
+        {
+            popupAwareViewModel.Popup = new WeakReference<Popup>(Popup!);
         }
 
         if (bindingContext != null)
@@ -61,6 +66,7 @@ public class NucleusMvvmPopupBehavior() : Behavior
         Popup!.Opened -= OnPopupOpened!;
         Popup!.Closed -= OnPopupClosed!;
     }
+
     private void OnPopupOpened(object? sender, EventArgs e)
     {
         var bindingContext = GetBindingContext();
@@ -112,7 +118,12 @@ public class NucleusMvvmPopupBehavior() : Behavior
         }
 
         var popupMapping = NucleusMvvmCore.Current.NucleusMvvmOptions.PopupMappings.FirstOrDefault(x => x.PopupViewType == Element?.GetType());
-        if (popupMapping != null && popupMapping.ServiceLifetime == ServiceLifetime.Transient)
+        if (popupMapping == null)
+        {
+            return;
+        }
+
+        if (popupMapping.ServiceLifetime == ServiceLifetime.Transient)
         {
             if (bindingContext is IDestructible destructibleViewModel)
             {
@@ -138,6 +149,18 @@ public class NucleusMvvmPopupBehavior() : Behavior
                     Element.Parent = null;
                 }
             }
+        }
+
+        if (popupMapping.ServiceLifetime != ServiceLifetime.Transient && Element != Popup)
+        {
+            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+            {
+                Popup!.Behaviors.Remove(this);
+                Popup!.BindingContext = null;
+                Popup!.Parent = null;
+            }
+
+            PopupViewFactory.ListenToParentChanges(Element!); // The CommunityToolkit will create a new Popup later, while using the reused view
         }
     }
 

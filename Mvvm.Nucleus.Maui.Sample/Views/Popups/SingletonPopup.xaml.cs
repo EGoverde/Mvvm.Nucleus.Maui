@@ -1,8 +1,8 @@
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class Intro : ContentPage
+public partial class SingletonPopup : ContentView
 {
-	public Intro()
+	public SingletonPopup()
 	{
 		InitializeComponent();
 	}

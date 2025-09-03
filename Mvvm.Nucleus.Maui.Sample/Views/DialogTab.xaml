@@ -4,49 +4,37 @@
              xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
              x:Class="Mvvm.Nucleus.Maui.Sample.DialogTab"
              x:DataType="local:DialogTabViewModel"
-             Title="Dialog">
+             Title="Dialogs">
 
     <ScrollView>
 
         <VerticalStackLayout
-            Spacing="10"
-            Margin="40">
+            MaximumWidthRequest="400"
+            Margin="40"
+            Spacing="10">
 
-            <Label
-                Text="Dialogs can be displayed in Nucleus.Mvvm through the IPageDialogService, generally from ViewModels." />
-            
-            <Label
-                Text="The buttons below demonstrate various calls to this service. See the DialogTabViewModel for the code behind these buttons." />
-            
-            <VerticalStackLayout
-                MaximumWidthRequest="400"
-                Margin="20"
-                Spacing="10">
+            <Button
+                Text="Display Alert"
+                Command="{Binding DisplayAlertCommand}"/>
 
-                <Button
-                    Text="Display Alert"
-                    Command="{Binding DisplayAlertCommand}"/>
+            <Button
+                Text="Display Alert (background thread)"
+                Command="{Binding DisplayBackgroundThreadAlertCommand}"/>
 
-                <Button
-                    Text="Display Alert (background thread)"
-                    Command="{Binding DisplayBackgroundThreadAlertCommand}"/>
+            <Button
+                Text="Display Confirm"
+                Command="{Binding DisplayConfirmCommand}"/>
 
-                <Button
-                    Text="Display Confirm"
-                    Command="{Binding DisplayConfirmCommand}"/>
+            <Button
+                Text="Display Prompt"
+                Command="{Binding DisplayPromptCommand}"/>
 
-                <Button
-                    Text="Display Prompt"
-                    Command="{Binding DisplayPromptCommand}"/>
-
-                <Button
-                    Text="Display Action Sheet"
-                    Command="{Binding DisplayActionSheetCommand}"/>
-            
-            </VerticalStackLayout>
-            
+            <Button
+                Text="Display Action Sheet"
+                Command="{Binding DisplayActionSheetCommand}"/>
+        
         </VerticalStackLayout>
-    
+            
     </ScrollView>
 
 </ContentPage>

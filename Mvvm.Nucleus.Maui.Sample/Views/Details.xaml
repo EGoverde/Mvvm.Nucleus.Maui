@@ -99,10 +99,6 @@
                 Text="Close All Modals (if any)"
                 Command="{Binding CloseAllModalCommand}"/>
 
-            <Button
-                Text="Navigate to Intro (change root)"
-                Command="{Binding NavigateToIntroCommand}"/>
-
         </VerticalStackLayout>
 
     </ScrollView>

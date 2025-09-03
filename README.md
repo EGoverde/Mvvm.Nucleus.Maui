@@ -158,11 +158,12 @@ A [migration guide](/MIGRATIONS.md) has been written to help migrate from the pr
 
 ### Popup interfaces
 
-- `IPopupAware`: Allows access to the generic Popup type using a WeakReference. *ViewModel-Only.*
+- `IPopupAware`: Allows access to the generic Popup type using a WeakReference. *ViewModel or ContentView.*
 - `IPopupAware<T>`: Allows access to an exact Popup type using a WeakReference. *ViewModel-Only.*
 - `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
 - `IPopupLifeCycleAware`: Events on opening and closing the popup. *ViewModel-Only.*
-- `IDestructible`: Triggered when the popup is closed.
+- `IDestructible`: Triggered when a `transient` popup is closed.
+- `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 
 ## Prism Compatibility
 
