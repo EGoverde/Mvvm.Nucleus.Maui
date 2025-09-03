@@ -29,35 +29,35 @@ public class PopupViewFactory : IPopupViewFactory
     /// <inheritdoc/>
     public object CreateView(Type viewType)
     {
-        var view = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
-        if (view is not ContentView contentView)
+        var viewObject = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
+        if (viewObject is not View view)
         {
-            return view;
+            return viewObject;
         }
 
-        return ConfigureView(contentView);
+        return ConfigureView(view);
     }
 
     /// <inheritdoc/>
-    public object ConfigureView(ContentView contentView)
+    public object ConfigureView(View view)
     {
         var popupMapping = _nucleusMvvmOptions
             .PopupMappings
-            .FirstOrDefault(x => x.PopupViewType == contentView.GetType());
+            .FirstOrDefault(x => x.PopupViewType == view.GetType());
 
-        if (popupMapping != null && popupMapping.PopupViewModelType != null && contentView.BindingContext == null)
+        if (popupMapping != null && popupMapping.PopupViewModelType != null && view.BindingContext == null)
         {
-            contentView.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
+            view.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, popupMapping!.PopupViewModelType!);
         }
 
-        if (contentView is Popup popup)
+        if (view is Popup popup)
         {
-            popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = contentView });
+            popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = view });
         }
 
-        ListenToParentChanges(contentView);
+        ListenToParentChanges(view);
 
-        return contentView;
+        return view;
     }
 
     private static void ListenToParentChanges(Element element)

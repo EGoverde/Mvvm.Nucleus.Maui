@@ -8,8 +8,6 @@ namespace Mvvm.Nucleus.Maui;
 /// </summary>
 public class NucleusMvvmPopupBehavior() : Behavior
 {
-    private bool _isInitializedBefore;
-
     /// <summary>
     /// The <see cref="Popup"/> this behavior is attached to and which events are used.
     /// </summary>
@@ -17,7 +15,7 @@ public class NucleusMvvmPopupBehavior() : Behavior
 
     /// <summary>
     /// The <see cref="Element"/> this behavior is handling. This is either the same as the <see cref="Popup"/>, but can
-    /// also be a <see cref="ContentView"/> that will be wrapped in a <see cref="Popup"/> by the Community Toolkit.
+    /// also be a <see cref="View"/> that will be wrapped in a <see cref="Popup"/> by the Community Toolkit.
     /// </summary>
     public Element? Element { get; set; }
 
@@ -71,30 +69,28 @@ public class NucleusMvvmPopupBehavior() : Behavior
             popupLifecycleAware.OnOpened();
         }
 
-        var isInitializedBefore = _isInitializedBefore;
-        _isInitializedBefore = true;
-
-        if (bindingContext is IInitializable initializable)
+        if (NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit)
         {
-            if (!isInitializedBefore)
-            {
-                initializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
-            }
-            else
-            {
-                initializable.Refresh(NucleusMvvmCore.Current.PopupNavigationParameters);
-            }
-        }
+            NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit = false;
 
-        if (bindingContext is IInitializableAsync initializableAsync)
-        {
-            if (!isInitializedBefore)
+            if (Element is IPopupInitializable popupInitializable)
             {
-                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
+                popupInitializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
             }
-            else
+
+            if (GetBindingContext() is IPopupInitializable popupInitializableViewModel)
             {
-                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.RefreshAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
+                popupInitializableViewModel.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (Element is IPopupInitializableAsync popupInitializableAsync)
+            {
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsync.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
+            }
+
+            if (GetBindingContext() is IPopupInitializableAsync popupInitializableAsyncViewModel)
+            {
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
         }
 

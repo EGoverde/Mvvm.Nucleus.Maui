@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IInitializableAsync, IPopupInitializable, IPageLifecycleAware
+public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupInitializable
 {
     public AdvancedPopupViewModel(CommunityToolkit.Maui.IPopupService popupService)
     {
@@ -52,33 +52,5 @@ public partial class AdvancedPopupViewModel : Compatibility.BindableBase, IPopup
         {
             { "Text", $"Cascading Popup: {Guid.NewGuid()}" }
         });
-    }
-
-    public void OnAppearing()
-    {
-        PopupState = "OnAppearing";
-    }
-
-    public void OnDisappearing()
-    {
-        PopupState = "OnDisappearing";
-    }
-
-    public void OnFirstAppearing()
-    {
-        PopupState = "OnFirstAppearing";
-    }
-
-    public Task InitAsync(IDictionary<string, object> navigationParameters)
-    {
-        PopupText = navigationParameters.GetValueOrDefault<string>("Text") ?? "Sample Text";
-        PopupState = "Initialized";
-        
-        return Task.CompletedTask;
-    }
-
-    public Task RefreshAsync(IDictionary<string, object> navigationParameters)
-    {
-        return Task.CompletedTask;
     }
 }

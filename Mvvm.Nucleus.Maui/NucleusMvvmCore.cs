@@ -34,6 +34,8 @@ public class NucleusMvvmCore
         set => _popupNavigationParameters = value ?? new Dictionary<string, object>();
     }
 
+    internal bool PopupOpenedThroughCommunityToolkit { get; set; }
+
     /// <summary>
     /// Gets the instance of Nucleus. It needs to have finishing initializing before it can be used.
     /// </summary>

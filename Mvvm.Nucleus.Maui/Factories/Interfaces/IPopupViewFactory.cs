@@ -19,7 +19,7 @@ public interface IPopupViewFactory
     /// If a View is resolved that is not a <see cref="Popup"/> it listens to parent changes until it is wrapped in one by
     /// the Community Toolkit.
     /// </summary>
-    /// <param name="contentView">The view.</param>
+    /// <param name="view">The view.</param>
     /// <returns>The configured view.</returns>
-    object ConfigureView(ContentView contentView);
+    object ConfigureView(View view);
 }

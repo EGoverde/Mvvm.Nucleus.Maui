@@ -32,16 +32,49 @@ public partial class PopupService : IPopupService
     }
 
     /// <inheritdoc/>
-    public void ShowPopup<TPopup>(IDictionary<string, object>? navigationParameters = null) where TPopup : View
+    public async void ShowPopup<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null) where TPopup : View
     {
-        ShowPopup<TPopup>(null, navigationParameters);
+        NucleusMvvmCore.Current.PopupNavigationParameters = navigationParameters ?? new Dictionary<string, object>();
+
+        var popup = await CreateAndInitializePopupAsync<TPopup>();
+
+        MainThread.BeginInvokeOnMainThread(() => NucleusMvvmCore.Current.Shell!.ShowPopup(popup, options, navigationParameters));
     }
 
     /// <inheritdoc/>
-    public void ShowPopup<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null) where TPopup : View
+    public async Task<IPopupResult> ShowPopupAsync<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : View
     {
         NucleusMvvmCore.Current.PopupNavigationParameters = navigationParameters ?? new Dictionary<string, object>();
-        NucleusMvvmCore.Current.Shell!.ShowPopup(CreatePopupContent<TPopup>(), options, navigationParameters);
+
+        var popup = await CreateAndInitializePopupAsync<TPopup>();
+        var result = await MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ShowPopupAsync(popup, options, navigationParameters, token));
+
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IPopupResult<TResult>> ShowPopupAsync<TPopup, TResult>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>
+    {
+        NucleusMvvmCore.Current.PopupNavigationParameters = navigationParameters ?? new Dictionary<string, object>();
+
+        var popup = await CreateAndInitializePopupAsync<TPopup>();
+        var result = await MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ShowPopupAsync<TResult>(popup, options, navigationParameters, token));
+
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public async Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultValue, IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>
+    {
+        var result = await ShowPopupAsync<TPopup, TResult>(options, navigationParameters, token);
+
+        return result.Result ?? defaultValue;
+    }
+
+    /// <inheritdoc/>
+    public void ShowPopup<TPopup>(IDictionary<string, object>? navigationParameters = null) where TPopup : View
+    {
+        ShowPopup<TPopup>(null, navigationParameters);
     }
 
     /// <inheritdoc/>
@@ -51,23 +84,9 @@ public partial class PopupService : IPopupService
     }
 
     /// <inheritdoc/>
-    public Task<IPopupResult> ShowPopupAsync<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : View
-    {
-        NucleusMvvmCore.Current.PopupNavigationParameters = navigationParameters ?? new Dictionary<string, object>();
-        return NucleusMvvmCore.Current.Shell!.ShowPopupAsync(CreatePopupContent<TPopup>(), options, navigationParameters, token);
-    }
-
-    /// <inheritdoc/>
     public Task<IPopupResult<TResult>> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>
     {
         return ShowPopupAsync<TPopup, TResult>(null, navigationParameters, token);
-    }
-
-    /// <inheritdoc/>
-    public Task<IPopupResult<TResult>> ShowPopupAsync<TPopup, TResult>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>
-    {
-        NucleusMvvmCore.Current.PopupNavigationParameters = navigationParameters ?? new Dictionary<string, object>();
-        return NucleusMvvmCore.Current.Shell!.ShowPopupAsync<TResult>(CreatePopupContent<TPopup>(), options, navigationParameters, token);
     }
 
     /// <inheritdoc/>
@@ -77,28 +96,55 @@ public partial class PopupService : IPopupService
     }
 
     /// <inheritdoc/>
-    public async Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultValue, IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>
+    public Task CloseMostRecentPopupAsync(CancellationToken token = default)
     {
-        var result = await ShowPopupAsync<TPopup, TResult>(options, navigationParameters, token);
-        return result.Result ?? defaultValue;
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ClosePopupAsync(token));
     }
 
     /// <inheritdoc/>
-    public async Task CloseMostRecentPopupAsync(CancellationToken token = default)
+    public Task CloseMostRecentPopupAsync<TResult>(TResult result, CancellationToken token = default)
     {
-        await NucleusMvvmCore.Current.Shell!.ClosePopupAsync(token);
-    }
-
-    /// <inheritdoc/>
-    public async Task CloseMostRecentPopupAsync<TResult>(TResult result, CancellationToken token = default)
-    {
-        await NucleusMvvmCore.Current.Shell!.ClosePopupAsync(result, token);
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ClosePopupAsync(result, token));
     }
     
-    private View CreatePopupContent<T>() where T : View
+    private async Task<View> CreateAndInitializePopupAsync<T>() where T : View
 	{
 		if (_serviceProvider.GetService(typeof(T)) is View content)
 		{
+            if (content is IPopupInitializable popupInitializable)
+            {
+                popupInitializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (content.BindingContext is IPopupInitializable popupInitializableViewModel)
+            {
+                popupInitializableViewModel.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (content is IPopupInitializableAsync popupInitializableAsync)
+            {
+                if (popupInitializableAsync.AwaitInitializeBeforeShowing)
+                {
+                    await popupInitializableAsync.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+                else
+                {
+                    _ = popupInitializableAsync.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+            }
+
+            if (content.BindingContext is IPopupInitializableAsync popupInitializableAsyncViewModel)
+            {
+                if (popupInitializableAsyncViewModel.AwaitInitializeBeforeShowing)
+                {
+                    await popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+                else
+                {
+                    _ = popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+            }
+
 			return content;
 		}
 

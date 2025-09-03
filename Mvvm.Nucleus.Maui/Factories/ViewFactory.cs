@@ -28,10 +28,10 @@ public class ViewFactory : IViewFactory
     /// <inheritdoc/>
     public object CreateView(Type viewType)
     {
-        var view = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
-        if (view is not Element element)
+        var viewObject = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
+        if (viewObject is not Element element)
         {
-            return view;
+            return viewObject;
         }
 
         return ConfigureView(element);

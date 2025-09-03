@@ -1,3 +1,5 @@
+using CommunityToolkit.Maui.Views;
+
 namespace Mvvm.Nucleus.Maui.Compatibility;
 
 /// <summary>
