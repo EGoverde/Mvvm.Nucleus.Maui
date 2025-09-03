@@ -12,8 +12,9 @@ namespace Mvvm.Nucleus.Maui.Compatibility;
 public class CommunityToolkitV1Popup : Popup<object?>
 {
     /// <summary>
-    /// This value is no longer used, please use <see cref="IPopupResult.WasDismissedByTappingOutsideOfPopup"/> instead.
-	/// </summary>
-    [Obsolete("Rely on 'WasDismissedByTappingOutsideOfPopup' instead.")]
-	protected object? ResultWhenUserTapsOutsideOfPopup { get; set; }
+    /// Please use <see cref="IPopupResult.WasDismissedByTappingOutsideOfPopup"/> instead,
+    /// or rely on the <see cref="IPopupService"/> functions with a default value as parameter.
+    /// </summary>
+    [Obsolete("Use 'WasDismissedByTappingOutsideOfPopup' instead, or rely on the IPopupService functions with a default value as parameter.")]
+    protected object? ResultWhenUserTapsOutsideOfPopup { get; set; }
 }

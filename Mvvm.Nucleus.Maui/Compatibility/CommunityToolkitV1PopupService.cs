@@ -1,15 +1,19 @@
 using CommunityToolkit.Maui.Views;
+using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui.Compatibility;
 
 /// <summary>
-/// A compatibility service that can be used as an intermediate step when migrating from the original CommunityToolkit
-/// <see cref="CommunityToolkit.Maui.Services.PopupService"/>. It is recommended to migrate to the new
-/// <see cref="IPopupService"/> as soon as possible.
+/// A compatibility service that can be used as an intermediate step when migrating from the earlier CommunityToolkit
+/// V1 Popups used in Nucleus versions below 0.6.x. It is recommended to migrate to the new <see cref="IPopupService"/>.
 /// </summary>
-[Obsolete("This class is only for compatibility with the original PopupService and will be removed in future versions. Use IPopupService instead.")]
-public class CommunityToolkitV1PopupService
+[Obsolete("This class is only for limited compatibility with the original PopupService and will be removed in future versions. Use IPopupService instead.")]
+public class CommunityToolkitV1PopupService(IPopupService popupService, ILogger<PopupService> logger)
 {
+    private readonly IPopupService _popupService = popupService;
+
+    private readonly ILogger<PopupService> _logger = logger;
+
     /// <summary>
     /// Creates and shows a <see cref="CommunityToolkitV1Popup"/>.
     /// </summary>
@@ -17,7 +21,7 @@ public class CommunityToolkitV1PopupService
     /// <returns>The result from the <see cref="CommunityToolkitV1Popup"/>.</returns>
     public Task<object?> ShowPopupAsync<TPopup>() where TPopup : CommunityToolkitV1Popup
     {
-        throw new NotImplementedException();
+        return _popupService.ShowPopupAsync<TPopup, object?>(defaultValue: null);
     }
 
     /// <summary>
@@ -29,7 +33,7 @@ public class CommunityToolkitV1PopupService
     /// <returns>The result from the <see cref="CommunityToolkitV1Popup"/> or the default if <see langword="null"/> or an invalid type.</returns>
     public Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultResult = default) where TPopup : CommunityToolkitV1Popup
     {
-        throw new NotImplementedException();
+        return ConvertResultAsync(_popupService.ShowPopupAsync<TPopup, object?>(defaultValue: defaultResult), defaultResult);
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ public class CommunityToolkitV1PopupService
     /// <returns>The result from the <see cref="CommunityToolkitV1Popup"/>.</returns>
     public Task<object?> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : CommunityToolkitV1Popup
     {
-        throw new NotImplementedException();
+        return _popupService.ShowPopupAsync<TPopup, object?>(defaultValue: null, navigationParameters, token);
     }
 
     /// <summary>
@@ -55,6 +59,32 @@ public class CommunityToolkitV1PopupService
     /// <returns>The result from the <see cref="Popup"/> or the default if <see langword="null"/> or an invalid type.</returns>
     public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : CommunityToolkitV1Popup
     {
-        throw new NotImplementedException();
+        return ConvertResultAsync(_popupService.ShowPopupAsync<TPopup, object?>(defaultValue: null, navigationParameters, token), defaultResult);
+    }
+
+    /// <summary>
+    /// Attempts to cast the result of the <see cref="Popup"/> to the expected <see cref="Type"/>.
+    /// </summary>
+    /// <typeparam name="TResult">The expected result <see cref="Type"/>.</typeparam>
+    /// <param name="resultTask">The <see cref="Task"/> that returns the result.</param>
+    /// <param name="defaultResult">The result to return if an unexpected value was found.</param>
+    /// <returns>The casted result, or the default value if invalid.</returns>
+    protected virtual async Task<TResult?> ConvertResultAsync<TResult>(Task<object?> resultTask, TResult? defaultResult)
+    {
+        var result = await resultTask;
+
+        if (result == null)
+        {
+            _logger.LogInformation($"Return value from popup is null, using the default result (if given).");
+            return defaultResult;
+        }
+        
+        if (result is not TResult)
+        {
+            _logger.LogError($"Return value '{result.GetType()}' from popup does not match expected type ({typeof(TResult)}), using the default result (if given).");
+            return defaultResult;
+        }
+
+        return (TResult)result;
     }
 }

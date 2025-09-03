@@ -402,7 +402,7 @@ public class NavigationService : INavigationService
 
         if (!isCanceled)
         {
-            _transientPagesOnNavigating = GetTransientPagesFromNavigationStack();
+            _transientPagesOnNavigating = GetNucleusTransientPagesFromNavigationStack();
         }
         
         IsNavigating = !isCanceled;
@@ -414,7 +414,7 @@ public class NavigationService : INavigationService
     {
         _logger.LogInformation($"Shell Navigated '{e.Current?.Location}' ({e.Source}).");
 
-        var pagesAfterNavigating = GetTransientPagesFromNavigationStack();
+        var pagesAfterNavigating = GetNucleusTransientPagesFromNavigationStack();
         var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
 
         _transientPagesOnNavigating!.Clear();
@@ -481,7 +481,7 @@ public class NavigationService : INavigationService
         return result;
     }
 
-    private IList<Page> GetTransientPagesFromNavigationStack()
+    private IList<Page> GetNucleusTransientPagesFromNavigationStack()
     {
         var result = new List<Page>(NucleusMvvmCore.Current.Shell?.CurrentPage?.Navigation?.NavigationStack?.Skip(1) ?? new List<Page>());
         
@@ -497,8 +497,6 @@ public class NavigationService : INavigationService
             }
         }
 
-        // Now only destroying pages registered as transient through Nucleus. This will not destroy pages that are registered as Singleton or Scoped,
-        // as well as skip pages not made by Nucleus, such as the PopupPage.
         var transientPageTypes = _nucleusMvvmOptions
             .ViewMappings
             .Where(x => x.ServiceLifetime == ServiceLifetime.Transient)
