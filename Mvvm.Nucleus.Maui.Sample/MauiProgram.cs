@@ -26,7 +26,7 @@ public static class MauiProgram
 
 					// These are popups, both with and without viewmodels. These can be used through IPopupService.
 					dependencyOptions.RegisterPopup<SimplePopup>();
-					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>(ServiceLifetime.Singleton);
+					dependencyOptions.RegisterPopup<AdvancedPopup, AdvancedPopupViewModel>(ServiceLifetime.Transient);
 				});
 
 				// This is called when Nucleus MVVM is initialized and before navigating to the first page.

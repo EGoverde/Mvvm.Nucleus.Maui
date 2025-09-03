@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Views;
 
 namespace Mvvm.Nucleus.Maui.Compatibility;
@@ -12,9 +11,71 @@ namespace Mvvm.Nucleus.Maui.Compatibility;
 public class CommunityToolkitV1Popup : Popup<object?>
 {
     /// <summary>
-    /// Please use <see cref="IPopupResult.WasDismissedByTappingOutsideOfPopup"/> instead,
-    /// or rely on the <see cref="IPopupService"/> functions with a default value as parameter.
+    ///  Backing BindableProperty for the <see cref="Color"/> property.
     /// </summary>
+    public static readonly BindableProperty ColorProperty = BindableProperty.Create(nameof(Color), typeof(Color), typeof(Popup), Colors.LightGray, propertyChanged: OnColorChanged);
+
+    /// <summary>
+    ///  Backing BindableProperty for the <see cref="Size"/> property.
+    /// </summary>
+    public static readonly BindableProperty SizeProperty = BindableProperty.Create(nameof(Size), typeof(Size), typeof(Popup), default(Size), propertyChanged: OnSizeChanged);
+
+    /// <summary>
+	/// Gets or sets the result that will return when the user taps outside the Popup.
+	/// </summary>
     [Obsolete("Use 'WasDismissedByTappingOutsideOfPopup' instead, or rely on the IPopupService functions with a default value as parameter.")]
     protected object? ResultWhenUserTapsOutsideOfPopup { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="Color"/> of the Popup.
+    /// </summary>
+    /// <remarks>
+    /// This color sets the native background color of the <see cref="Popup"/>, which is
+    /// independent of any background color configured in the actual View.
+    /// </remarks>
+    [Obsolete("Use the 'BackgroundColor' property of the Popup instead.")]
+    public Color Color
+    {
+        get => (Color)GetValue(ColorProperty);
+        set => SetValue(ColorProperty, value);
+    }
+
+    /// <summary>
+	/// Gets or sets the <see cref="Size"/> of the Popup Display.
+	/// </summary>
+	/// <remarks>
+	/// The Popup will always try to constrain the actual size of the <see cref="Popup" />
+	/// to the <see cref="Popup" /> of the View unless a <see cref="Size"/> is specified.
+	/// If the <see cref="Popup" /> contains <see cref="LayoutOptions"/> a <see cref="Size"/>
+	/// will be required. This will allow the View to have a concept of <see cref="Size"/>
+	/// that varies from the actual <see cref="Size"/> of the <see cref="Popup" />
+	/// </remarks>
+	public Size Size
+    {
+        get => (Size)GetValue(SizeProperty);
+        set => SetValue(SizeProperty, value);
+    }
+
+    public CommunityToolkitV1Popup()
+    {
+        OnColorChanged(this, default, Color);
+        OnSizeChanged(this, default, Size);
+    }
+
+    private static void OnColorChanged(BindableObject bindable, object? oldValue, object? newValue)
+    {
+        if (bindable is CommunityToolkitV1Popup popup && newValue is Color color)
+        {
+            popup.BackgroundColor = color;
+        }
+    }
+    
+    private static void OnSizeChanged(BindableObject bindable, object? oldValue, object? newValue)
+	{
+        if (bindable is CommunityToolkitV1Popup popup && newValue is Size size)
+        {
+            popup.WidthRequest = size.Width;
+            popup.HeightRequest = size.Height;
+        }
+	}
 }

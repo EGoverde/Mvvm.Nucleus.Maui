@@ -1,5 +1,5 @@
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -104,9 +104,40 @@ public class NucleusMvvmPopupBehavior() : Behavior
         NucleusMvvmCore.Current.AppResumed -= AppResumed!;
         NucleusMvvmCore.Current.AppStopped -= AppStopped!;
 
-        if (GetBindingContext() is IPopupLifecycleAware popupLifecycleAware)
+        var bindingContext = GetBindingContext();
+
+        if (bindingContext is IPopupLifecycleAware popupLifecycleAware)
         {
             popupLifecycleAware.OnClosed();
+        }
+
+        var popupMapping = NucleusMvvmCore.Current.NucleusMvvmOptions.PopupMappings.FirstOrDefault(x => x.PopupViewType == Element?.GetType());
+        if (popupMapping != null && popupMapping.ServiceLifetime == ServiceLifetime.Transient)
+        {
+            if (bindingContext is IDestructible destructibleViewModel)
+            {
+                destructibleViewModel.Destroy();
+            }
+
+            if (Element is IDestructible destructiblePopup)
+            {
+                destructiblePopup.Destroy();
+            }
+
+            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+            {
+                NucleusMvvmCore.Current.Logger?.LogInformation($"Deconstructing Popup '{Element?.GetType()?.Name}'.");
+
+                Popup!.Behaviors.Remove(this);
+                Popup!.BindingContext = null;
+                Popup!.Parent = null;
+
+                if (Element != null && Element != Popup)
+                {
+                    Element.BindingContext = null;
+                    Element.Parent = null;
+                }
+            }
         }
     }
 
