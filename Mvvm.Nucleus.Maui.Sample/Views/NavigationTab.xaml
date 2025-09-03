@@ -18,47 +18,52 @@
             <Label
                 Text="The buttons below demonstrate navigation to a globally registered view (see MauiProgram.cs). See the NavigationTabViewModel for the code behind these buttons." />
             
-            <ContentView />
+            <VerticalStackLayout
+                MaximumWidthRequest="400"
+                Margin="20"
+                Spacing="10">
 
-            <Button
-                Text="Navigation by Type"
-                Command="{Binding NavigateByTypeCommand}"/>
-            
-            <Button
-                Text="Navigation by Global Route"
-                Command="{Binding NavigateByRouteCommand}"/>
+                <Button
+                    Text="Navigation by Type"
+                    Command="{Binding NavigateByTypeCommand}"/>
+                
+                <Button
+                    Text="Navigation by Global Route"
+                    Command="{Binding NavigateByRouteCommand}"/>
 
-            <Button
-                Text="Navigation by Modal"
-                Command="{Binding NavigateByModalCommand}"/>
-            
-            <Button
-                Text="Navigation by Modal + Stack"
-                Command="{Binding NavigationByModalWithNavigationStackCommand}"/>
+                <Button
+                    Text="Navigation by Modal"
+                    Command="{Binding NavigateByModalCommand}"/>
+                
+                <Button
+                    Text="Navigation by Modal + Stack"
+                    Command="{Binding NavigationByModalWithNavigationStackCommand}"/>
 
-            <Button
-                Text="Navigation with Parameters"
-                Command="{Binding NavigateWithParametersCommand}"/>
+                <Button
+                    Text="Navigation with Parameters"
+                    Command="{Binding NavigateWithParametersCommand}"/>
 
-            <Button
-                Text="Navigation with Query"
-                Command="{Binding NavigateWithQueryCommand}"/>
-            
-            <Button
-                Text="Navigation from background thread"
-                Command="{Binding NavigateFromBackgroundThreadCommand}"/>
+                <Button
+                    Text="Navigation with Query"
+                    Command="{Binding NavigateWithQueryCommand}"/>
+                
+                <Button
+                    Text="Navigation from background thread"
+                    Command="{Binding NavigateFromBackgroundThreadCommand}"/>
 
-            <Button
-                Text="Navigation ignoring multiple requests"
-                Command="{Binding NavigateMultipleTriggersCommand}"/>
+                <Button
+                    Text="Navigation ignoring multiple requests"
+                    Command="{Binding NavigateMultipleTriggersCommand}"/>
 
-            <Button
-                Text="Switch Tabs"
-                Command="{Binding SwitchTabsCommand}"/>
-            
-             <Button
-                Text="Restart App"
-                Command="{Binding RestartAppCommand}"/>
+                <Button
+                    Text="Switch Tabs"
+                    Command="{Binding SwitchTabsCommand}"/>
+                
+                <Button
+                    Text="Restart App"
+                    Command="{Binding RestartAppCommand}"/>
+
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     

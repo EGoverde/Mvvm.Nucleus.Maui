@@ -14,15 +14,15 @@
 
     <TabBar Route="Tabs">
 
-        <Tab Route="NavigationTab" Title="Navigation">
+        <Tab Route="NavigationTab" Title="Navigation" Icon="atom.png">
             <ShellContent ContentTemplate="{DataTemplate local:NavigationTab}" />
         </Tab>
 
-        <Tab Route="PopupTab" Title="Popup">
+        <Tab Route="PopupTab" Title="Popup" Icon="atom.png">
             <ShellContent ContentTemplate="{DataTemplate local:PopupTab}" />
         </Tab>
 
-        <Tab Route="DialogTab" Title="Dialog">
+        <Tab Route="DialogTab" Title="Dialog" Icon="atom.png">
             <ShellContent ContentTemplate="{DataTemplate local:DialogTab}" />
         </Tab>
 

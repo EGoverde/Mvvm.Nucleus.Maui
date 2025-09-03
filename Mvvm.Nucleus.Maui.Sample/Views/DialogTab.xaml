@@ -18,27 +18,32 @@
             <Label
                 Text="The buttons below demonstrate various calls to this service. See the DialogTabViewModel for the code behind these buttons." />
             
-            <ContentView />
+            <VerticalStackLayout
+                MaximumWidthRequest="400"
+                Margin="20"
+                Spacing="10">
 
-            <Button
-                Text="Display Alert"
-                Command="{Binding DisplayAlertCommand}"/>
+                <Button
+                    Text="Display Alert"
+                    Command="{Binding DisplayAlertCommand}"/>
 
-            <Button
-                Text="Display Alert (background thread)"
-                Command="{Binding DisplayBackgroundThreadAlertCommand}"/>
+                <Button
+                    Text="Display Alert (background thread)"
+                    Command="{Binding DisplayBackgroundThreadAlertCommand}"/>
 
-            <Button
-                Text="Display Confirm"
-                Command="{Binding DisplayConfirmCommand}"/>
+                <Button
+                    Text="Display Confirm"
+                    Command="{Binding DisplayConfirmCommand}"/>
 
-            <Button
-                Text="Display Prompt"
-                Command="{Binding DisplayPromptCommand}"/>
+                <Button
+                    Text="Display Prompt"
+                    Command="{Binding DisplayPromptCommand}"/>
 
-            <Button
-                Text="Display Action Sheet"
-                Command="{Binding DisplayActionSheetCommand}"/>
+                <Button
+                    Text="Display Action Sheet"
+                    Command="{Binding DisplayActionSheetCommand}"/>
+            
+            </VerticalStackLayout>
             
         </VerticalStackLayout>
     
