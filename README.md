@@ -137,7 +137,7 @@ Nucleus can display [CommunityToolkit.MAUI Popups](https://learn.microsoft.com/e
 
 Popups can be used with or without ViewModels and require registration in `MauiProgram.cs` using `RegisterPopup<MyPopup>` or `RegisterPopup<MyPopup, MyPopupViewModel>`. After registration popups can be shown by passing the view type to one of the various `ShowPopupAsync` methods. 
 
-Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)). These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
+Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)), as well as `IQueryAttributable`. These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
 
 Using the `IPopupAware` the ViewModel can receive a reference to the popup, which is required in order to close the popup programatically.
 
