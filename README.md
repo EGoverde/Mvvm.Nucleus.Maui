@@ -139,7 +139,7 @@ Popups can be used with or without ViewModels and require registration in `MauiP
 
 Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)), as well as `IQueryAttributable`. These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
 
-Using the `IPopupAware` the ViewModel can receive a reference to the popup, which is required in order to close the popup programatically.
+Popups are by default registered as `Transient`, but support `Scoped` and `Singleton` as well.
 
 ### Closing and return values
 The `IPopupService` can either show a popup with or without an expected return value, wrapped in an `IPopupResult`. The methods that return a value other than the generic result, require the use of a `Popup<T>` (T being the return type).
