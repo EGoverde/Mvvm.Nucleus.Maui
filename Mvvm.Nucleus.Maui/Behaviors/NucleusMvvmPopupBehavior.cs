@@ -137,7 +137,7 @@ public class NucleusMvvmPopupBehavior() : Behavior
 
             if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
             {
-                NucleusMvvmCore.Current.Logger?.LogInformation($"Deconstructing Popup '{Element?.GetType()?.Name}'.");
+                NucleusMvvmCore.Current.Logger?.LogInformation("Deconstructing Popup '{popupName}'.", Element?.GetType()?.Name);
 
                 Popup!.Behaviors.Remove(this);
                 Popup!.BindingContext = null;

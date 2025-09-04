@@ -136,7 +136,7 @@ public class NucleusMvvmCore
         }
         catch (Exception ex)
         {
-            Logger?.LogCritical(ex, $"Failed to run async method '{callerName}' in '{GetType()}', with exception: {ex.Message}.");
+            Logger?.LogCritical(ex, "Failed to run async method '{callerName}' in '{type}', with exception: {message}.", callerName, GetType(), ex.Message);
         }
         finally
         {

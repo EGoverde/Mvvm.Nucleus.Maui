@@ -63,13 +63,13 @@ public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase
     {
         if (IsInitialized)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{0}' is already initialized.", GetType());
+            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{type}' is already initialized.", GetType());
             return;
         }
 
         if (IsInitializing)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{0}' is already in the process of initializing.", GetType());
+            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{type}' is already in the process of initializing.", GetType());
             return;
         }
 

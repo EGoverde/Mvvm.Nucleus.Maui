@@ -56,6 +56,9 @@ public class CommunityToolkitV1Popup : Popup<object?>
         set => SetValue(SizeProperty, value);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommunityToolkitV1Popup"/> class.
+    /// </summary>
     public CommunityToolkitV1Popup()
     {
         OnColorChanged(this, default, Color);

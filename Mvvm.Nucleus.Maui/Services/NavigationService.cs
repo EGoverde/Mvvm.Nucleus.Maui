@@ -74,7 +74,7 @@ public class NavigationService : INavigationService
         var viewMapping = GetViewMapping(viewType);
         if (viewMapping == null)
         {
-            _logger.LogError($"No valid mapping found for view of type '{viewType}'.");
+            _logger.LogError("No valid mapping found for view of type '{viewType}'.", viewType);
             return;
         }
 
@@ -101,7 +101,7 @@ public class NavigationService : INavigationService
             {
                 if (parameters.ContainsKey(parameter.Key))
                 {
-                    _logger.LogWarning($"Query parameter with key '{parameter.Key}' already exists in NavigationParameters, not adding value.");
+                    _logger.LogWarning("Query parameter with key '{key}' already exists in NavigationParameters, not adding value.", parameter.Key);
                     continue;
                 }
                     
@@ -351,7 +351,7 @@ public class NavigationService : INavigationService
         
         if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
         {
-            _logger?.LogInformation($"IsNavigating changed to '{_isNavigating}'." + (_isNavigating ? " Incoming navigation requests will be ignored." : string.Empty));
+            _logger?.LogInformation("IsNavigating changed to '{_isNavigating}{additionalMessage}'.", _isNavigating, _isNavigating ? " Incoming navigation requests will be ignored." : string.Empty);
         }
     }
 
@@ -398,7 +398,14 @@ public class NavigationService : INavigationService
             }
         }
 
-        _logger.LogInformation(isCanceled ? "Shell Navigation Canceled." : $"Shell Navigating '{e.Current?.Location}' > '{e.Target?.Location}' ({e.Source}).");
+        if (isCanceled)
+        {
+            _logger.LogInformation("Shell Navigation Canceled.");
+        }
+        else
+        {
+            _logger.LogInformation("Shell Navigating '{currentLocation}' > '{etargetLocation}' ({source}).", e.Current?.Location, e.Target?.Location, e.Source);
+        }
 
         if (!isCanceled)
         {
@@ -412,7 +419,7 @@ public class NavigationService : INavigationService
 
     private void ShellNavigated(object sender, ShellNavigatedEventArgs e)
     {
-        _logger.LogInformation($"Shell Navigated '{e.Current?.Location}' ({e.Source}).");
+        _logger.LogInformation("Shell Navigated '{location}' ({source}).", e.Current?.Location, e.Source);
 
         var pagesAfterNavigating = GetNucleusTransientPagesFromNavigationStack();
         var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
@@ -429,7 +436,7 @@ public class NavigationService : INavigationService
         var viewMappings = _nucleusMvvmOptions.ViewMappings.Where(x => x.ViewType == viewType);
         if (viewMappings.Count() > 1)
         {
-            _logger.LogWarning($"Multiple mappings found for View '{viewType}', choosing the first result.");
+            _logger.LogWarning("Multiple mappings found for View '{viewType}', choosing the first result.", viewType);
         }
 
         return viewMappings.FirstOrDefault();

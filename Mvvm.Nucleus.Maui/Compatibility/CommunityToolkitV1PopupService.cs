@@ -75,13 +75,13 @@ public class CommunityToolkitV1PopupService(IPopupService popupService, ILogger<
 
         if (result == null)
         {
-            _logger.LogInformation($"Return value from popup is null, using the default result (if given).");
+            _logger.LogInformation("Return value from popup is null, using the default result (if given).");
             return defaultResult;
         }
         
         if (result is not TResult)
         {
-            _logger.LogError($"Return value '{result.GetType()}' from popup does not match expected type ({typeof(TResult)}), using the default result (if given).");
+            _logger.LogError("Return value '{resultType}' from popup does not match expected type ({expectedType}), using the default result (if given).", result.GetType(), typeof(TResult));
             return defaultResult;
         }
 
