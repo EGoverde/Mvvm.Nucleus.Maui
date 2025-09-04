@@ -24,6 +24,8 @@ Nucleus uses the `Popup` functionality from the `Maui.CommunityToolkit`. In vers
     * Don't register your popups through the CommunityToolkit, Nucleus will do this for you.
     * The `IPopupInitializable(Async)` interface is triggered when the popup is opened (instead of created) when using this method.
     * Note that the compatibility is achieved partially by replacing the IoC registration. Do not call `UseMauiCommunityToolkit()`.
+* The `NucleusPopupViewModel` no longer includes the `CloseCommand` and `CloseAsync`, as it is at odds with the new `Popup` and `Popup<T>`
+    * Similar to `NucleusViewModel` it has also been marked as `obsolete`, as you are recommended to implement your own base ViewModel features.
 
 ### Migration helpers
 
