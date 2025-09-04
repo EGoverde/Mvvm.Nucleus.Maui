@@ -15,13 +15,17 @@ public class CommunityToolkitV1PopupService : PopupService
     /// <summary>
     /// Initializes a new instance of the <see cref="PopupService"/> class.
     /// </summary>
+    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
     /// <param name="communityToolkitPopupService">The <see cref="CommunityToolkit.Maui.Services.PopupService"/>.</param>
-    public CommunityToolkitV1PopupService(ILogger<CommunityToolkitV1PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService) : base(logger, serviceProvider, communityToolkitPopupService)
+    public CommunityToolkitV1PopupService(NucleusMvvmOptions nucleusMvvmOptions, ILogger<CommunityToolkitV1PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService) : base(logger, serviceProvider, communityToolkitPopupService)
     {
+        _nucleusMvvmOptions = nucleusMvvmOptions;
         _logger = logger;
     }
+
+    private readonly NucleusMvvmOptions _nucleusMvvmOptions;
 
     private readonly ILogger<CommunityToolkitV1PopupService> _logger;
 
@@ -60,14 +64,10 @@ public class CommunityToolkitV1PopupService : PopupService
 
         var popup = await CreateAndInitializePopupAsync<TPopup>() as CommunityToolkitV1Popup;
 
-        var fallbackPopupOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = popup!.CanBeDismissedByTappingOutsideOfPopup,
-            Shadow = default,
-            Shape = default
-        };
+        var popupOptions = _nucleusMvvmOptions.CommunityToolkitV1PopupServicePopupOptions ?? new PopupOptions();
+        popupOptions.CanBeDismissedByTappingOutsideOfPopup = popup!.CanBeDismissedByTappingOutsideOfPopup;
 
-        var popupResult = await MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ShowPopupAsync<object?>(popup!, fallbackPopupOptions, navigationParameters, token));
+        var popupResult = await MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ShowPopupAsync<object?>(popup!, popupOptions, navigationParameters, token));
 
         if (popupResult.WasDismissedByTappingOutsideOfPopup && popup!.ResultWhenUserTapsOutsideOfPopup != null)
         {

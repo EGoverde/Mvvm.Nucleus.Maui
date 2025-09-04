@@ -11,7 +11,7 @@ public static class MauiProgram
 			.UseNucleusMvvm<App, AppShell>(options =>
             {
 				// This method is used to register and map your Views and ViewModels.
-                options.RegisterTypes(dependencyOptions => 
+				options.RegisterTypes(dependencyOptions => 
 				{
 					// These are pages registered within the AppShell.xaml with 'Absolute' routes.
 					// It is important to match the given routes found in the XAML.

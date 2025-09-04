@@ -1,4 +1,7 @@
-﻿namespace Mvvm.Nucleus.Maui;
+﻿using CommunityToolkit.Maui;
+using Mvvm.Nucleus.Maui.Compatibility;
+
+namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
 /// The <see cref="NucleusMvvmOptions"/> contains all the relevant configuration values set during initialization
@@ -87,4 +90,10 @@ public class NucleusMvvmOptions
     /// Default value is `true`.
     /// </summary>
     public bool UseCommunityToolkitPopupServiceCompatibility { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the default <see cref="IPopupOptions"/> to use when showing a popup through the <see cref="CommunityToolkitV1PopupService"/>.
+    /// </summary>
+    [Obsolete("This property is only for limited compatibility with the original PopupService and will be removed in future versions. Use IPopupService instead.")]
+    public PopupOptions? CommunityToolkitV1PopupServicePopupOptions { get; set; }
 }

@@ -33,4 +33,6 @@ To make migrating to the new `Popup` functionality easier a few additional compa
 This file can be used as a temporary replacement for files subclassing `Popup`, giving them a return value of `object?` like before. It includes the properties `ResultWhenUserTapsOutsideOfPopup`, `Color` and `Size`, which have since been removed or changed. This class is best to be used in conjunction with the `Compatibility.CommunityToolkitV1PopupService`.
 
 #### `Compatibility.CommunityToolkitV1PopupService`
-This service has an identical interface to the `IPopupService` from Nucleus before 0.6.0. It expects the above `Compatibility.CommunityToolkitV1Popup` and behaves mostly as the original service does in regard to return values. It overrides the default PopupOptions from the toolkit with one that has no styling, as well as make use of the `ResultWhenUserTapsOutsideOfPopup` if set..
+This service has an identical interface to the `IPopupService` from Nucleus before 0.6.0. It expects the above `Compatibility.CommunityToolkitV1Popup` and behaves mostly as the original service does in regard to return values, including using the `ResultWhenUserTapsOutsideOfPopup`.
+
+Due to the difference in implementation between the V1 and V2 Popups the end-result will still look somewhat different. This service uses an empty `PopupOptions` by default, but it can be overriden by setting the option `CommunityToolkitV1PopupServicePopupOptions` in `UseNucleusMvvm`.
