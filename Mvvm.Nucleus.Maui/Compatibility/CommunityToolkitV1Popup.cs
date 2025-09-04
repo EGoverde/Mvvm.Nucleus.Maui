@@ -24,7 +24,7 @@ public class CommunityToolkitV1Popup : Popup<object?>
 	/// Gets or sets the result that will return when the user taps outside the Popup.
 	/// </summary>
     [Obsolete("Use 'WasDismissedByTappingOutsideOfPopup' instead, or rely on the IPopupService functions with a default value as parameter.")]
-    protected object? ResultWhenUserTapsOutsideOfPopup { get; set; }
+    public object? ResultWhenUserTapsOutsideOfPopup { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Color"/> of the Popup.

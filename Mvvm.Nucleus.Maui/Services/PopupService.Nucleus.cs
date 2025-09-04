@@ -12,12 +12,6 @@ namespace Mvvm.Nucleus.Maui;
 /// </summary>
 public partial class PopupService : IPopupService
 {
-    private readonly ILogger<PopupService> _logger;
-
-    private readonly IServiceProvider _serviceProvider;
-
-    private readonly CommunityToolkit.Maui.Services.PopupService _communityToolkitPopupService;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="PopupService"/> class.
     /// </summary>
@@ -30,6 +24,12 @@ public partial class PopupService : IPopupService
         _serviceProvider = serviceProvider;
         _communityToolkitPopupService = communityToolkitPopupService;
     }
+
+    private readonly ILogger<PopupService> _logger;
+
+    private readonly IServiceProvider _serviceProvider;
+
+    private readonly CommunityToolkit.Maui.Services.PopupService _communityToolkitPopupService;
 
     /// <inheritdoc/>
     public async void ShowPopup<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null) where TPopup : View
@@ -107,10 +107,17 @@ public partial class PopupService : IPopupService
         return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.Shell!.ClosePopupAsync(result, token));
     }
     
-    private async Task<View> CreateAndInitializePopupAsync<T>() where T : View
-	{
-		if (_serviceProvider.GetService(typeof(T)) is View content)
-		{
+    /// <summary>
+    /// Creates a <see cref="Popup"/> or <see cref="View"/> through the <see cref="IServiceProvider"/> and initializes it if it 
+    /// implements <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the <see cref="View"/> to create.</typeparam>
+    /// <returns>The created <see cref="View"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the requested View cannot be resolved.</exception>
+    protected async Task<View> CreateAndInitializePopupAsync<T>() where T : View
+    {
+        if (_serviceProvider.GetService(typeof(T)) is View content)
+        {
             if (content is IPopupInitializable popupInitializable)
             {
                 popupInitializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
@@ -145,11 +152,11 @@ public partial class PopupService : IPopupService
                 }
             }
 
-			return content;
-		}
+            return content;
+        }
 
         _logger.LogInformation("Failed to create a popup from the type '{expectedType}'. Register the popup through the DependencyOptions in the NucleusMvvmBuilder.", typeof(T));
 
-		throw new InvalidOperationException($"Could not locate {typeof(T).FullName}");
-	}
+        throw new InvalidOperationException($"Could not locate {typeof(T).FullName}");
+    }
 }
