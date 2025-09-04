@@ -3,17 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class SingletonPopupViewModel : Compatibility.BindableBase, IPopupLifecycleAware, IPopupInitializable
+public partial class SingletonPopupViewModel(IPopupService popupService, IPageDialogService pageDialogService) : Compatibility.BindableBase, IPopupLifecycleAware, IPopupInitializable
 {
-    public SingletonPopupViewModel(IPopupService popupService, IPageDialogService pageDialogService)
-    {
-        _popupService = popupService;
-        _pageDialogService = pageDialogService;
-    }
+    private readonly IPopupService _popupService = popupService;
 
-    private readonly IPopupService _popupService;
-
-    private readonly IPageDialogService _pageDialogService;
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
 
     [ObservableProperty]
     private string _popupState = "Default";

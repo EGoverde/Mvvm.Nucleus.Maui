@@ -7,24 +7,19 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="PopupViewFactory"/> is the default implementation for <see cref="IPopupViewFactory"/>.
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
-public class PopupViewFactory : IPopupViewFactory
+/// <remarks>
+/// Initializes a new instance of the <see cref="PopupViewFactory"/> class.
+/// </remarks>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+/// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+/// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions) : IPopupViewFactory
 {
-    private readonly ILogger _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly NucleusMvvmOptions _nucleusMvvmOptions;
+    private readonly ILogger _logger = logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PopupViewFactory"/> class.
-    /// </summary>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    public PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _nucleusMvvmOptions = nucleusMvvmOptions;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+
+    private readonly NucleusMvvmOptions _nucleusMvvmOptions = nucleusMvvmOptions;
 
     /// <inheritdoc/>
     public object CreateView(Type viewType)

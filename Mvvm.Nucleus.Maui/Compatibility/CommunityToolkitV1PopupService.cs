@@ -9,25 +9,19 @@ namespace Mvvm.Nucleus.Maui.Compatibility;
 /// A compatibility service that can be used as an intermediate step when migrating from the earlier CommunityToolkit
 /// V1 Popups used in Nucleus versions below 0.6.x. It is recommended to migrate to the new <see cref="IPopupService"/>.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="PopupService"/> class.
+/// </remarks>
+/// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+/// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+/// <param name="communityToolkitPopupService">The <see cref="CommunityToolkit.Maui.Services.PopupService"/>.</param>
 [Obsolete("This class is only for limited compatibility with the original PopupService and will be removed in future versions. Use IPopupService instead.")]
-public class CommunityToolkitV1PopupService : PopupService
+public class CommunityToolkitV1PopupService(NucleusMvvmOptions nucleusMvvmOptions, ILogger<CommunityToolkitV1PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService) : PopupService(logger, serviceProvider, communityToolkitPopupService)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PopupService"/> class.
-    /// </summary>
-    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-    /// <param name="communityToolkitPopupService">The <see cref="CommunityToolkit.Maui.Services.PopupService"/>.</param>
-    public CommunityToolkitV1PopupService(NucleusMvvmOptions nucleusMvvmOptions, ILogger<CommunityToolkitV1PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService) : base(logger, serviceProvider, communityToolkitPopupService)
-    {
-        _nucleusMvvmOptions = nucleusMvvmOptions;
-        _logger = logger;
-    }
+    private readonly NucleusMvvmOptions _nucleusMvvmOptions = nucleusMvvmOptions;
 
-    private readonly NucleusMvvmOptions _nucleusMvvmOptions;
-
-    private readonly ILogger<CommunityToolkitV1PopupService> _logger;
+    private readonly ILogger<CommunityToolkitV1PopupService> _logger = logger;
 
     /// <summary>
     /// Creates and shows a <see cref="CommunityToolkitV1Popup"/>.

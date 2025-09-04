@@ -3,14 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class DialogTabViewModel : ObservableObject
+public partial class DialogTabViewModel(IPageDialogService pageDialogService) : ObservableObject
 {
-    private readonly IPageDialogService _pageDialogService;
-
-    public DialogTabViewModel(IPageDialogService pageDialogService)
-    {
-        _pageDialogService = pageDialogService;
-    }
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
 
     [RelayCommand]
     private async Task DisplayAlertAsync()

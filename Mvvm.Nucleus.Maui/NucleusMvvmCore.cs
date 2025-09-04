@@ -8,7 +8,14 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="NucleusMvvmCore"/> is a singleton class that keeps track of various events. It also contains
 /// state properties that can be accessed by other parts of Nucleus (or by custom logic).
 /// </summary>
-public class NucleusMvvmCore
+/// <remarks>
+/// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
+/// </remarks>
+/// <param name="application">The <see cref="Application"/>.</param>
+/// <param name="viewFactory">The <see cref="IViewFactory"/>.</param>
+/// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+public class NucleusMvvmCore(Application application, IViewFactory viewFactory, NucleusMvvmOptions nucleusMvvmOptions, ILogger<NucleusMvvmCore> logger)
 {
     private static NucleusMvvmCore? _current;
 
@@ -16,9 +23,9 @@ public class NucleusMvvmCore
 
     private IDictionary<string, object> _popupNavigationParameters = new Dictionary<string, object>();
 
-    internal ILogger<NucleusMvvmCore>? Logger { get; }
+    internal ILogger<NucleusMvvmCore>? Logger { get; } = logger;
 
-    internal NucleusMvvmOptions NucleusMvvmOptions { get; }
+    internal NucleusMvvmOptions NucleusMvvmOptions { get; } = nucleusMvvmOptions;
 
     internal static bool IsInitialized => _current != null;
 
@@ -66,7 +73,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the current <see cref="Application"/>.
     /// </summary>
-    public Application Application { get; }
+    public Application Application { get; } = application;
 
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/> for IoC purposes.
@@ -76,7 +83,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the <see cref="IViewFactory"/> used to create Views and ViewModels.
     /// </summary>
-    public IViewFactory? ViewFactory { get; }
+    public IViewFactory? ViewFactory { get; } = viewFactory;
 
     /// <summary>
     /// Gets the current <see cref="Shell"/>. This property will automatically be updated if a new <see cref="Shell"/> is presented.
@@ -106,21 +113,6 @@ public class NucleusMvvmCore
     /// Gets the current <see cref="Page"/>. It takes into account modally presented pages, as well as pages like <see cref="FlyoutPage"/>.
     /// </summary>
     public Page CurrentPage => GetCurrentPage(Window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
-    /// </summary>
-    /// <param name="application">The <see cref="Application"/>.</param>
-    /// <param name="viewFactory">The <see cref="IViewFactory"/>.</param>
-    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public NucleusMvvmCore(Application application, IViewFactory viewFactory, NucleusMvvmOptions nucleusMvvmOptions, ILogger<NucleusMvvmCore> logger)
-    {
-        Application = application;
-        ViewFactory = viewFactory;
-        NucleusMvvmOptions = nucleusMvvmOptions;
-        Logger = logger;
-    }
 
     internal void Initialize(IServiceProvider serviceProvider)
     {

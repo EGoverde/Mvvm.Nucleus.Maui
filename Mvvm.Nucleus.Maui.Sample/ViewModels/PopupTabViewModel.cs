@@ -4,20 +4,15 @@ using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class PopupTabViewModel : ObservableObject
+public partial class PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService, CommunityToolkitV1PopupService communityToolkitV1PopupService) : ObservableObject
 {
-    private readonly IPopupService _popupService;
-    private readonly CommunityToolkit.Maui.IPopupService _communityToolkitPopupService;
-    private readonly IPageDialogService _pageDialogService;
-    private readonly CommunityToolkitV1PopupService _communityToolkitV1PopupService;
+    private readonly IPopupService _popupService = popupService;
 
-    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService, CommunityToolkitV1PopupService communityToolkitV1PopupService)
-    {
-        _popupService = popupService;
-        _pageDialogService = pageDialogService;
-        _communityToolkitPopupService = communityToolkitPopupService;
-        _communityToolkitV1PopupService = communityToolkitV1PopupService;
-    }
+    private readonly CommunityToolkit.Maui.IPopupService _communityToolkitPopupService = communityToolkitPopupService;
+
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
+
+    private readonly CommunityToolkitV1PopupService _communityToolkitV1PopupService = communityToolkitV1PopupService;
 
     [RelayCommand]
     private async Task ShowSimplePopupAsync()

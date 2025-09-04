@@ -10,26 +10,19 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="PopupService"/> is the default implementation for <see cref="IPopupService"/>.
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
-public partial class PopupService : IPopupService
+/// <remarks>
+/// Initializes a new instance of the <see cref="PopupService"/> class.
+/// </remarks>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+/// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+/// <param name="communityToolkitPopupService">The <see cref="CommunityToolkit.Maui.Services.PopupService"/>.</param>
+public partial class PopupService(ILogger<PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService) : IPopupService
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PopupService"/> class.
-    /// </summary>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-    /// <param name="communityToolkitPopupService">The <see cref="CommunityToolkit.Maui.Services.PopupService"/>.</param>
-    public PopupService(ILogger<PopupService> logger, IServiceProvider serviceProvider, CommunityToolkit.Maui.Services.PopupService communityToolkitPopupService)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _communityToolkitPopupService = communityToolkitPopupService;
-    }
+    private readonly ILogger<PopupService> _logger = logger;
 
-    private readonly ILogger<PopupService> _logger;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    private readonly IServiceProvider _serviceProvider;
-
-    private readonly CommunityToolkit.Maui.Services.PopupService _communityToolkitPopupService;
+    private readonly CommunityToolkit.Maui.Services.PopupService _communityToolkitPopupService = communityToolkitPopupService;
 
     /// <inheritdoc/>
     public async void ShowPopup<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null) where TPopup : View

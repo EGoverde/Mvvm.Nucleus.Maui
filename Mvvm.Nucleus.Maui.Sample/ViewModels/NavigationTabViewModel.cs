@@ -3,16 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class NavigationTabViewModel : ObservableObject
+public partial class NavigationTabViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : ObservableObject
 {
-    private readonly INavigationService _navigationService;
-    private readonly IPageDialogService _pageDialogService;
+    private readonly INavigationService _navigationService = navigationService;
 
-    public NavigationTabViewModel(INavigationService navigationService, IPageDialogService pageDialogService)
-    {
-        _navigationService = navigationService;
-        _pageDialogService = pageDialogService;
-    }
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
 
     [RelayCommand]
     private async Task NavigateByTypeAsync()

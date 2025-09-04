@@ -2,14 +2,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class LegacyPopupViewModel : Compatibility.BindableBase, IPopupAware<LegacyPopup>
+public partial class LegacyPopupViewModel(IPopupService popupService) : Compatibility.BindableBase, IPopupAware<LegacyPopup>
 {
-    public LegacyPopupViewModel(IPopupService popupService)
-    {
-        _popupService = popupService;
-    }
-
-    private readonly IPopupService _popupService;
+    private readonly IPopupService _popupService = popupService;
 
     public WeakReference<LegacyPopup>? Popup { get; set; }
 
