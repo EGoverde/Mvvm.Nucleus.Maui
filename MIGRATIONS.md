@@ -38,3 +38,5 @@ This file can be used as a temporary replacement for files subclassing `Popup`, 
 This service has an identical interface to the `IPopupService` from Nucleus before 0.6.0. It expects the above `Compatibility.CommunityToolkitV1Popup` and behaves mostly as the original service does in regard to return values, including using the `ResultWhenUserTapsOutsideOfPopup`.
 
 Due to the difference in implementation between the V1 and V2 Popups the end-result will still look somewhat different. This service uses an empty `PopupOptions` by default, but it can be overriden by setting the option `CommunityToolkitV1PopupServicePopupOptions` in `UseNucleusMvvm`.
+
+See the Sample project for example implementations of both `Compatibility.CommunityToolkitV1Popup` and `Compatibility.CommunityToolkitV1PopupService`.
