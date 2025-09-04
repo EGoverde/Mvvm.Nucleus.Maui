@@ -63,6 +63,7 @@ public class CommunityToolkitV1PopupService : PopupService
         var fallbackPopupOptions = new PopupOptions
         {
             CanBeDismissedByTappingOutsideOfPopup = popup!.CanBeDismissedByTappingOutsideOfPopup,
+            Shadow = default,
             Shape = default
         };
 
