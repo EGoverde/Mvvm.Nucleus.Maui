@@ -6,16 +6,30 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="Mvvm.Nucleus.Maui.Sample.LegacyPopup"
-             x:DataType="local:LegacyPopupViewModel">
+             x:DataType="local:LegacyPopupViewModel"
+             Color="DarkGray"
+             Size="350,200">
 
-    <VerticalStackLayout>
+    <Grid>
 
-        <Button
-            Text="Close Popup"
-            Command="{Binding CloseCommand}"
-            CommandParameter="Closed using ICommand."
-            Margin="20,0,20,20" />
+        <VerticalStackLayout
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
 
-    </VerticalStackLayout>
+            <Button
+                Text="Close using IPopupService"
+                Command="{Binding CloseUsingServiceCommand}"
+                CommandParameter="Closed using IPopupService."
+                Margin="20,0,20,20" />
+
+            <Button
+                Text="Close using IPopupAware"
+                Command="{Binding CloseUsingPopupAwareCommand}"
+                CommandParameter="Closed using IPopupAware."
+                Margin="20,0,20,20" />
+
+        </VerticalStackLayout>
+
+    </Grid>
 
 </compatibility:CommunityToolkitV1Popup>

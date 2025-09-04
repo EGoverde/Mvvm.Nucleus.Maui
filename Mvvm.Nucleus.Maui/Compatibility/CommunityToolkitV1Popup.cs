@@ -50,6 +50,7 @@ public class CommunityToolkitV1Popup : Popup<object?>
 	/// will be required. This will allow the View to have a concept of <see cref="Size"/>
 	/// that varies from the actual <see cref="Size"/> of the <see cref="Popup" />
 	/// </remarks>
+    [Obsolete("Use the 'WidthRequest' and 'HeightRequest' properties of the Popup instead.")]
 	public Size Size
     {
         get => (Size)GetValue(SizeProperty);

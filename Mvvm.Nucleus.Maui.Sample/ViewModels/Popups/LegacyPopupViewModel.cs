@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class LegacyPopupViewModel : Compatibility.BindableBase
+public partial class LegacyPopupViewModel : Compatibility.BindableBase, IPopupAware<LegacyPopup>
 {
     public LegacyPopupViewModel(IPopupService popupService)
     {
@@ -11,9 +11,20 @@ public partial class LegacyPopupViewModel : Compatibility.BindableBase
 
     private readonly IPopupService _popupService;
 
+    public WeakReference<LegacyPopup>? Popup { get; set; }
+
     [RelayCommand]
-    private async Task CloseAsync(string? result = null)
+    private async Task CloseUsingServiceAsync(string? result = null)
     {
-        await _popupService.CloseMostRecentPopupAsync(result);
+        await _popupService.CloseMostRecentPopupAsync<object?>(result);
+    }
+
+    [RelayCommand]
+    private async Task CloseUsingPopupAwareAsync(string? result = null)
+    {
+        if (Popup?.TryGetTarget(out LegacyPopup? popup) == true && popup != null)
+        {
+            await popup.CloseAsync(result);
+        }
     }
 }
