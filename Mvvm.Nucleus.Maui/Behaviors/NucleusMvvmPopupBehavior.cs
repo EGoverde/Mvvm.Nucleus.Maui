@@ -76,6 +76,8 @@ public class NucleusMvvmPopupBehavior() : Behavior
             popupLifecycleAware.OnOpened();
         }
 
+        // See the caveat mentioned at OnPopupClosed. This implementation could have unintended effects, because Init can be called multiple
+        // times, even when a popup has not yet been closed. Keeping this in here for now, but should be resolved before release.
         if (NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit)
         {
             NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit = false;
@@ -123,45 +125,55 @@ public class NucleusMvvmPopupBehavior() : Behavior
             return;
         }
 
-        if (popupMapping.ServiceLifetime == ServiceLifetime.Transient)
-        {
-            if (bindingContext is IDestructible destructibleViewModel)
-            {
-                destructibleViewModel.Destroy();
-            }
-
-            if (Element is IDestructible destructiblePopup)
-            {
-                destructiblePopup.Destroy();
-            }
-
-            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
-            {
-                NucleusMvvmCore.Current.Logger?.LogInformation("Deconstructing Popup '{popupName}'.", Element?.GetType()?.Name);
-
-                Popup!.Behaviors.Remove(this);
-                Popup!.BindingContext = null;
-                Popup!.Parent = null;
-
-                if (Element != null && Element != Popup)
-                {
-                    Element.BindingContext = null;
-                    Element.Parent = null;
-                }
-            }
-        }
-
         if (popupMapping.ServiceLifetime != ServiceLifetime.Transient && Element != Popup)
         {
-            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
-            {
-                Popup!.Behaviors.Remove(this);
-                Popup!.BindingContext = null;
-                Popup!.Parent = null;
-            }
-
-            PopupViewFactory.ListenToParentChanges(Element!); // The CommunityToolkit will create a new Popup later, while using the reused view
+            // The CommunityToolkit will create a new Popup later, while using the reused view
+            PopupViewFactory.ListenToParentChanges(Element!);
         }
+
+        // The Popup V2 implementation triggers an OnClosed event when a new popup is shown from the current popup.
+        // This is an undocumented change (possibly bug) from how V2 worked. As such, we cannot reliably use this method
+        // for Destroy and Deconstruction. Work in progress.
+        //
+        // if (popupMapping.ServiceLifetime == ServiceLifetime.Transient)
+        // {
+        //     if (bindingContext is IDestructible destructibleViewModel)
+        //     {
+        //         destructibleViewModel.Destroy();
+        //     }
+
+        //     if (Element is IDestructible destructiblePopup)
+        //     {
+        //         destructiblePopup.Destroy();
+        //     }
+
+        //     if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+        //     {
+        //         NucleusMvvmCore.Current.Logger?.LogInformation("Deconstructing Popup '{popupName}'.", Element?.GetType()?.Name);
+
+        //         Popup!.Behaviors.Remove(this);
+        //         Popup!.BindingContext = null;
+        //         Popup!.Parent = null;
+
+        //         if (Element != null && Element != Popup)
+        //         {
+        //             Element.BindingContext = null;
+        //             Element.Parent = null;
+        //         }
+        //     }
+        // }
+
+        // if (popupMapping.ServiceLifetime != ServiceLifetime.Transient && Element != Popup)
+        // {
+        //     if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+        //     {
+        //         Popup!.Behaviors.Remove(this);
+        //         Popup!.BindingContext = null;
+        //         Popup!.Parent = null;
+        //     }
+
+        //     PopupViewFactory.ListenToParentChanges(Element!); // The CommunityToolkit will create a new Popup later, while using the reused view
+        // }
     }
 
     private void AppResumed(object sender, EventArgs e)
