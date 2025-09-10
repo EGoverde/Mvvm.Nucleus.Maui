@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Views;
 using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui;
@@ -90,6 +91,15 @@ public class NucleusMvvmOptions
     /// Default value is `true`.
     /// </summary>
     public bool UseCommunityToolkitPopupServiceCompatibility { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to use on the default '<see cref="Popup.Opened"/>' and '<see cref="Popup.Closed"/>' events for the
+    /// <see cref="IPopupLifecycleAware"/> interface or an alternative that is bound to the <see cref="Page"/> instead. The implementation in the
+    /// CommunityToolkit can trigger these events even though a <see cref="Popup"/> is not actually closed, but rather hidden by another cascading
+    /// <see cref="Popup"/>.
+    /// Default value is `true`.
+    /// </summary>
+    public bool UseAlternativePopupOpenedAndClosedEvents { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the default <see cref="IPopupOptions"/> to use when showing a popup through the <see cref="CommunityToolkitV1PopupService"/>.

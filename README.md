@@ -67,6 +67,7 @@ Within the options the following additional settings can be changed:
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
 - `UseCommunityToolkitPopupServiceCompatibility`: Default `true`. Enables usage of the `CommunityToolkit.PopupService` on top of the build-in `Mvvm.Nucleus.Maui.PopupService`. You only need to register popups through Nucleus for this to work.
+- `UseAlternativePopupOpenedAndClosedEvents`: Default: `true`. If set the `IPopupLifecycleAware` will not use the default Popup events, but one bound to the Page in which the Popup is shown. This fixes an issue in the CommunityToolkit implementation, that triggers these events when a Popup is shown from within another Popup.
 - `CommunityToolkitV1PopupServicePopupOptions`: Default: `null`. If set this value will be used in the `CommunityToolkitV1PopupService` compatibility service.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
