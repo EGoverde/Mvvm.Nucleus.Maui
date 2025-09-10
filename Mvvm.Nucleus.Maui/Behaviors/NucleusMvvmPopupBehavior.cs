@@ -1,5 +1,4 @@
 using CommunityToolkit.Maui.Views;
-using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -10,13 +9,19 @@ namespace Mvvm.Nucleus.Maui;
 public class NucleusMvvmPopupBehavior() : Behavior
 {
     /// <summary>
-    /// The <see cref="Popup"/> this behavior is attached to and which events are used.
+    /// The <see cref="Page"/> the <see cref="CommunityToolkit.Maui.Views.Popup"/> has been presented in modally. This is created by the
+    /// CommunityToolkit.
+    /// </summary>
+    public Page? PopupPage { get; set; }
+
+    /// <summary>
+    /// The <see cref="Popup"/> this behavior is attached to.
     /// </summary>
     public Popup? Popup { get; set; }
 
     /// <summary>
     /// The <see cref="Element"/> this behavior is handling. This is either the same as the <see cref="Popup"/>, but can
-    /// also be a <see cref="View"/> that will be wrapped in a <see cref="Popup"/> by the Community Toolkit.
+    /// also be a <see cref="View"/> that will be wrapped in a <see cref="CommunityToolkit.Maui.Views.Popup"/> by the Community Toolkit.
     /// </summary>
     public Element? Element { get; set; }
 
@@ -54,8 +59,13 @@ public class NucleusMvvmPopupBehavior() : Behavior
             }
         }
 
-        Popup!.Opened += OnPopupOpened!;
-        Popup!.Closed += OnPopupClosed!;
+        if (!NucleusMvvmCore.Current.NucleusMvvmOptions.UseAlternativePopupOpenedAndClosedEvents)
+        {
+            Popup!.Opened += OnPopupOpened!;
+            Popup!.Closed += OnPopupClosed!;
+        }
+
+        AttachPopupPage(Popup?.GetRootElement(typeof(Page)) as Page);
     }
 
     /// <inheritdoc/>
@@ -63,8 +73,36 @@ public class NucleusMvvmPopupBehavior() : Behavior
     {
         base.OnDetachingFrom(bindable);
 
-        Popup!.Opened -= OnPopupOpened!;
-        Popup!.Closed -= OnPopupClosed!;
+        DettachPopupPage();
+
+        if (!NucleusMvvmCore.Current.NucleusMvvmOptions.UseAlternativePopupOpenedAndClosedEvents)
+        {
+            Popup!.Opened -= OnPopupOpened!;
+            Popup!.Closed -= OnPopupClosed!;
+        }
+    }
+
+    private void AttachPopupPage(Page? popupPage)
+    {
+        PopupPage = popupPage;
+
+        if (PopupPage == null)
+        {
+            if (Element?.GetRootElement(null) is Element rootElement)
+            {
+                rootElement.ParentChanged -= OnParentChanged;
+                rootElement.ParentChanged += OnParentChanged;
+            }
+        }
+
+        if (PopupPage != null)
+            {
+            }
+    }
+
+    private void DettachPopupPage()
+    {
+        PopupPage = null;
     }
 
     private void OnPopupOpened(object? sender, EventArgs e)
@@ -195,5 +233,35 @@ public class NucleusMvvmPopupBehavior() : Behavior
     private object? GetBindingContext()
     {
         return Element != null ? Element.BindingContext : Popup?.BindingContext;
+    }
+
+    private void OnParentChanged(object? sender, EventArgs args)
+    {
+        if (sender is not Element element)
+        {
+            return;
+        }
+
+        var rootElement = element.Parent.GetRootElement(typeof(Page));
+        if (rootElement == null)
+        {
+            return;
+        }
+
+        element.ParentChanged -= OnParentChanged!;
+
+        if (rootElement is Page page)
+        {
+            if (PopupPage != null)
+            {
+                DettachPopupPage();
+            }
+
+            AttachPopupPage(page);
+
+            return;
+        }
+
+        rootElement.ParentChanged += OnParentChanged!;
     }
 }

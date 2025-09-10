@@ -51,22 +51,32 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
         }
         else
         {
-            ListenToParentChanges(view);
+            view.ListenToParentChanges(typeof(Popup), (rootElement) =>
+            {
+                if (rootElement is not Popup popup)
+                {
+                    return false;
+                }
+
+                popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = view });
+
+                return true;
+            });
         }
 
         return view;
     }
 
-    internal static void ListenToParentChanges(Element element)
+    internal static void ListenToParentChanges(Element element,  Func<Element, bool> shouldStopListening)
     {
-        static void OnParentChanged(object sender, EventArgs args)
+        void OnParentChanged(object sender, EventArgs args)
         {
             if (sender is not Element element)
             {
                 return;
             }
 
-            var rootElement = GetRootElement(element.Parent);
+            var rootElement = element.Parent.GetRootElement(typeof(Popup));
             if (rootElement == null)
             {
                 return;
@@ -74,9 +84,8 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
 
             element.ParentChanged -= OnParentChanged!;
 
-            if (rootElement is Popup popup)
+            if (shouldStopListening(rootElement))
             {
-                popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = element });
                 return;
             }
 
@@ -84,25 +93,5 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
         }
 
         element.ParentChanged += OnParentChanged!;
-    }
-
-    private static Element? GetRootElement(Element element)
-    {
-        var rootElement = element?.Parent ?? element;
-        var parentElement = element?.Parent;
-
-        while (parentElement != null)
-        {
-            rootElement = parentElement;
-
-            if (rootElement is Page)
-            {
-                break;
-            }
-
-            parentElement = rootElement.Parent;
-        }
-
-        return rootElement;
     }
 }

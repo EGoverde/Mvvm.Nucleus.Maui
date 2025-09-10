@@ -88,58 +88,19 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
         }
         else
         {
-            ListenToParentChanges(element);
+            element.ListenToParentChanges(typeof(Page), (rootElement) =>
+            {
+                if (rootElement is not Page page)
+                {
+                    return false;
+                }
+
+                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
+
+                return true;
+            });
         }
 
         return element;
-    }
-
-    private static void ListenToParentChanges(Element element)
-    {
-        static void OnParentChanged(object sender, EventArgs args)
-        {
-            if (sender is not Element element)
-            {
-                return;
-            }
-
-            element.ParentChanged -= OnParentChanged!;
-
-            var rootElement = GetRootElement(element.Parent);
-            if (rootElement == null)
-            {
-                return;
-            }
-
-            if (rootElement is Page page)
-            {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
-                return;
-            }
-
-            rootElement.ParentChanged += OnParentChanged!;
-        }
-
-        element.ParentChanged += OnParentChanged!;
-    }
-
-    private static Element? GetRootElement(Element element)
-    {
-        var rootElement = element?.Parent ?? element;
-        var parentElement = element?.Parent;
-
-        while (parentElement != null)
-        {
-            rootElement = parentElement;
-
-            if (rootElement is Page)
-            {
-                break;
-            }
-
-            parentElement = rootElement.Parent;
-        }
-
-        return rootElement;
     }
 }
