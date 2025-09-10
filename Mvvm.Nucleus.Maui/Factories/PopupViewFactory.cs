@@ -56,10 +56,10 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
 
         return view;
     }
-
-    internal static void ListenToParentChanges(Element element)
+    
+    internal static void ListenToParentChanges(Element resolvedElement)
     {
-        static void OnParentChanged(object sender, EventArgs args)
+        void OnParentChanged(object sender, EventArgs args)
         {
             if (sender is not Element element)
             {
@@ -76,14 +76,14 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
 
             if (rootElement is Popup popup)
             {
-                popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = element });
+                popup.Behaviors.Add(new NucleusMvvmPopupBehavior { Popup = popup, Element = resolvedElement });
                 return;
             }
 
             rootElement.ParentChanged += OnParentChanged!;
         }
 
-        element.ParentChanged += OnParentChanged!;
+        resolvedElement.ParentChanged += OnParentChanged!;
     }
 
     private static Element? GetRootElement(Element element)
@@ -95,7 +95,7 @@ public class PopupViewFactory(ILogger<ViewFactory> logger, IServiceProvider serv
         {
             rootElement = parentElement;
 
-            if (rootElement is Page)
+            if (rootElement is Popup)
             {
                 break;
             }

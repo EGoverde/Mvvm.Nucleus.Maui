@@ -94,9 +94,9 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
         return element;
     }
 
-    private static void ListenToParentChanges(Element element)
+    private static void ListenToParentChanges(Element resolvedElement)
     {
-        static void OnParentChanged(object sender, EventArgs args)
+        void OnParentChanged(object sender, EventArgs args)
         {
             if (sender is not Element element)
             {
@@ -113,14 +113,14 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
 
             if (rootElement is Page page)
             {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = element });
+                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = resolvedElement });
                 return;
             }
 
             rootElement.ParentChanged += OnParentChanged!;
         }
 
-        element.ParentChanged += OnParentChanged!;
+        resolvedElement.ParentChanged += OnParentChanged!;
     }
 
     private static Element? GetRootElement(Element element)

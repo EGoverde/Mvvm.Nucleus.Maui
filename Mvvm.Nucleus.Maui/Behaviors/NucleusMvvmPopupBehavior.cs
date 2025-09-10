@@ -4,19 +4,24 @@ using Microsoft.Extensions.Logging;
 namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
-/// The <see cref="NucleusMvvmPageBehavior"/> is a <see cref="Behavior"/> added to all views created by Nucleus
-/// which will register the various events used by the interfaces.
+/// The <see cref="NucleusMvvmPopupBehavior"/> is a <see cref="Behavior"/> added to views created by Nucleus
+/// through the <see cref="PopupViewFactory"/>. It uses the <see cref="CommunityToolkit.Maui.Views.Popup"/>
+/// and its events.
 /// </summary>
 public class NucleusMvvmPopupBehavior() : Behavior
 {
+    private readonly bool useAlternativePopupOpenedAndClosedEvents = NucleusMvvmCore.Current.NucleusMvvmOptions.UseAlternativePopupOpenedAndClosedEvents;
+
+    private string? _popupShellLocation;
+
     /// <summary>
-    /// The <see cref="Popup"/> this behavior is attached to and which events are used.
+    /// The <see cref="CommunityToolkit.Maui.Views.Popup"/> this behavior is attached to and which events are used.
     /// </summary>
     public Popup? Popup { get; set; }
 
     /// <summary>
-    /// The <see cref="Element"/> this behavior is handling. This is either the same as the <see cref="Popup"/>, but can
-    /// also be a <see cref="View"/> that will be wrapped in a <see cref="Popup"/> by the Community Toolkit.
+    /// The <see cref="Microsoft.Maui.Controls.Element"/> this behavior is handling. This is either the same as the <see cref="Popup"/>, but can
+    /// also be a <see cref="View"/> that is wrapped in a <see cref="CommunityToolkit.Maui.Views.Popup"/> by the Community Toolkit.
     /// </summary>
     public Element? Element { get; set; }
 
@@ -69,32 +74,35 @@ public class NucleusMvvmPopupBehavior() : Behavior
 
     private void OnPopupOpened(object? sender, EventArgs e)
     {
-        var bindingContext = GetBindingContext();
+        var isInitialNavigation = string.IsNullOrEmpty(_popupShellLocation);
 
-        if (bindingContext is IPopupLifecycleAware popupLifecycleAware)
+        var isOpened = !useAlternativePopupOpenedAndClosedEvents || isInitialNavigation;
+        if (isOpened)
         {
-            popupLifecycleAware.OnOpened();
+            _popupShellLocation = NucleusMvvmCore.Current.Shell?.CurrentState?.Location?.ToString();
+
+            if (Element is IPopupLifecycleAware popupLifecycleAware)
+            {
+                popupLifecycleAware.OnOpened();
+            }
+
+            if (GetBindingContext() is IPopupLifecycleAware popupViewModelLifecycleAware)
+            {
+                popupViewModelLifecycleAware.OnOpened();
+            }
+        }
+        else
+        {
+            NucleusMvvmCore.Current.Logger?.LogInformation("Popup '{popupType}' triggered the 'Opened' event, but was ignored due to 'UseAlternativePopupOpenedAndClosedEvents'.", Element?.GetType());
         }
 
-        // See the caveat mentioned at OnPopupClosed. This implementation could have unintended effects, because Init can be called multiple
-        // times, even when a popup has not yet been closed. Keeping this in here for now, but should be resolved before release.
-        if (NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit)
+        if (isInitialNavigation && NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit)
         {
             NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit = false;
-
-            if (Element is IPopupInitializable popupInitializable)
-            {
-                popupInitializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
-            }
 
             if (GetBindingContext() is IPopupInitializable popupInitializableViewModel)
             {
                 popupInitializableViewModel.Init(NucleusMvvmCore.Current.PopupNavigationParameters);
-            }
-
-            if (Element is IPopupInitializableAsync popupInitializableAsync)
-            {
-                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsync.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
 
             if (GetBindingContext() is IPopupInitializableAsync popupInitializableAsyncViewModel)
@@ -102,21 +110,34 @@ public class NucleusMvvmPopupBehavior() : Behavior
                 NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
         }
-
-        NucleusMvvmCore.Current.AppResumed += AppResumed!;
-        NucleusMvvmCore.Current.AppStopped += AppStopped!;
     }
 
     private void OnPopupClosed(object? sender, EventArgs e)
     {
-        NucleusMvvmCore.Current.AppResumed -= AppResumed!;
-        NucleusMvvmCore.Current.AppStopped -= AppStopped!;
+        var currentLocation = NucleusMvvmCore.Current.Shell?.CurrentState?.Location?.ToString() ?? string.Empty;
+        var isPopupPagePopped = !currentLocation.Contains(_popupShellLocation ?? string.Empty);
 
-        var bindingContext = GetBindingContext();
-
-        if (bindingContext is IPopupLifecycleAware popupLifecycleAware)
+        var isClosed = !useAlternativePopupOpenedAndClosedEvents || isPopupPagePopped;
+        if (isClosed)
         {
-            popupLifecycleAware.OnClosed();
+            if (Element is IPopupLifecycleAware popupLifecycleAware)
+            {
+                popupLifecycleAware.OnClosed();
+            }
+
+            if (GetBindingContext() is IPopupLifecycleAware popupViewModelLifecycleAware)
+            {
+                popupViewModelLifecycleAware.OnClosed();
+            }
+        }
+        else
+        {
+            NucleusMvvmCore.Current.Logger?.LogInformation("Popup '{popupType}' triggered the 'Closed' event, but was ignored due to 'UseAlternativePopupOpenedAndClosedEvents'.", Element?.GetType());
+        }
+
+        if (!isPopupPagePopped)
+        {
+            return;
         }
 
         var popupMapping = NucleusMvvmCore.Current.NucleusMvvmOptions.PopupMappings.FirstOrDefault(x => x.PopupViewType == Element?.GetType());
@@ -125,70 +146,41 @@ public class NucleusMvvmPopupBehavior() : Behavior
             return;
         }
 
-        if (popupMapping.ServiceLifetime != ServiceLifetime.Transient && Element != Popup)
+        _popupShellLocation = null;
+
+        if (popupMapping.ServiceLifetime == ServiceLifetime.Transient)
         {
-            // The CommunityToolkit will create a new Popup later, while using the reused view
+            (GetBindingContext() as IDestructible)?.Destroy();
+            (Element as IDestructible)?.Destroy();
+
+            if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
+            {
+                NucleusMvvmCore.Current.Logger?.LogInformation("Deconstructing Popup '{popupType}'.", Element?.GetType());
+
+                if (Popup?.Behaviors != null)
+                {
+                    Popup.Behaviors.Remove(this);
+                    Popup.Parent = null;
+                }
+
+                if (Element != null)
+                {
+                    Element.BindingContext = null;
+                    Element.Parent = null;
+                }
+            }
+
+            return;
+        }
+
+        // We do not call IDestructible or deconstruct when using a Scoped or Singleton registration.
+        // However, if a 'View' was registered instead of a 'Popup' instance, we can still clean up the
+        // Popup created by the Community Toolkit, as it will create a new one each time while reusing
+        // the View.
+        if (Element != Popup)
+        {
             PopupViewFactory.ListenToParentChanges(Element!);
-        }
-
-        // The Popup V2 implementation triggers an OnClosed event when a new popup is shown from the current popup.
-        // This is an undocumented change (possibly bug) from how V2 worked. As such, we cannot reliably use this method
-        // for Destroy and Deconstruction. Work in progress.
-        //
-        // if (popupMapping.ServiceLifetime == ServiceLifetime.Transient)
-        // {
-        //     if (bindingContext is IDestructible destructibleViewModel)
-        //     {
-        //         destructibleViewModel.Destroy();
-        //     }
-
-        //     if (Element is IDestructible destructiblePopup)
-        //     {
-        //         destructiblePopup.Destroy();
-        //     }
-
-        //     if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
-        //     {
-        //         NucleusMvvmCore.Current.Logger?.LogInformation("Deconstructing Popup '{popupName}'.", Element?.GetType()?.Name);
-
-        //         Popup!.Behaviors.Remove(this);
-        //         Popup!.BindingContext = null;
-        //         Popup!.Parent = null;
-
-        //         if (Element != null && Element != Popup)
-        //         {
-        //             Element.BindingContext = null;
-        //             Element.Parent = null;
-        //         }
-        //     }
-        // }
-
-        // if (popupMapping.ServiceLifetime != ServiceLifetime.Transient && Element != Popup)
-        // {
-        //     if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPopupOnDestroy)
-        //     {
-        //         Popup!.Behaviors.Remove(this);
-        //         Popup!.BindingContext = null;
-        //         Popup!.Parent = null;
-        //     }
-
-        //     PopupViewFactory.ListenToParentChanges(Element!); // The CommunityToolkit will create a new Popup later, while using the reused view
-        // }
-    }
-
-    private void AppResumed(object sender, EventArgs e)
-    {
-        if (GetBindingContext() is IApplicationLifecycleAware applicationLifecycleAware)
-        {
-            applicationLifecycleAware.OnResume();
-        }
-    }
-
-    private void AppStopped(object sender, EventArgs e)
-    {
-        if (GetBindingContext() is IApplicationLifecycleAware applicationLifecycleAware)
-        {
-            applicationLifecycleAware.OnSleep();
+            Popup?.Behaviors.Remove(this);
         }
     }
 

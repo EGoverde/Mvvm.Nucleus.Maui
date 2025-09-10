@@ -3,8 +3,8 @@
 namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
-/// The <see cref="NucleusMvvmPageBehavior"/> is a <see cref="Behavior"/> added to all views created by Nucleus
-/// which will register the various events used by the interfaces.
+/// The <see cref="NucleusMvvmPageBehavior"/> is a <see cref="Behavior"/> added to views created by Nucleus
+/// through the <see cref="ViewFactory"/>. It will register the various events used by the interfaces.
 /// </summary>
 public class NucleusMvvmPageBehavior : Behavior
 {
@@ -17,7 +17,7 @@ public class NucleusMvvmPageBehavior : Behavior
     private bool _isNavigatedFrom;
 
     /// <summary>
-    /// The <see cref="Page"/> this behavior is attached to and which events are used.
+    /// The <see cref="Microsoft.Maui.Controls.Page"/> this behavior is attached to and which events are used.
     /// </summary>
     public Page? Page { get; set; }
 
@@ -62,7 +62,7 @@ public class NucleusMvvmPageBehavior : Behavior
         NucleusMvvmCore.Current.AppStopped -= AppStopped!;
     }
 
-    private void PageAppearing(object sender, EventArgs e)
+    internal void PageAppearing(object sender, EventArgs e)
     {
         if (GetBindingContext() is IPageLifecycleAware pageLifecycleAware)
         {
@@ -155,8 +155,8 @@ public class NucleusMvvmPageBehavior : Behavior
             if (NucleusMvvmCore.Current.NucleusMvvmOptions.UseDeconstructPageOnDestroy)
             {
                 NucleusMvvmCore.Current.Logger?.LogInformation(Element != null ?
-                $"Deconstructing Element '{Element.GetType().Name}'." :
-                $"Deconstructing Page '{Page?.GetType().Name}'.");
+                    $"Deconstructing Element '{Element.GetType().Name}'." :
+                    $"Deconstructing Page '{Page?.GetType().Name}'.");
 
                 if (Page?.Behaviors != null)
                 {

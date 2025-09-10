@@ -130,7 +130,7 @@ Note that due to the nature of the `PopupService` there is no logic for avoiding
 - `IDestructible`: Triggered when `transient` pages are removed from the stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
-- `IPageLifecycleAware`: Appearing and disappearing events from the view.
+- `IPageLifecycleAware`: Appearing and disappearing events from the page.
 
 ## Popups
 
@@ -154,18 +154,19 @@ To close the popup and return the value you can either use `IPopupService.CloseM
 
 ### Migrating from Nucleus 0.5.0
 
-Nucleus uses the `Popup` functionality from the `Maui.CommunityToolkit`. In version 12.x of the toolkit a large breaking change was done, known as the V2 Popups. This required significant changes to the Nucleus implementation as well, which was part of the 0.6.0 release.
+Nucleus uses the `Popup` functionality from the `Maui.CommunityToolkit`. In version 12.x of the toolkit a large breaking change was done, known as the V2 Popups. This required significant changes to the Nucleus implementation as well, which were part of the 0.6.0 release.
 
 A [migration guide](/MIGRATIONS.md) has been written to help migrate from the previous implementation to the current.
 
 ### Popup interfaces
 
-- `IPopupAware`: Allows access to the generic Popup type using a WeakReference. *ViewModel or ContentView.*
-- `IPopupAware<T>`: Allows access to an exact Popup type using a WeakReference. *ViewModel-Only.*
+The interfaces below all work on the ViewModel. Additionally, `IPopupAware`, `IPopupLifeCycleAware` and `IDestructible` work on the registered popup or view as well.
+
+- `IPopupAware`: Allows access to the generic Popup type using a WeakReference.
+- `IPopupAware<T>`: Allows access to an exact Popup type using a WeakReference.
 - `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
-- `IPopupLifeCycleAware`: Events on opening and closing the popup. *ViewModel-Only.*
+- `IPopupLifeCycleAware`: Events on opening and closing the popup. Can differ from the CommunityToolkit events, see [configuration](#configuration)
 - `IDestructible`: Triggered when a `transient` popup is closed.
-- `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 
 ## Prism Compatibility
 
