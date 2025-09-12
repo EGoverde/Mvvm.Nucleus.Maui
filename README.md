@@ -162,7 +162,7 @@ A [migration guide](/MIGRATIONS.md) has been written to help migrate from the pr
 
 ### Popup interfaces
 
-The interfaces below all work on the ViewModel. Additionally, `IPopupAware`, `IPopupLifeCycleAware` and `IDestructible` work on the registered popup or view as well.
+Below interfaces below work on both the View and the ViewModel, with the exception of `IPopupAware<T>`.
 
 - `IPopupAware`: Allows access to the generic Popup type using a WeakReference.
 - `IPopupAware<T>`: Allows access to an exact Popup type using a WeakReference.

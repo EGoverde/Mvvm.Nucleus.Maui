@@ -107,7 +107,7 @@ public class NucleusMvvmPopupBehavior() : Behavior
 
             if (GetBindingContext() is IPopupInitializableAsync popupInitializableAsyncViewModel)
             {
-                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupInitializableAsyncViewModel.InitAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
             }
         }
     }
