@@ -4,16 +4,16 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class DetailsViewModel : ObservableObject, IInitializable, IConfirmNavigationAsync
+public partial class DetailsViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : ObservableObject, IInitializable, IConfirmNavigationAsync
 {
-    private readonly INavigationService _navigationService;
+    private readonly INavigationService _navigationService = navigationService;
 
-    private readonly IPageDialogService _pageDialogService;
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
 
     private bool _shouldConfirmNavigation;
 
     [ObservableProperty]
-    private string _pageIdentifier;
+    private string _pageIdentifier = Guid.NewGuid().ToString();
 
     [ObservableProperty]
     private string _navigationParameterData = "-";
@@ -23,14 +23,6 @@ public partial class DetailsViewModel : ObservableObject, IInitializable, IConfi
 
     [ObservableProperty]
     private string _onRefreshData = "-";
-
-    public DetailsViewModel(INavigationService navigationService, IPageDialogService pageDialogService)
-    {
-        _navigationService = navigationService;
-        _pageDialogService = pageDialogService;
-
-        _pageIdentifier = Guid.NewGuid().ToString();
-    }
 
     public void Init(IDictionary<string, object> navigationParameters)
     {
@@ -128,12 +120,6 @@ public partial class DetailsViewModel : ObservableObject, IInitializable, IConfi
     private async Task CloseAllModalAsync()
     {
         await _navigationService.CloseAllModalAsync();
-    }
-    
-    [RelayCommand]
-    private async Task NavigateToIntroAsync()
-    {
-        await _navigationService.NavigateAsync<Intro>();
     }
 
     private void SetNavigationParameterData(IDictionary<string, object> navigationParameters)

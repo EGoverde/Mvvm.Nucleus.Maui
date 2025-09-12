@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui.Views;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Views;
 
 namespace Mvvm.Nucleus.Maui;
 
@@ -11,55 +13,97 @@ public interface IPopupService
     /// <summary>
     /// Creates and shows a <see cref="Popup"/>.
     /// </summary>
-    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
-    /// <returns>The result from the <see cref="Popup"/>.</returns>
-    public Task<object?> ShowPopupAsync<TPopup>() where TPopup : Popup;
-
-    /// <summary>
-    /// Creates and shows a <see cref="Popup"/> with an expected result.
-    /// </summary>
-    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="defaultResult">The default return value.</param>
-    /// <returns>The result from the <see cref="Popup"/> or the default if <see langword="null"/> or an invalid type.</returns>
-    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultResult = default) where TPopup : Popup;
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
+    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
+    void ShowPopup<TPopup>(IDictionary<string, object>? navigationParameters = null) where TPopup : View;
 
     /// <summary>
     /// Creates and shows a <see cref="Popup"/>.
     /// </summary>
-    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
+    /// <param name="options">The <see cref="IPopupOptions"/> for displaying the popup.</param>
     /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
-    /// <param name="token">The <see cref="CancellationToken"/> to cancel the popup.</param>
-    /// <returns>The result from the <see cref="Popup"/>.</returns>
-    public Task<object?> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters, CancellationToken token = default) where TPopup : Popup;
-
-    /// <summary>
-    /// Creates and shows a <see cref="Popup"/> with an expected result.
-    /// </summary>
-    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
-    /// <param name="defaultResult">The default return value.</param>
-    /// <param name="token">The <see cref="CancellationToken"/> to cancel the popup.</param>
-    /// <returns>The result from the <see cref="Popup"/> or the default if <see langword="null"/> or an invalid type.</returns>
-    public Task<TResult?> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default) where TPopup : Popup;
+    void ShowPopup<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null) where TPopup : View;
 
     /// <summary>
     /// Creates and shows a <see cref="Popup"/>.
     /// </summary>
-    /// <param name="popupViewType">The <see cref="Type"/> of the <see cref="Popup"/>.</param>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
     /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
-    /// <param name="token">The <see cref="CancellationToken"/> to cancel the popup.</param>
-    /// <returns>The result from the <see cref="Popup"/>.</returns>
-    public Task<object?> ShowPopupAsync(Type popupViewType, IDictionary<string, object>? navigationParameters, CancellationToken token = default);
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<IPopupResult> ShowPopupAsync<TPopup>(IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : View;
 
     /// <summary>
-    /// Creates and shows a <see cref="Popup"/> with an expected result.
+    /// Creates and shows a <see cref="Popup"/>.
     /// </summary>
-    /// <param name="popupViewType">The <see cref="Type"/> of the <see cref="Popup"/>.</param>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/> or <see cref="View"/>.</typeparam>
+    /// <param name="options">The <see cref="IPopupOptions"/> for displaying the popup.</param>
     /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
-    /// <param name="defaultResult">The default return value.</param>
-    /// <param name="token">The <see cref="CancellationToken"/> to cancel the popup.</param>
-    /// <returns>The result from the <see cref="Popup"/> or the default if <see langword="null"/> or an invalid type.</returns>
-    public Task<TResult?> ShowPopupAsync<TResult>(Type popupViewType, IDictionary<string, object>? navigationParameters, TResult? defaultResult = default, CancellationToken token = default);
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<IPopupResult> ShowPopupAsync<TPopup>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : View;
+
+    /// <summary>
+    /// Creates and shows a <see cref="Popup"/> with a return value wrapped in an <see cref="IPopupResult"/>.
+    /// </summary>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<IPopupResult<TResult>> ShowPopupAsync<TPopup, TResult>(IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>;
+
+    /// <summary>
+    /// Creates and shows a <see cref="Popup"/> with a return value wrapped in an <see cref="IPopupResult"/>.
+    /// </summary>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="options">The <see cref="IPopupOptions"/> for displaying the popup.</param>
+    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<IPopupResult<TResult>> ShowPopupAsync<TPopup, TResult>(IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>;
+
+    /// <summary>
+    /// Creates and shows a <see cref="Popup"/>, with a return value based on <see cref="IPopupResult"/>.
+    /// The value will fallback to the default if the result is <see langword="null"/> or the popup dismissed.
+    /// </summary>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="defaultValue">The default return value.</param>
+    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultValue, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>;
+
+    /// <summary>
+    /// Creates and shows a <see cref="Popup"/>, with a return value based on <see cref="IPopupResult"/>.
+    /// The value will fallback to the default if the result is <see langword="null"/> or the popup dismissed.
+    /// </summary>
+    /// <typeparam name="TPopup">The type of the <see cref="Popup"/>.</typeparam>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="defaultValue">The default return value.</param>
+    /// <param name="options">The <see cref="IPopupOptions"/> for displaying the popup.</param>
+    /// <param name="navigationParameters">The navigation parameters to pass to <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.</param>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>The <see cref="IPopupResult"/>> from the <see cref="Popup"/>.</returns>
+    Task<TResult?> ShowPopupAsync<TPopup, TResult>(TResult? defaultValue, IPopupOptions? options, IDictionary<string, object>? navigationParameters = null, CancellationToken token = default) where TPopup : Popup<TResult>;
+
+    /// <summary>
+    /// Closes the most recently opened <see cref="Popup"/> without a return value.
+    /// </summary>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A bool indicating whether or not the action succeeded.</returns>
+    Task CloseMostRecentPopupAsync(CancellationToken token = default);
+
+    /// <summary>
+    /// Closes the most recently opened <see cref="Popup"/> with the given return value.
+    /// Note that the given return value must match the type used to show the popup.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="result">The return value.</param>
+    /// <param name="token">The <see cref="CancellationToken"/>.</param>
+    /// <returns>A bool indicating whether or not the action succeeded.</returns>
+    Task CloseMostRecentPopupAsync<TResult>(TResult result, CancellationToken token = default);
 }

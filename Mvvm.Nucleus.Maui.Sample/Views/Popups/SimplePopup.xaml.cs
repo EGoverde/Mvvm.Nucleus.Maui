@@ -2,15 +2,27 @@ using CommunityToolkit.Maui.Views;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class SimplePopup : Popup, IPopupInitializable
+public partial class SimplePopup : ContentView, IPopupAware, IPopupInitializable
 {
-	public SimplePopup()
+	public SimplePopup(IPopupService popupService)
 	{
 		InitializeComponent();
 
-		ResultWhenUserTapsOutsideOfPopup = "Dismissed using tap.";
-        CloseButton.Clicked += (obj, e) => Close("Closed using Button.");
+        CloseButtonService.Clicked += (obj, e) =>
+        {
+            _ = popupService.CloseMostRecentPopupAsync();
+        };
+
+        CloseButtonPopupAware.Clicked += (obj, e) =>
+        {
+            if (Popup?.TryGetTarget(out var popupInstance) == true)
+            {
+                _ = popupInstance.CloseAsync();
+            }
+        };
 	}
+
+    public WeakReference<Popup>? Popup { get; set; }
 
     public void Init(IDictionary<string, object> navigationParameters)
     {

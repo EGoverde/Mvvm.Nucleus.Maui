@@ -1,18 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mvvm.Nucleus.Maui.Compatibility;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class PopupTabViewModel : ObservableObject
+public partial class PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService, CommunityToolkit.Maui.IPopupService communityToolkitPopupService, CommunityToolkitV1PopupService communityToolkitV1PopupService) : ObservableObject
 {
-    private readonly IPopupService _popupService;
-    private readonly IPageDialogService _pageDialogService;
+    private readonly IPopupService _popupService = popupService;
 
-    public PopupTabViewModel(IPopupService popupService, IPageDialogService pageDialogService)
-    {
-        _popupService = popupService;
-        _pageDialogService = pageDialogService;
-    }
+    private readonly CommunityToolkit.Maui.IPopupService _communityToolkitPopupService = communityToolkitPopupService;
+
+    private readonly IPageDialogService _pageDialogService = pageDialogService;
+
+    private readonly CommunityToolkitV1PopupService _communityToolkitV1PopupService = communityToolkitV1PopupService;
 
     [RelayCommand]
     private async Task ShowSimplePopupAsync()
@@ -22,9 +22,8 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        var result = await _popupService.ShowPopupAsync<SimplePopup, string>(navigationParameters);
-
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        await _popupService.ShowPopupAsync<SimplePopup>(navigationParameters);
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed'", "Okay");
     }
 
     [RelayCommand]
@@ -35,9 +34,30 @@ public partial class PopupTabViewModel : ObservableObject
             { "Text", "Text from navigation parameters." }
         };
 
-        var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
+        var popupResult = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
 
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
+    }
+
+    [RelayCommand]
+    private async Task ShowSingletonPopupAsync()
+    {
+        var popupResult = await _popupService.ShowPopupAsync<SingletonPopup>();
+
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
+    }
+
+    [RelayCommand]
+    private async Task ShowCommunityToolkitPopupAsync()
+    {
+        var navigationParameters = new Dictionary<string, object>
+        {
+            { "Text", "Text from navigation parameters." }
+        };
+
+        var popupResult = await _communityToolkitPopupService.ShowPopupAsync<AdvancedPopup, string>(Shell.Current, shellParameters: navigationParameters);
+
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult.Result}'. WasDismissedByTappingOutsideOfPopup: {popupResult.WasDismissedByTappingOutsideOfPopup}.", "Okay");
     }
 
     [RelayCommand]
@@ -50,9 +70,15 @@ public partial class PopupTabViewModel : ObservableObject
                 { "Text", $"IsMainThread = {MainThread.IsMainThread}" }
             };
 
-            var result = await _popupService.ShowPopupAsync<AdvancedPopup, string>(navigationParameters);
-
-            await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{result}'", "Okay");
+            var result = await _popupService.ShowPopupAsync<SimplePopup>();
         });
+    }
+
+    [RelayCommand]
+    private async Task ShowCompatibilityPopupAsync()
+    {
+        var popupResult = await _communityToolkitV1PopupService.ShowPopupAsync<LegacyPopup, string>();
+        
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed, result was '{popupResult}'.", "Okay");
     }
 }

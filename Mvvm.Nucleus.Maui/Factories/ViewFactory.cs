@@ -6,38 +6,27 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="ViewFactory"/> is the default implementation for <see cref="IViewFactory"/>.
 /// It can be customized through inheritence and registering the service before initializing Nucleus.
 /// </summary>
-public class ViewFactory : IViewFactory
+/// <remarks>
+/// Initializes a new instance of the <see cref="ViewFactory"/> class.
+/// </remarks>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+/// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+/// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions) : IViewFactory
 {
-    private readonly ILogger _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly NucleusMvvmOptions _nucleusMvvmOptions;
+    private readonly ILogger _logger = logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ViewFactory"/> class.
-    /// </summary>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    public ViewFactory(ILogger<ViewFactory> logger, IServiceProvider serviceProvider, NucleusMvvmOptions nucleusMvvmOptions)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _nucleusMvvmOptions = nucleusMvvmOptions;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    /// <inheritdoc/>
-    public T? CreateView<T>() where T : Element
-    {
-        return CreateView(typeof(T)) as T;
-    }
+    private readonly NucleusMvvmOptions _nucleusMvvmOptions = nucleusMvvmOptions;
 
     /// <inheritdoc/>
     public object CreateView(Type viewType)
     {
-        var view = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
-        if (view is not Element element)
+        var viewObject = ActivatorUtilities.CreateInstance(_serviceProvider, viewType);
+        if (viewObject is not Element element)
         {
-            return view;
+            return viewObject;
         }
 
         return ConfigureView(element);
@@ -50,12 +39,7 @@ public class ViewFactory : IViewFactory
             .ViewMappings
             .FirstOrDefault(x => x.ViewType == element.GetType());
 
-        var setBindingContext = viewMapping != null &&
-            element.BindingContext == null &&
-            (!element.IsSet(NucleusMvvm.NucleusConfigureViewProperty) ||
-            (element.GetValue(NucleusMvvm.NucleusConfigureViewProperty) is bool nucleusConfigureView && nucleusConfigureView));
-
-        if (setBindingContext)
+        if (viewMapping != null && element.BindingContext == null)
         {
             element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, viewMapping!.ViewModelType);
         }
@@ -76,17 +60,15 @@ public class ViewFactory : IViewFactory
 
             PresentationMode? presentationMode = null;
             var wrapNavigationPage = false;
-            
-            if (navigationParameters.ContainsKey(NucleusNavigationParameters.NavigatingPresentationMode) &&
-                navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode] is PresentationMode)
+
+            if (navigationParameters.TryGetValue(NucleusNavigationParameters.NavigatingPresentationMode, out object? valueAsPresentationMode) && valueAsPresentationMode is PresentationMode)
             {
-                presentationMode = (PresentationMode)navigationParameters[NucleusNavigationParameters.NavigatingPresentationMode]!;
+                presentationMode = (PresentationMode)valueAsPresentationMode!;
             }
 
-            if (navigationParameters.ContainsKey(NucleusNavigationParameters.WrapInNavigationPage) &&
-                navigationParameters[NucleusNavigationParameters.WrapInNavigationPage] is bool)
+            if (navigationParameters.TryGetValue(NucleusNavigationParameters.WrapInNavigationPage, out object? valueAsBool) && valueAsBool is bool)
             {
-                wrapNavigationPage = (bool)navigationParameters[NucleusNavigationParameters.WrapInNavigationPage]!;
+                wrapNavigationPage = (bool)valueAsBool!;
             }
 
             if (presentationMode != null)
@@ -112,12 +94,11 @@ public class ViewFactory : IViewFactory
         return element;
     }
 
-    private void ListenToParentChanges(Element createdElement)
+    private static void ListenToParentChanges(Element resolvedElement)
     {
         void OnParentChanged(object sender, EventArgs args)
         {
-            var element = sender as Element;
-            if (element == null)
+            if (sender is not Element element)
             {
                 return;
             }
@@ -132,17 +113,17 @@ public class ViewFactory : IViewFactory
 
             if (rootElement is Page page)
             {
-                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = createdElement });
+                page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page, Element = resolvedElement });
                 return;
             }
 
             rootElement.ParentChanged += OnParentChanged!;
         }
 
-        createdElement.ParentChanged += OnParentChanged!;
+        resolvedElement.ParentChanged += OnParentChanged!;
     }
 
-    private Element? GetRootElement(Element element)
+    private static Element? GetRootElement(Element element)
     {
         var rootElement = element?.Parent ?? element;
         var parentElement = element?.Parent;

@@ -1,4 +1,4 @@
-﻿namespace Mvvm.Nucleus.Maui;
+namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
 /// The <see cref="IPopupInitializableAsync"/> can be used to load data when a popup is being loaded.

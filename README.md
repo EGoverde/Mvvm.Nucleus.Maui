@@ -16,8 +16,10 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
     - [Avoiding double navigation](#avoiding-double-navigation)
     - [Navigation interfaces](#navigation-interfaces)
 - [Popups](#popups)
+    - [Closing and return values](#closing-and-return-values)
+    - [Migrating from Nucleus 0.5.0](#migrating-from-nucleus-050)
     - [Popup interfaces](#popup-interfaces)
-- [Migrating from Prism](#migrating-from-prism)
+- [Prism compatibility](#prism-compatibility)
 - [Limitations and plans](#limitations-and-plans)
 - [Support](#support)
 
@@ -33,25 +35,24 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Getting started
 
-Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options:
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options.
 
-                builder
-                .UseNucleusMvvm<App, AppShell>(options =>
-                {
-                    options.RegisterTypes(dependencyOptions => 
-                        dependencyOptions.RegisterShellView<MyAbsoluteView, MyAbsoluteViewModel>("//MyAbsoluteView");
-                        dependencyOptions.RegisterView<MyGlobalView, MyGlobalViewModel>("//MyGlobalView");
-                    );
-                })
-                .Etc..
+See [Navigation](#navigation) and [Popups](#popups) for the usage of the `RegisterShellView`, `RegisterView` and `RegisterPopup`, .
 
-*Note that the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/) is a dependency of Nucleus. You should not call `UseMauiCommunityToolkit` manually, as this is already done through `UseNucleusMvvm`.*
+*Note that the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/) is a dependency of Nucleus. You should not call `UseMauiCommunityToolkit` manually, as this is already done through `UseNucleusMvvm`. If you need to configure the Community Toolkit you can access the options through the `UseNucleusMvvm` method.*
 
-See [Navigation](#navigation) to see the usage and differences between `RegisterShellView` and `RegisterView`.
 
-ViewModels can be of any type and support dependency injection. By implementing interfaces (see [Event interfaces](#event-interfaces)) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObserableObject` as a base for its bindings.
+    builder
+    .UseNucleusMvvm<App, AppShell>(options =>
+    {
+        options.RegisterTypes(dependencyOptions => 
+            dependencyOptions.RegisterShellView<MyAbsoluteView, MyAbsoluteViewModel>("//MyAbsoluteView");
+            dependencyOptions.RegisterView<MyGlobalView, MyGlobalViewModel>("//MyGlobalView");
+        );
+    })
+    .Etc..
 
-An optional `NucleusViewModel` is included to have some boilerplate events like `OnInitAsync()` and `OnRefreshAsync`.
+ViewModels can be of any type and support dependency injection. By implementing interfaces (see [Navigation interfaces](#navigation-interfaces) and [Popup interfaces](#popup-interfaces)) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObservableObject` as a base for its bindings.
 
 ### Configuration
 
@@ -65,6 +66,9 @@ Within the options the following additional settings can be changed:
 - `UseConfirmNavigationForAllNavigationRequests`: Default `false`. If set, all navigation requests will be passed to the `IConfirmNavigation` and `IConfirmNavigationAsync` interfaces. Otherwise only Push and Pop requests are used.
 - `UseDeconstructPageOnDestroy`: Default `true`. Unload behaviors and unset bindingcontext of pages when they are popped.
 - `UseDeconstructPopupOnDestroy`: Default `true`. Unset the bindingcontext and parent of popups when they are dismissed.
+- `UseCommunityToolkitPopupServiceCompatibility`: Default `true`. Enables usage of the `CommunityToolkit.PopupService` on top of the build-in `Mvvm.Nucleus.Maui.PopupService`. You only need to register popups through Nucleus for this to work.
+- `UseAlternativePopupOpenedAndClosedEvents`: Default: `true`. If set the `IPopupLifecycleAware` will do an additional check on the default Popup `Opened` and `Closed` events, see [Popups](#popups) for details.
+- `CommunityToolkitV1PopupServicePopupOptions`: Default: `null`. If set this value will be used in the `CommunityToolkitV1PopupService` compatibility service.
 
 See the *Sample Project* in the repository for more examples of Nucleus MVVM usage.
 
@@ -126,28 +130,47 @@ Note that due to the nature of the `PopupService` there is no logic for avoiding
 - `IDestructible`: Triggered when `transient` pages are removed from the stack.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
-- `IPageLifecycleAware`: Appearing and disappearing events from the view.
+- `IPageLifecycleAware`: Appearing and disappearing events from the page.
 
 ## Popups
 
-Nucleus can display [CommunityToolkit.MAUI Popups](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/views/popup) through the `IPopupService`. This works very similar to navigation.
+Nucleus can display [CommunityToolkit.MAUI Popups](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/views/popup) through the `IPopupService`. This works very similar to navigation. The `CommunityToolkit.PopupService` is also supported for certain scenarios, as long as `options.UseCommunityToolkitPopupServiceCompatibility` is set to `true`. Note that you should always navigate by passing the `View` type, not the ViewModel.
 
-Popups can be used with or without ViewModels and require registration in `MauiProgram.cs` using `RegisterPopup<MyPopup>` or `RegisterPopup<MyPopup, MyPopupViewModel>`.
+Popups can be used with or without ViewModels and require registration in `MauiProgram.cs` using `RegisterPopup<MyPopup>` or `RegisterPopup<MyPopup, MyPopupViewModel>`. After registration popups can be shown by passing the view type to one of the various `ShowPopupAsync` methods. 
 
-After registration popups can be shown by passing the view type to one of the various `ShowPopupAsync` methods. The result can be awaited, either as an `object?` or a given type (*note that the popup is responsible for the correct type*).
+Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)), as well as `IQueryAttributable`. These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
 
-Parameters can be sent through an `IDictionary<string, object>`, which will be passed to Init or InitAsync (see [Popup interfaces](#popup-interfaces)). These methods will be called before showing the popup. The async variant can be configured such that it has to finish before showing the popup.
+Popups are by default registered as `Transient`, but support `Scoped` and `Singleton` as well.
 
-Using the `IPopupAware` the ViewModel can receive a reference to the popup, which is required in order to close the popup programatically. Alternatively the `NucleusPopupViewModel` can be used for common functionality, such as a CloseCommand and function.
+**Note:** By default the `Opened` and `Closed` events that are passed to `IPopupLifeCycleAware` have additional logic to ensure the `Popup` is actually closed, and not just currently deeper in the navigation stack. This can occur in the CommunityToolkit when presenting a Popup from within a Popup, which we consider a bug. This functionality can be disabled through `UseAlternativePopupOpenedAndClosedEvents`.
+
+### Closing and return values
+The `IPopupService` can either show a popup with or without an expected return value, wrapped in an `IPopupResult`. The methods that return a value other than the generic result, require the use of a `Popup<T>` (T being the return type).
+
+To close the popup and return the value you can either use `IPopupService.CloseMostRecentPopupAsync`, or the `IPopupAware` and `IPopupAware<T>` interfaces. Note that you can always access `CloseAsync()` fom the `WeakReference<Popup>`, but To access `CloseAsync(value)` you need to use `IPopupAware<T>` (where T matches the used `Popup<T>`).
+
+    if (Popup?.TryGetTarget(out MyCustomPopup? myCustomPopup) == true)
+    {
+        await myCustomPopup.CloseAsync("result");
+    }
+
+### Migrating from Nucleus 0.5.0
+
+Nucleus uses the `Popup` functionality from the `Maui.CommunityToolkit`. In version 12.x of the toolkit a large breaking change was done, known as the V2 Popups. This required significant changes to the Nucleus implementation as well, which were part of the 0.6.0 release.
+
+A [migration guide](/MIGRATIONS.md) has been written to help migrate from the previous implementation to the current.
 
 ### Popup interfaces
 
-- `IPopupAware`: Allows access to the Popup using a WeakReference. *ViewModel-Only.*
-- `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
-- `IPopupLifeCycleAware`: Events on opening and closing the popup. *ViewModel-Only.*
-- `IDestructible`: Triggered when the popup is closed.
+Below interfaces below work on both the View and the ViewModel, with the exception of `IPopupAware<T>`.
 
-## Migrating from Prism
+- `IPopupAware`: Allows access to the generic Popup type using a WeakReference.
+- `IPopupAware<T>`: Allows access to an exact Popup type using a WeakReference.
+- `IPopupInitializable(Async)`: Init functions triggered before showing the popup.
+- `IPopupLifeCycleAware`: Events on opening and closing the popup.
+- `IDestructible`: Triggered when a `transient` popup is closed.
+
+## Prism Compatibility
 
 [Prism](https://prismlibrary.com/docs/maui/index.html) is a popular library offering the same (and quite a few more) features as this library. Nucleus MVVM aims to be a simpler alternative, only adding quality-of-life MVVM features as a layer on top of [MAUI](https://github.com/dotnet/maui). This should result in an easy to maintain library able to use the latest MAUI features.
 

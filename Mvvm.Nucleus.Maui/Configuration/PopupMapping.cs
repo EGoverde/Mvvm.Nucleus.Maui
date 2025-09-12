@@ -7,15 +7,17 @@ namespace Mvvm.Nucleus.Maui;
 /// </summary>
 public class PopupMapping
 {
-    internal PopupMapping(Type popupViewType)
+    internal PopupMapping(Type popupViewType, ServiceLifetime serviceLifetime)
     {
         PopupViewType = popupViewType;
+        ServiceLifetime = serviceLifetime;
     }
 
-    internal PopupMapping(Type popupViewType, Type popupViewModelType)
+    internal PopupMapping(Type popupViewType, Type popupViewModelType, ServiceLifetime serviceLifetime)
     {
         PopupViewType = popupViewType;
         PopupViewModelType = popupViewModelType;
+        ServiceLifetime = serviceLifetime;
     }
 
     /// <summary>
@@ -29,17 +31,17 @@ public class PopupMapping
     public Type? PopupViewModelType { get; }
 
     /// <summary>
-    /// Gets a value indicating whether this registration includes a ViewModel.
+    /// The <see cref="ServiceLifetime"/> of this registration.
     /// </summary>
-    public bool IsWithoutViewModel => PopupViewModelType == null;
+    public ServiceLifetime ServiceLifetime { get; }
 
-    internal static PopupMapping Create<TPopupView, TPopupViewModel>() where TPopupView : Popup
+    internal static PopupMapping Create<TPopupView, TPopupViewModel>(ServiceLifetime serviceLifetime) where TPopupView : View
     {
-        return new PopupMapping(typeof(TPopupView), typeof(TPopupViewModel));
+        return new PopupMapping(typeof(TPopupView), typeof(TPopupViewModel), serviceLifetime);
     }
 
-    internal static PopupMapping Create<TPopupView>() where TPopupView : Popup
+    internal static PopupMapping Create<TPopupView>(ServiceLifetime serviceLifetime) where TPopupView : View
     {
-        return new PopupMapping(typeof(TPopupView));
+        return new PopupMapping(typeof(TPopupView), serviceLifetime);
     }
 }

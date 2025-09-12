@@ -4,16 +4,12 @@
              xmlns:local="clr-namespace:Mvvm.Nucleus.Maui.Sample"
              x:Class="Mvvm.Nucleus.Maui.Sample.PopupTab"
              x:DataType="local:PopupTabViewModel"
-             Title="Popup">
+             Title="Popups">
     
     <VerticalStackLayout
-        Spacing="10"
-        Margin="40">
-
-        <Label
-            Text="Popups are shown in Nucleus.Mvvm through the IPopupService, generally from ViewModels. This uses the implementation of CommunityToolkit.Maui." />
-        
-        <ContentView />
+            MaximumWidthRequest="400"
+            Margin="40"
+            Spacing="10">
 
         <Button
             Text="Show Popup without ViewModel"
@@ -24,9 +20,21 @@
             Command="{Binding ShowAdvancedPopupCommand}"/>
 
         <Button
-            Text="Show Popup with background thread"
+            Text="Show Popup as Singleton"
+            Command="{Binding ShowSingletonPopupCommand}"/>
+
+        <Button
+            Text="Use CommunityToolkit.PopupService"
+            Command="{Binding ShowCommunityToolkitPopupCommand}"/>
+
+        <Button
+            Text="Show Popup from background thread"
             Command="{Binding ShowBackgroundThreadPopupCommand}"/>
 
-    </VerticalStackLayout>
+        <Button
+            Text="Show Compatibility Popup"
+            Command="{Binding ShowCompatibilityPopupCommand}"/>
     
+    </VerticalStackLayout>
+
 </ContentPage>

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 
 namespace Mvvm.Nucleus.Maui;
@@ -8,6 +7,7 @@ namespace Mvvm.Nucleus.Maui;
 /// <summary>
 /// The <see cref="INucleusPopupViewModel"/> holds initialization functions and properties used by <see cref="NucleusPopupViewModel"/>.
 /// </summary>
+[Obsolete("The NucleusPopupViewModel and related interface will be removed in future versions. Implement your own base ViewModel instead.")]
 public interface INucleusPopupViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IPopupAware, IPopupInitializableAsync, IPopupLifecycleAware
 {
     /// <summary>
@@ -32,6 +32,7 @@ public interface INucleusPopupViewModel : INotifyPropertyChanged, INotifyPropert
 /// <summary>
 /// An optional ViewModel that can be inherited to have commonly used functions and properties.
 /// </summary>
+[Obsolete("The NucleusPopupViewModel and related interface will be removed in future versions. Implement your own base ViewModel instead.")]
 public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase, INucleusPopupViewModel
 {
     private bool _isInitializing;
@@ -63,13 +64,13 @@ public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase
     {
         if (IsInitialized)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{0}' is already initialized.", GetType());
+            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{type}' is already initialized.", GetType());
             return;
         }
 
         if (IsInitializing)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{0}' is already in the process of initializing.", GetType());
+            NucleusMvvmCore.Current.Logger?.LogWarning("PopupViewModel '{type}' is already in the process of initializing.", GetType());
             return;
         }
 
@@ -100,20 +101,6 @@ public abstract partial class NucleusPopupViewModel : Compatibility.BindableBase
     /// <inheritdoc/>
     public virtual void OnOpened()
     {
-    }
-
-    /// <summary>
-    /// Closes the popup and returns the given result value to the caller.
-    /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
-    [RelayCommand]
-    protected virtual async Task CloseAsync(object? result = null)
-    {
-        if (GetPopup() is Popup popup)
-        {
-            await popup.CloseAsync(result);
-        }
     }
 
     /// <summary>

@@ -9,16 +9,9 @@
     <ScrollView>
 
         <VerticalStackLayout
-            Spacing="10"
-            Margin="40">
-
-            <Label
-                Text="Navigation is done in Nucleus.Mvvm through the INavigationService, generally from ViewModels. The default, and currently the only supported implemention, uses Maui Shell." />
-            
-            <Label
-                Text="The buttons below demonstrate navigation to a globally registered view (see MauiProgram.cs). See the NavigationTabViewModel for the code behind these buttons." />
-            
-            <ContentView />
+            MaximumWidthRequest="400"
+            Margin="40"
+            Spacing="10">
 
             <Button
                 Text="Navigation by Type"
@@ -55,13 +48,9 @@
             <Button
                 Text="Switch Tabs"
                 Command="{Binding SwitchTabsCommand}"/>
-            
-             <Button
-                Text="Restart App"
-                Command="{Binding RestartAppCommand}"/>
 
         </VerticalStackLayout>
-    
+
     </ScrollView>
 
 </ContentPage>

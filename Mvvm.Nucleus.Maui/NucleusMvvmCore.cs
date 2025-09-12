@@ -8,15 +8,24 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="NucleusMvvmCore"/> is a singleton class that keeps track of various events. It also contains
 /// state properties that can be accessed by other parts of Nucleus (or by custom logic).
 /// </summary>
-public class NucleusMvvmCore
+/// <remarks>
+/// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
+/// </remarks>
+/// <param name="application">The <see cref="Application"/>.</param>
+/// <param name="viewFactory">The <see cref="IViewFactory"/>.</param>
+/// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
+/// <param name="logger">The <see cref="ILogger"/>.</param>
+public class NucleusMvvmCore(Application application, IViewFactory viewFactory, NucleusMvvmOptions nucleusMvvmOptions, ILogger<NucleusMvvmCore> logger)
 {
     private static NucleusMvvmCore? _current;
 
     private IDictionary<string, object> _navigationParameters = new Dictionary<string, object>();
 
-    internal ILogger<NucleusMvvmCore>? Logger { get; }
+    private IDictionary<string, object> _popupNavigationParameters = new Dictionary<string, object>();
 
-    internal NucleusMvvmOptions NucleusMvvmOptions { get; }
+    internal ILogger<NucleusMvvmCore>? Logger { get; } = logger;
+
+    internal NucleusMvvmOptions NucleusMvvmOptions { get; } = nucleusMvvmOptions;
 
     internal static bool IsInitialized => _current != null;
 
@@ -25,13 +34,21 @@ public class NucleusMvvmCore
         get => _navigationParameters;
         set => _navigationParameters = value ?? new Dictionary<string, object>();
     }
+    
+    internal IDictionary<string, object> PopupNavigationParameters
+    {
+        get => _popupNavigationParameters;
+        set => _popupNavigationParameters = value ?? new Dictionary<string, object>();
+    }
+
+    internal bool PopupOpenedThroughCommunityToolkit { get; set; }
 
     /// <summary>
     /// Gets the instance of Nucleus. It needs to have finishing initializing before it can be used.
     /// </summary>
     public static NucleusMvvmCore Current
     {
-        get =>  _current ?? throw new InvalidOperationException("NucleusMvvm has not yet been initialized.");
+        get => _current ?? throw new InvalidOperationException("NucleusMvvm has not yet been initialized.");
         private set => _current = value;
     }
 
@@ -56,7 +73,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the current <see cref="Application"/>.
     /// </summary>
-    public Application Application { get; }
+    public Application Application { get; } = application;
 
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/> for IoC purposes.
@@ -66,7 +83,7 @@ public class NucleusMvvmCore
     /// <summary>
     /// Gets the <see cref="IViewFactory"/> used to create Views and ViewModels.
     /// </summary>
-    public IViewFactory? ViewFactory { get; }
+    public IViewFactory? ViewFactory { get; } = viewFactory;
 
     /// <summary>
     /// Gets the current <see cref="Shell"/>. This property will automatically be updated if a new <see cref="Shell"/> is presented.
@@ -97,21 +114,6 @@ public class NucleusMvvmCore
     /// </summary>
     public Page CurrentPage => GetCurrentPage(Window?.Page ?? throw new InvalidOperationException("NucleusMvvm could not detect the current page."));
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NucleusMvvmCore"/> class.
-    /// </summary>
-    /// <param name="application">The <see cref="Application"/>.</param>
-    /// <param name="viewFactory">The <see cref="IViewFactory"/>.</param>
-    /// <param name="nucleusMvvmOptions">The <see cref="NucleusMvvmOptions"/>.</param>
-    /// <param name="logger">The <see cref="ILogger"/>.</param>
-    public NucleusMvvmCore(Application application, IViewFactory viewFactory, NucleusMvvmOptions nucleusMvvmOptions, ILogger<NucleusMvvmCore> logger)
-    {
-        Application = application;
-        ViewFactory = viewFactory;
-        NucleusMvvmOptions = nucleusMvvmOptions;
-        Logger = logger;
-    }
-
     internal void Initialize(IServiceProvider serviceProvider)
     {
         Current = this;
@@ -126,7 +128,7 @@ public class NucleusMvvmCore
         }
         catch (Exception ex)
         {
-            Logger?.LogCritical(ex, $"Failed to run async method '{callerName}' in '{GetType()}', with exception: {ex.Message}.");
+            Logger?.LogCritical(ex, "Failed to run async method '{callerName}' in '{type}', with exception: {message}.", callerName, GetType(), ex.Message);
         }
         finally
         {
