@@ -40,7 +40,7 @@ Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mv
 To get started:
 
 1. **Remove `CreateWindow(IActivationState? activationState)` in `App.xaml.cs`.**
-2. **Remove `UseMauiApp<App>` (and `UseCommunityToolkit` if there) and replace it with `UseNucleusMvvm<App, AppShell>`.**
+2. **Remove `UseMauiApp<App>` and `UseCommunityToolkit` and replace with `UseNucleusMvvm<App, AppShell>`.**
 3. **Then configure Nucleus, at the minimum the page(s) in `AppShell` using the options.**
 
 See [Navigation](#navigation) and [Popups](#popups) for the usage of the `RegisterShellView`, `RegisterView` and `RegisterPopup`, .
