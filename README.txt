@@ -5,9 +5,10 @@ Upgrading: https://github.com/EGoverde/Mvvm.Nucleus.Maui/blob/main/MIGRATIONS.md
 
 Quick getting started guide:
 
-1. In MauiProgram.cs replace 'UseMauiApp' and 'UseMauiCommunityToolkit' with .UseNucleusMvvm.
-2. Register your Pages, ViewModels and Popups through the options in the above method.
-3. Use the INavigationService to navigate from ViewModel-to-ViewModel, and use the interfaces for events.
+1. In App.xaml.cs remove 'CreateWindow(IActivationState? activationState)'.
+2. In MauiProgram.cs replace 'UseMauiApp' and 'UseMauiCommunityToolkit' with 'UseNucleusMvvm'.
+3. Register your Pages, ViewModels and Popups through the options in the above method.
+4. Use the INavigationService to navigate from your viewmodel, and use the interfaces for events.
 
 Important note when upgrading to 0.6.0 from a previous version:
 

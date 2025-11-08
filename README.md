@@ -35,7 +35,13 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 
 ## Getting started
 
-Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings. To get started remove the default `UseMauiApp<App>` and configure Nucleus using the options.
+Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings.
+
+To get started:
+
+1. **Remove `CreateWindow(IActivationState? activationState)` in `App.xaml.cs`.**
+2. **Remove `UseMauiApp<App>` and `UseCommunityToolkit` and replace with `UseNucleusMvvm<App, AppShell>`.**
+3. **Then configure Nucleus, at the minimum the page(s) in `AppShell` using the options.**
 
 See [Navigation](#navigation) and [Popups](#popups) for the usage of the `RegisterShellView`, `RegisterView` and `RegisterPopup`, .
 
@@ -53,6 +59,8 @@ See [Navigation](#navigation) and [Popups](#popups) for the usage of the `Regist
     .Etc..
 
 ViewModels can be of any type and support dependency injection. By implementing interfaces (see [Navigation interfaces](#navigation-interfaces) and [Popup interfaces](#popup-interfaces)) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObservableObject` as a base for its bindings.
+
+
 
 ### Configuration
 
