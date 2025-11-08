@@ -3,7 +3,7 @@
 namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
-/// The <see cref="IInitializable"/> can be used to load data when a <see cref="Page"/> or <see cref="Popup"/> is being loaded or returned to.
+/// The <see cref="IInitializable"/> can be used to load data when a <see cref="Page"/> is being loaded or returned to.
 /// </summary>
 public interface IInitializable
 {

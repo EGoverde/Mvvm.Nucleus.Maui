@@ -50,6 +50,15 @@
             <Label>
                 <Label.FormattedText>
                     <FormattedString>
+                        <Span Text="OnPrepare: " FontAttributes="Bold" />
+                        <Span Text="{Binding OnPrepareData}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
                         <Span Text="OnInit: " FontAttributes="Bold" />
                         <Span Text="{Binding OnInitData}"/>
                     </FormattedString>

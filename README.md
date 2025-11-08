@@ -128,6 +128,7 @@ Note that due to the nature of the `PopupService` there is no logic for avoiding
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, by default limited to Pop and Push events (see [Configuration]).
 - `IDestructible`: Triggered when `transient` pages are removed from the stack.
+- `IPrepare`: Triggered when a page is created, but before it is returned for navigation. It allows for using NavigationParameters before a page is rendered.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
 - `IPageLifecycleAware`: Appearing and disappearing events from the page.

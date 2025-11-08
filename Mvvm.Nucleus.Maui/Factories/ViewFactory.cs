@@ -39,9 +39,21 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
             .ViewMappings
             .FirstOrDefault(x => x.ViewType == element.GetType());
 
+        var navigationParameters = NucleusMvvmCore.Current.NavigationParameters;
+
         if (viewMapping != null && element.BindingContext == null)
         {
             element.BindingContext = ActivatorUtilities.CreateInstance(_serviceProvider, viewMapping!.ViewModelType);
+        }
+
+        if (element is IPrepare prepareElement)
+        {
+            prepareElement.Prepare(navigationParameters);
+        }
+
+        if (element.BindingContext is IPrepare prepareViewModel)
+        {
+            prepareViewModel.Prepare(navigationParameters);
         }
 
         if (element is Window || element is Shell)
@@ -55,8 +67,6 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
             {
                 page.Behaviors.Add(new NucleusMvvmPageBehavior { Page = page });
             }
-
-            var navigationParameters = NucleusMvvmCore.Current.NavigationParameters ?? new Dictionary<string, object>();
 
             PresentationMode? presentationMode = null;
             var wrapNavigationPage = false;
