@@ -148,7 +148,10 @@ public partial class PopupService(ILogger<PopupService> logger, IServiceProvider
             return content;
         }
 
-        _logger.LogInformation("Failed to create a popup from the type '{expectedType}'. Register the popup through the DependencyOptions in the NucleusMvvmBuilder.", typeof(T));
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Failed to create a popup from the type '{expectedType}'. Register the popup through the DependencyOptions in the NucleusMvvmBuilder.", typeof(T));
+        }
 
         throw new InvalidOperationException($"Could not locate {typeof(T).FullName}");
     }

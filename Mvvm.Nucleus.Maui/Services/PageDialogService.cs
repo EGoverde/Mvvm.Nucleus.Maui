@@ -9,37 +9,37 @@ public class PageDialogService : IPageDialogService
     /// <inheritdoc/>
     public Task<string> DisplayActionSheetAsync(string? title, string? cancel, string? destruction, params string[] buttons)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayActionSheet(title, cancel, destruction, buttons));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayActionSheetAsync(title, cancel, destruction, buttons));
     }
 
     /// <inheritdoc/>
     public Task<string> DisplayActionSheetAsync(string? title, string? cancel, string? destruction, FlowDirection flowDirection, params string[] buttons)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayActionSheet(title, cancel, destruction, flowDirection, buttons));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayActionSheetAsync(title, cancel, destruction, flowDirection, buttons));
     }
 
     /// <inheritdoc/>
     public Task<bool> DisplayAlertAsync(string? title, string message, string acceptButton, string cancelButton)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlert(title, message, acceptButton, cancelButton));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlertAsync(title, message, acceptButton, cancelButton));
     }
 
     /// <inheritdoc/>
     public Task<bool> DisplayAlertAsync(string? title, string message, string acceptButton, string cancelButton, FlowDirection flowDirection)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlert(title, message, acceptButton, cancelButton, flowDirection));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlertAsync(title, message, acceptButton, cancelButton, flowDirection));
     }
 
     /// <inheritdoc/>
     public Task DisplayAlertAsync(string? title, string message, string cancelButton)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlert(title, message, cancelButton));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlertAsync(title, message, cancelButton));
     }
 
     /// <inheritdoc/>
     public Task DisplayAlertAsync(string? title, string message, string cancelButton, FlowDirection flowDirection)
     {
-        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlert(title, message, cancelButton, flowDirection));
+        return MainThread.InvokeOnMainThreadAsync(() => NucleusMvvmCore.Current.CurrentPage.DisplayAlertAsync(title, message, cancelButton, flowDirection));
     }
 
     /// <inheritdoc/>
