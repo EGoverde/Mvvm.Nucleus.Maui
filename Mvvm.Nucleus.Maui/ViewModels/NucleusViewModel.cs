@@ -121,13 +121,19 @@ public abstract class NucleusViewModel : Compatibility.BindableBase, INucleusVie
     {
         if (IsInitialized)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{type}' is already initialized.", GetType());
+            if (NucleusMvvmCore.Current.Logger?.IsEnabled(LogLevel.Warning) == true)
+            {
+                NucleusMvvmCore.Current.Logger.LogWarning("ViewModel '{type}' is already initialized.", GetType());
+            }
             return;
         }
 
         if (IsInitializing)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{type}' is already in the process of initializing.", GetType());
+            if (NucleusMvvmCore.Current.Logger?.IsEnabled(LogLevel.Warning) == true)
+            {
+                NucleusMvvmCore.Current.Logger.LogWarning("ViewModel '{type}' is already in the process of initializing.", GetType());
+            }
             return;
         }
 
@@ -149,7 +155,11 @@ public abstract class NucleusViewModel : Compatibility.BindableBase, INucleusVie
     {
         if (IsRefreshing)
         {
-            NucleusMvvmCore.Current.Logger?.LogWarning("ViewModel '{type}' is already in the process of refreshing.", GetType());
+            if (NucleusMvvmCore.Current.Logger?.IsEnabled(LogLevel.Warning) == true)
+            {
+                NucleusMvvmCore.Current.Logger.LogWarning("ViewModel '{type}' is already in the process of refreshing.", GetType());
+            }
+
             return;
         }
 
