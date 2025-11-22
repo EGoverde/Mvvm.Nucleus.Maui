@@ -58,12 +58,12 @@ public class ViewFactory(ILogger<ViewFactory> logger, IServiceProvider servicePr
 
         if (element is IPrepareAsync prepareAsyncElement)
         {
-            _ = prepareAsyncElement.PrepareAsync(navigationParameters);
+            NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => prepareAsyncElement.PrepareAsync(navigationParameters));
         }
 
         if (element.BindingContext is IPrepareAsync prepareAsyncViewModel)
         {
-            _ = prepareAsyncViewModel.PrepareAsync(navigationParameters);
+            NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => prepareAsyncViewModel.PrepareAsync(navigationParameters));
         }
 
         if (element is Window || element is Shell)
