@@ -125,7 +125,7 @@ Note that above parameters allow for modal presentation in Shell including deepe
 On slower devices it is a common issue that users are able to trigger multiple navigation requests by pressing a button one more than once,
 either too quickly or while waiting for the navigation to start. When using the CommunityToolkit `(Async)RelayCommand` this problem is reduced, as the Command will be disabled while it's processing. But since a navigation Task returns before it has finished navigating, it can still occur.
 
-Nucleus offers two features to improve the navigation behavior, both are enabled by default. These are `IgnoreNavigationWhenInProgress` and `IgnoreNavigationWithinMilliseconds`, see [Configuration].
+Nucleus offers two features to improve the navigation behavior, both are enabled by default. These are `IgnoreNavigationWhenInProgress` and `IgnoreNavigationWithinMilliseconds`, see [Configuration](#configuration).
 
 In specific cases you might want to bypass these restrictions, but not disable them fully. In those cases you can add `NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest` in the NavigationParameters and set it to true.
 
@@ -134,9 +134,9 @@ Note that due to the nature of the `PopupService` there is no logic for avoiding
 ### Navigation interfaces
 
 - `IApplicationLifeCycleAware`: When the app is going to the background or returning.
-- `IConfirmNavigation(Async)`: Allows to interupt the navigation, by default limited to Pop and Push events (see [Configuration]).
+- `IConfirmNavigation(Async)`: Allows to interupt the navigation, by default limited to Pop and Push events (see [Configuration](#configuration)).
 - `IDestructible`: Triggered when `transient` pages are removed from the stack.
-- `IPrepare`: Triggered when a page is created, but before it is returned for navigation. It allows for using NavigationParameters before a page is rendered.
+- `IPrepare(Async)`: Triggered when a page is created, but before it is returned for navigation. It allows for using NavigationParameters before a page is rendered when using the synchronous version, or load data in the background asynchronously as early as possible.
 - `IInitializable(Async)`: Init and Refresh functions upon navigating the first or further times.
 - `INavigatedAware`: Navigation events 'from' and 'to' the ViewModel.
 - `IPageLifecycleAware`: Appearing and disappearing events from the page.

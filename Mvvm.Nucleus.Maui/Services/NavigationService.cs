@@ -74,7 +74,13 @@ public class NavigationService : INavigationService
         var viewMapping = GetViewMapping(viewType);
         if (viewMapping == null)
         {
-            _logger.LogError("No valid mapping found for view of type '{viewType}'.", viewType);
+            IsNavigating = false;
+
+            if (_logger.IsEnabled(LogLevel.Error))
+            {
+                _logger.LogError("No valid mapping found for view of type '{viewType}'.", viewType);
+            }
+
             return;
         }
 
@@ -101,7 +107,11 @@ public class NavigationService : INavigationService
             {
                 if (parameters.ContainsKey(parameter.Key))
                 {
-                    _logger.LogWarning("Query parameter with key '{key}' already exists in NavigationParameters, not adding value.", parameter.Key);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                    {
+                        _logger.LogWarning("Query parameter with key '{key}' already exists in NavigationParameters, not adding value.", parameter.Key);
+                    }
+
                     continue;
                 }
                     
@@ -152,6 +162,7 @@ public class NavigationService : INavigationService
         var modalStackCount = navigation?.ModalStack?.Count ?? 0;
         if (modalStackCount < 1)
         {
+            IsNavigating = false;
             return;
         }
 
@@ -190,6 +201,7 @@ public class NavigationService : INavigationService
         var modalStackCount = navigation?.ModalStack?.Count ?? 0;
         if (modalStackCount < 1)
         {
+            IsNavigating = false;
             return;
         }
 
@@ -230,7 +242,10 @@ public class NavigationService : INavigationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed handling navigation request with exception: " + ex.Message);
+            if (_logger.IsEnabled(LogLevel.Error))
+            {
+                _logger.LogError(ex, "Failed handling navigation request with exception: {exceptionMessage}", ex.Message);
+            }
         }
         
         IsNavigating = false;
@@ -404,7 +419,10 @@ public class NavigationService : INavigationService
         }
         else
         {
-            _logger.LogInformation("Shell Navigating '{currentLocation}' > '{etargetLocation}' ({source}).", e.Current?.Location, e.Target?.Location, e.Source);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Shell Navigating '{currentLocation}' > '{etargetLocation}' ({source}).", e.Current?.Location, e.Target?.Location, e.Source);
+            }
         }
 
         if (!isCanceled)
@@ -419,7 +437,10 @@ public class NavigationService : INavigationService
 
     private void ShellNavigated(object sender, ShellNavigatedEventArgs e)
     {
-        _logger.LogInformation("Shell Navigated '{location}' ({source}).", e.Current?.Location, e.Source);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Shell Navigated '{location}' ({source}).", e.Current?.Location, e.Source);
+        }
 
         var pagesAfterNavigating = GetNucleusTransientPagesFromNavigationStack();
         var pagesBeforeNavigating = new List<Page>(_transientPagesOnNavigating ?? new List<Page>());
@@ -436,7 +457,10 @@ public class NavigationService : INavigationService
         var viewMappings = _nucleusMvvmOptions.ViewMappings.Where(x => x.ViewType == viewType);
         if (viewMappings.Count() > 1)
         {
-            _logger.LogWarning("Multiple mappings found for View '{viewType}', choosing the first result.", viewType);
+            if (_logger.IsEnabled(LogLevel.Warning))
+            {
+                _logger.LogWarning("Multiple mappings found for View '{viewType}', choosing the first result.", viewType);
+            }
         }
 
         return viewMappings.FirstOrDefault();
@@ -516,6 +540,6 @@ public class NavigationService : INavigationService
 
     private bool GetIsAnimated(bool isAnimated)
     {
-        return _nucleusMvvmOptions.AlwaysDisableNavigationAnimation ? false : isAnimated;
+        return !_nucleusMvvmOptions.AlwaysDisableNavigationAnimation && isAnimated;
     }
 }

@@ -105,7 +105,11 @@ public class CommunityToolkitV1PopupService(NucleusMvvmOptions nucleusMvvmOption
         
         if (result is not TResult)
         {
-            _logger.LogError("Return value '{resultType}' from popup does not match expected type ({expectedType}), using the default result (if given).", result.GetType(), typeof(TResult));
+            if (_logger.IsEnabled(LogLevel.Error))
+            {
+                _logger.LogError("Return value '{resultType}' from popup does not match expected type ({expectedType}), using the default result (if given).", result.GetType(), typeof(TResult));
+            }
+
             return defaultResult;
         }
 
