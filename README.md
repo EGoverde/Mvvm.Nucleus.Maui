@@ -7,6 +7,8 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 ## Index
 
 - [Highlighted features](#highlighted-features)
+    - [Recommended ViewModel flow](#recommended-viewmodel-flow)
+- [Basic usage](#basic-usage)
 - [Getting started](#getting-started)
     - [Configuration](#configuration)
 - [Services](#services)
@@ -33,6 +35,21 @@ Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is buil
 - Flexibility in Views and ViewModels, no base classes are required.
 - Basic [Prism compatibility](#migrating-from-prism) for migrating an existing codebase.
 
+## Basic Usage
+
+1. Register `Views` (e.a. pages) with matching `ViewModels` in MauiProgram.
+2. Navigate to pages using `INavigationService` (resolved through IoC).
+3. Implement interfaces to handle flow (e.a. `IPrepare` or `IPageLifecycleAware`).
+4. Optionally use the `IPopupService` and `IPageDialogService` when applicable.
+
+### Recommended ViewModel flow
+
+* Use the ViewModel constructor or `IPrepare` to load fast non-async data, which *will* be loaded before navigation, meaning you can use one-time bindings.
+* Use the `IPrepareAsync` to load async data as early as possible, but keep in mind navigation can still finish before this method completes (so use proper bindings)
+* Use the `Refresh` from `IInitializable(Async)` from `IPageLifecycleAware` for pages that have to reload (partially) when returned to.
+    
+*Note that a (configurable) `IRefresh(Async)` is planned for a future release, which will improve this flow and making `IInitializable(Async)` obsolete.*
+
 ## Getting started
 
 Nucleus MVVM is available as a [NuGet package](https://www.nuget.org/packages/Mvvm.Nucleus.Maui). After adding the package it requires little code to get started and remains similar to a regular MAUI app. It is recommended to add the `Mvvm.Nucleus.Maui` namespace to your GlobalUsings.
@@ -47,7 +64,6 @@ See [Navigation](#navigation) and [Popups](#popups) for the usage of the `Regist
 
 *Note that the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/) is a dependency of Nucleus. You should not call `UseMauiCommunityToolkit` manually, as this is already done through `UseNucleusMvvm`. If you need to configure the Community Toolkit you can access the options through the `UseNucleusMvvm` method.*
 
-
     builder
     .UseNucleusMvvm<App, AppShell>(options =>
     {
@@ -59,8 +75,6 @@ See [Navigation](#navigation) and [Popups](#popups) for the usage of the `Regist
     .Etc..
 
 ViewModels can be of any type and support dependency injection. By implementing interfaces (see [Navigation interfaces](#navigation-interfaces) and [Popup interfaces](#popup-interfaces)) they can trigger logic on events like navigation or its page appearing. It is recommended for a ViewModel to have `ObservableObject` as a base for its bindings.
-
-
 
 ### Configuration
 
