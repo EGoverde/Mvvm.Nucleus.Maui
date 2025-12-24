@@ -2,6 +2,7 @@
 
 /// <summary>
 /// The <see cref="IApplicationLifecycleAware"/> handles the events of the app going to and from the background.
+/// Supports only ViewModels.
 /// </summary>
 public interface IApplicationLifecycleAware
 {

@@ -1,20 +1,16 @@
-using System;
-
 namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
-/// The <see cref="IRefresh"/> can be used to load data when a <see cref="Page"/> is being loaded or returned to.
+/// The <see cref="IRefresh"/> can be used to refresh data when a <see cref="Page"/> is being navigated
+/// again, while it is already in the navigation stack or is being reused due to its scope.
+/// Supports both ViewModels and Pages.
 /// </summary>
 public interface IRefresh
 {
     /// <summary>
-    /// Triggered when a <see cref="Page"/> is being navigated to for the first time.
-    /// </summary>
-    /// <param name="navigationParameters">The navigation parameters.</param>
-    void Init(IDictionary<string, object> navigationParameters);
-
-    /// <summary>
-    /// Triggered when a <see cref="Page"/> is being navigated to for a second or later time.
+    /// Triggered when a <see cref="Page"/> is being navigated to while it is already in the navigation stack.
+    /// Usually this means navigating backwards after closing a modal or popping a page. It also triggers when
+    /// navigating to a reused page with a scope other than <see cref="ServiceLifetime.Transient"/>.
     /// </summary>
     /// <param name="navigationParameters">The navigation parameters.</param>
     void Refresh(IDictionary<string, object> navigationParameters);

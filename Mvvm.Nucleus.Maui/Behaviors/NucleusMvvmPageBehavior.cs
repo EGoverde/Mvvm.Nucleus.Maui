@@ -105,6 +105,16 @@ public class NucleusMvvmPageBehavior : Behavior
             navigatedAware.OnNavigatedTo(NucleusMvvmCore.Current.NavigationParameters);
         }
 
+        if (bindingContext is IRefresh refreshable && isInitializedBefore)
+        {
+            refreshable.Refresh(NucleusMvvmCore.Current.NavigationParameters);
+        }
+
+        if (bindingContext is IRefreshAsync refreshableAsync && isInitializedBefore)
+        {
+            NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => refreshableAsync.RefreshAsync(NucleusMvvmCore.Current.NavigationParameters));
+        }
+
         if (bindingContext is IInitializable initializable)
         {
             if (!isInitializedBefore)

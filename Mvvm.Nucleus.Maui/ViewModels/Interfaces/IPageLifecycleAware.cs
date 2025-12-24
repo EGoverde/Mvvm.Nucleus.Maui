@@ -2,6 +2,7 @@
 
 /// <summary>
 /// The <see cref="IPageLifecycleAware"/> handles the events of a page appearing or disappearing.
+/// Supports only ViewModels.
 /// </summary>
 public interface IPageLifecycleAware
 {

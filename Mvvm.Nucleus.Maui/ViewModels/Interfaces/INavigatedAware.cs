@@ -2,6 +2,7 @@
 
 /// <summary>
 /// The <see cref="INavigatedAware"/> handles the navigation events of <see cref="Shell"/>.
+/// Supports only ViewModels.
 /// </summary>
 public interface INavigatedAware
 {
