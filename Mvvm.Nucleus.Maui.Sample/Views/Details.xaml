@@ -59,15 +59,6 @@
             <Label>
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text="OnInit: " FontAttributes="Bold" />
-                        <Span Text="{Binding OnInitData}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-        
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
                         <Span Text="OnRefresh: " FontAttributes="Bold" />
                         <Span Text="{Binding OnRefreshData}"/>
                     </FormattedString>
