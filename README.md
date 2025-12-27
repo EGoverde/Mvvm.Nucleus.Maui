@@ -59,7 +59,7 @@ Services are available through Dependency Injection. They can be overriden or su
 
 ### ViewModel interfaces
 
-Interfaces are used to automatically introduce callbacks and events to registered ViewModels. Note that for popups there are additional [popup interfaces](#popup-interfaces).
+Interfaces are used to automatically introduce callbacks and events to registered ViewModels. Additionally, the interfaces `IPrepare(Async)`, `IRefresh(Async)`, `IDestructible` also support implementation within a Page. Note that for popups there are additional [popup interfaces](#popup-interfaces).
 
 - `IPrepare(Async)`
     - Triggers when a page is created, but before it is returned for navigation.
@@ -71,7 +71,6 @@ Interfaces are used to automatically introduce callbacks and events to registere
 - `IInitializable(Async)`: Init and Refresh functions upon navigating.
     - This interface relies on `OnNavigated` events and triggers after navigation has finished.
     - **[Obsolete]** Use `IPrepare(Async)` and `IRefresh(Async)` instead.
-
 - `IPageLifecycleAware`: The `OnAppearing` and `OnDisappearing` events from a page.
 - `IApplicationLifeCycleAware`: The `OnPause` and `OnResume` events from the application.
 - `IConfirmNavigation(Async)`: Allows to interupt the navigation, by default limited to Pop and Push events (see [Configuration](#configuration)).
@@ -186,7 +185,7 @@ Parameters can be sent through an `IDictionary<string, object>`, which will be p
 
 ### Popup interfaces
 
-Below interfaces below work on both the View and the ViewModel, with the exception of `IPopupAware<T>`.
+Below interfaces below work on both the ViewModel and the View or Popup, with the exception of `IPopupAware<T>`.
 
 - `IPopupPrepare(Async)`
     - Similar to the `IPrepare(Async)`, this triggers when a popup is created  but before it is returned for navigation.
