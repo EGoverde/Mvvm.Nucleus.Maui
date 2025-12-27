@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class AdvancedPopupViewModel(IPopupService popupService) : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupInitializable, IPageLifecycleAware
+public partial class AdvancedPopupViewModel(IPopupService popupService) : Compatibility.BindableBase, IPopupAware<AdvancedPopup>, IPopupLifecycleAware, IPopupPrepare, IPageLifecycleAware
 {
     private readonly IPopupService _popupService = popupService;
 
@@ -15,10 +15,10 @@ public partial class AdvancedPopupViewModel(IPopupService popupService) : Compat
     [ObservableProperty]
     private string _popupState = "Default";
 
-    public void Init(IDictionary<string, object> navigationParameters)
+    public void Prepare(IDictionary<string, object> navigationParameters)
     {
         PopupText = navigationParameters.GetValueOrDefault<string>("Text") ??  "Sample Text";
-        PopupState += ", Initialized";
+        PopupState += ", Prepared";
     }
 
     public void OnOpened()

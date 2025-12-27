@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class DetailsViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : ObservableObject, IPrepare, IInitializable, IConfirmNavigationAsync
+public partial class DetailsViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : ObservableObject, IPrepare, IRefresh, IConfirmNavigationAsync
 {
     private readonly INavigationService _navigationService = navigationService;
 
@@ -22,19 +22,11 @@ public partial class DetailsViewModel(INavigationService navigationService, IPag
     private string _onPrepareData = "-";
 
     [ObservableProperty]
-    private string _onInitData = "-";
-
-    [ObservableProperty]
     private string _onRefreshData = "-";
 
     public void Prepare(IDictionary<string, object> navigationParameters)
     {
         OnPrepareData = $"Triggered ({DateTime.Now:HH:mm:ss)})";
-    }
-
-    public void Init(IDictionary<string, object> navigationParameters)
-    {
-        OnInitData = $"Triggered ({DateTime.Now:HH:mm:ss)})";
         SetNavigationParameterData(navigationParameters);
     }
 

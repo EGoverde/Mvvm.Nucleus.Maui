@@ -6,6 +6,7 @@ namespace Mvvm.Nucleus.Maui;
 /// <summary>
 /// The <see cref="INucleusViewModel"/> holds initialization functions and properties used by <see cref="NucleusViewModel"/>.
 /// </summary>
+[Obsolete("The NucleusViewModel and related interface will be removed in future versions. Implement your own base ViewModel instead.")]
 public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IInitializableAsync, INavigatedAware
 {
     /// <summary>
@@ -57,6 +58,7 @@ public interface INucleusViewModel : INotifyPropertyChanged, INotifyPropertyChan
 /// <summary>
 /// An optional ViewModel that can be inherited to have commonly used functions and properties.
 /// </summary>
+[Obsolete("The NucleusViewModel and related interface will be removed in future versions. Implement your own base ViewModel instead.")]
 public abstract class NucleusViewModel : Compatibility.BindableBase, INucleusViewModel
 {
     private bool _isInitializing;

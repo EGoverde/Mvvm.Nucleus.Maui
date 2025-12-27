@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Mvvm.Nucleus.Maui.Sample;
 
-public partial class SingletonPopupViewModel(IPopupService popupService, IPageDialogService pageDialogService) : Compatibility.BindableBase, IPopupLifecycleAware, IPopupInitializable
+public partial class SingletonPopupViewModel(IPopupService popupService, IPageDialogService pageDialogService) : Compatibility.BindableBase, IPopupLifecycleAware, IPopupPrepare
 {
     private readonly IPopupService _popupService = popupService;
 
@@ -15,9 +15,9 @@ public partial class SingletonPopupViewModel(IPopupService popupService, IPageDi
     [ObservableProperty]
     private string _instanceValue = "Unset";
 
-    public void Init(IDictionary<string, object> navigationParameters)
+    public void Prepare(IDictionary<string, object> navigationParameters)
     {
-        PopupState += ", Initialized";
+        PopupState += ", Prepared";
     }
 
     public void OnOpened()

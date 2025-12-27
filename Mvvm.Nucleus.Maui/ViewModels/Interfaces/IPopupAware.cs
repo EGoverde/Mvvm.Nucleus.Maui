@@ -6,6 +6,7 @@ namespace Mvvm.Nucleus.Maui;
 /// The <see cref="IPopupAware"/> is used for a viewmodel bound to a <see cref="Popup"/> to get a reference
 /// to the <see cref="Popup"/>. This allows for access to <see cref="Popup.CloseAsync(CancellationToken)"/>.
 /// If you want the reference to have a specific type, use <see cref="IPopupAware{T}"/> instead.
+/// Supports both ViewModels and Popups.
 /// </summary>
 public interface IPopupAware
 {

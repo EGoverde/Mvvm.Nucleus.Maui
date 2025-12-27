@@ -100,6 +100,16 @@ public class NucleusMvvmPopupBehavior() : Behavior
         {
             NucleusMvvmCore.Current.PopupOpenedThroughCommunityToolkit = false;
 
+            if (GetBindingContext() is IPopupPrepare popupPrepareViewModel)
+            {
+                popupPrepareViewModel.Prepare(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (GetBindingContext() is IPopupPrepareAsync popupPrepareAsyncViewModel)
+            {
+                NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => popupPrepareAsyncViewModel.PrepareAsync(NucleusMvvmCore.Current.PopupNavigationParameters));
+            }
+
             if (GetBindingContext() is IPopupInitializable popupInitializableViewModel)
             {
                 popupInitializableViewModel.Init(NucleusMvvmCore.Current.PopupNavigationParameters);

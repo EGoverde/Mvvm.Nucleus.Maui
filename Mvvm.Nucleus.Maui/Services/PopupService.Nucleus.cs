@@ -101,8 +101,8 @@ public partial class PopupService(ILogger<PopupService> logger, IServiceProvider
     }
     
     /// <summary>
-    /// Creates a <see cref="Popup"/> or <see cref="View"/> through the <see cref="IServiceProvider"/> and initializes it if it 
-    /// implements <see cref="IPopupInitializable"/> or <see cref="IPopupInitializableAsync"/>.
+    /// Creates a <see cref="Popup"/> or <see cref="View"/> through the <see cref="IServiceProvider"/> and prepares it if it 
+    /// implements <see cref="IPopupPrepare"/> or <see cref="IPopupPrepareAsync"/>.
     /// </summary>
     /// <typeparam name="T">The type of the <see cref="View"/> to create.</typeparam>
     /// <returns>The created <see cref="View"/>.</returns>
@@ -111,6 +111,40 @@ public partial class PopupService(ILogger<PopupService> logger, IServiceProvider
     {
         if (_serviceProvider.GetService(typeof(T)) is View content)
         {
+            if (content is IPopupPrepare popupPrepare)
+            {
+                popupPrepare.Prepare(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (content.BindingContext is IPopupPrepare popupPrepareViewModel)
+            {
+                popupPrepareViewModel.Prepare(NucleusMvvmCore.Current.PopupNavigationParameters);
+            }
+
+            if (content is IPopupPrepareAsync popupPrepareAsync)
+            {
+                if (popupPrepareAsync.AwaitInitializeBeforeShowing)
+                {
+                    await popupPrepareAsync.PrepareAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+                else
+                {
+                    _ = popupPrepareAsync.PrepareAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+            }
+
+            if (content.BindingContext is IPopupPrepareAsync popupPrepareAsyncViewModel)
+            {
+                if (popupPrepareAsyncViewModel.AwaitInitializeBeforeShowing)
+                {
+                    await popupPrepareAsyncViewModel.PrepareAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+                else
+                {
+                    _ = popupPrepareAsyncViewModel.PrepareAsync(NucleusMvvmCore.Current.PopupNavigationParameters);
+                }
+            }
+
             if (content is IPopupInitializable popupInitializable)
             {
                 popupInitializable.Init(NucleusMvvmCore.Current.PopupNavigationParameters);

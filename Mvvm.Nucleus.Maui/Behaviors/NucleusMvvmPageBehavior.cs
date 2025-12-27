@@ -105,13 +105,23 @@ public class NucleusMvvmPageBehavior : Behavior
             navigatedAware.OnNavigatedTo(NucleusMvvmCore.Current.NavigationParameters);
         }
 
+        if (bindingContext is IRefresh refreshable && isInitializedBefore)
+        {
+            refreshable.Refresh(NucleusMvvmCore.Current.NavigationParameters);
+        }
+
+        if (bindingContext is IRefreshAsync refreshableAsync && isInitializedBefore)
+        {
+            NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => refreshableAsync.RefreshAsync(NucleusMvvmCore.Current.NavigationParameters));
+        }
+
         if (bindingContext is IInitializable initializable)
         {
             if (!isInitializedBefore)
             {
                 initializable.Init(NucleusMvvmCore.Current.NavigationParameters);
             }
-            else
+            else if (bindingContext is not IRefreshAsync)
             {
                 initializable.Refresh(NucleusMvvmCore.Current.NavigationParameters);
             }
@@ -123,7 +133,7 @@ public class NucleusMvvmPageBehavior : Behavior
             {
                 NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
-            else
+            else if (bindingContext is not IRefreshAsync)
             {
                 NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.RefreshAsync(NucleusMvvmCore.Current.NavigationParameters));
             }

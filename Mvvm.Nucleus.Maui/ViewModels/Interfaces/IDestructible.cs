@@ -4,6 +4,7 @@ namespace Mvvm.Nucleus.Maui;
 
 /// <summary>
 /// The <see cref="IDestructible"/> can be used to cleanup resources from memory.
+/// Supports both ViewModels and Pages.
 /// </summary>
 public interface IDestructible
 {

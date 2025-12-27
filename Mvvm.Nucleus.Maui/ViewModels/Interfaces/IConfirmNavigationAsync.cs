@@ -2,6 +2,7 @@
 
 /// <summary>
 /// The <see cref="IConfirmNavigationAsync"/> can be used to interupt a page from navigating.
+/// Supports only ViewModels.
 /// </summary>
 public interface IConfirmNavigationAsync
 {
