@@ -1,7 +1,7 @@
 # Migration guide
 
 ## Nucleus 0.7.0: Deprecation of IInitializable(Async)
-Since the inception of Nucleus MVVM the `IInitializable` and `IInitializableAsync` interfaces have been a core feature. It's concept of a method that handles the initialization and subsequent refreshing upon navigating back to a page remains, but in a different interface.
+The `IInitializable` and `IInitializableAsync` interfaces have been around since the start of Nucleus MVVM. Its concept of a method that handles the initialization and subsequent refreshing upon navigating back to a page remains, but in a different interface.
 
 As of `0.7.0` the above interface and related `IPopupInitializable` have been marked as obsolete. They are replaced by `Prepare(Async)` and `Refresh(Async)`.
 
@@ -20,10 +20,19 @@ There are a few reasons why moving forwards the `IPrepare(Async)` and `IRefresh(
 
 1. `IInitializable(Async)` uses `OnNavigatedTo`, which means it will only trigger *after* a page has been shown.
     - This means data is being loaded later than necessary, resulting in a slower experience and bindings having to refresh.
-    - In contrast `IPrepare(Async)` triggers as soon as the IoC resolves the page, meaning it is very likely (though still not ensured in the case of async) data has finished loading before the page is shown.
-    - Additionally the `OnNavigatedTo` flow is already supported by `INavigatedAware`.
+    - In contrast `IPrepare(Async)` triggers as soon as the IoC resolves the page, meaning:
+        - `Prepare` is ensured to finish before the page is shown, meaning unchanging values do not need bindings at all.
+        - `PrepareAsync` is likely, but not certain, to finish loading before the page is shown, so still use regular bindings.
+    - Additionally if necessary, the `OnNavigatedTo` flow is already supported by `INavigatedAware`.
 2. Often there is no need to refresh a page after its initialization.
     - By seperating these two functions in `IPrepare(Async)` and `Refresh(Async)` viewmodels can contain less boilerplate code.
+
+## Nucleus 0.7.0: Deprecation of NucleusViewModel / NucleusPopupViewModel
+The integrated and optional ViewModels that can be used as a base class have been marked obsolete in the `0.7.0` release as well.
+
+For many applications these might either be too complex, or not complex enough. It is recommended to start with `ObservableObject` and the required interfaces.
+
+If currently relying on the `NucleusViewModel` or `NucleusPopupViewModel`, simply copy it to your project and adjust if necessary.
 
 ## Nucleus 0.6.0: Breaking changes to `Popup` and `IPopupService`
 Nucleus uses the `Popup` functionality from the `Maui.CommunityToolkit`. In version 12.x of the toolkit a large breaking change was done, known as the V2 Popups. This required significant changes to the Nucleus implementation as well, which was part of the 0.6.0 release.

@@ -121,7 +121,7 @@ public class NucleusMvvmPageBehavior : Behavior
             {
                 initializable.Init(NucleusMvvmCore.Current.NavigationParameters);
             }
-            else
+            else if (bindingContext is not IRefreshAsync)
             {
                 initializable.Refresh(NucleusMvvmCore.Current.NavigationParameters);
             }
@@ -133,7 +133,7 @@ public class NucleusMvvmPageBehavior : Behavior
             {
                 NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.InitAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
-            else
+            else if (bindingContext is not IRefreshAsync)
             {
                 NucleusMvvmCore.Current.RunTaskInVoidAndTrackException(() => initializableAsync.RefreshAsync(NucleusMvvmCore.Current.NavigationParameters));
             }
