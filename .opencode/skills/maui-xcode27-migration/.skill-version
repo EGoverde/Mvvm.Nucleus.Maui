@@ -1,0 +1,10 @@
+{
+  "contentHash": "329d454fb46897d69660ca6d340862997e5b3762fb44a6897af1f449c79829a1",
+  "resolvedCommit": "4332fcd9dd13c20aee0db8f4784f76e94c4ef11c",
+  "name": "maui-xcode27-migration",
+  "commit": "1bf441381379c6030eeff9030fc933abccd563f4",
+  "branch": "main",
+  "updatedAt": "2026-11-13T10:08:18.3138050Z",
+  "source": "dotnet/maui-labs",
+  "pluginPath": "plugins/dotnet-maui/skills/maui-xcode27-migration"
+}

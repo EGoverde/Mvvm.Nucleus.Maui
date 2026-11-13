@@ -1,0 +1,12 @@
+{
+  "mcp": {
+    "maui-devflow": {
+      "type": "local",
+      "command": [
+        "maui",
+        "devflow",
+        "mcp"
+      ]
+    }
+  }
+}
