@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net11.0-android;net11.0-ios;net11.0-maccatalyst;net11.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net11.0;net11.0-android;net11.0-ios;net11.0-maccatalyst;net11.0-windows10.0.19041.0</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net11.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net11.0-tizen</TargetFrameworks> -->
@@ -34,6 +34,12 @@
     	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+		<!-- The plain net11.0 target is only used as a host for the unit tests; suppress the benign platform-attribute
+		warnings that surface there (e.g. on UseMauiCommunityToolkit) while keeping the platform TFMs untouched. -->
+		<NoWarn>$(NoWarn);CA1416</NoWarn>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net11.0-ios|AnyCPU'">
 		<CreatePackage>false</CreatePackage>
 	</PropertyGroup>
@@ -46,6 +52,12 @@
 
 	<ItemGroup>
   		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Test seam: exposes only NucleusMvvmCore.Initialize(IServiceProvider) and the Shell setter to the unit test
+		assembly (see decision-test-seam-internalsvisiblet.md). No public API surface change. -->
+		<InternalsVisibleTo Include="Mvvm.Nucleus.Maui.UnitTests" />
 	</ItemGroup>
 
 	<ItemGroup>
