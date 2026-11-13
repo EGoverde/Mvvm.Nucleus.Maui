@@ -1,6 +1,6 @@
 # Migration guide
 
-## Nucleus 0.8.0: .NET 11
+## Nucleus 0.8.0: Targetting .NET 11
 Nucleus `0.8.0` targets .NET 11 and depends on **MAUI** `11.0.x`, **CommunityToolkit.Maui** `17.0.0` and **CommunityToolkit.Mvvm** `8.4.2`. Building or consuming it requires .NET SDK 11.
 
 ### Migration steps
