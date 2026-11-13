@@ -366,3 +366,8 @@ FodyWeavers.xsd
 
 # VS Code workspace settings
 .vscode/
+
+# OpenCode / AI related
+opencode.json
+.opencode/
+.maui/

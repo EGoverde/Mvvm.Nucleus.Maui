@@ -1,5 +1,26 @@
 # Migration guide
 
+## Nucleus 0.8.0: Targetting .NET 11
+Nucleus `0.8.0` targets .NET 11 and depends on **MAUI** `11.0.x`, **CommunityToolkit.Maui** `17.0.0` and **CommunityToolkit.Mvvm** `8.4.2`. Building or consuming it requires .NET SDK 11.
+
+### Migration steps
+
+1. Migrate your app to the .NET 11 target frameworks (e.g. `net11.0-android`, `net11.0-ios`, `net11.0-maccatalyst`, `net11.0-windows10.0.19041.0`).
+2. Install the .NET 11 workloads (`maui-ios`, `maccatalyst`, `android`) and update `Microsoft.Maui.*` to `11.0.x`.
+3. Update `Mvvm.Nucleus.Maui` to `0.8.0`; the new `CommunityToolkit.Maui` `17.0.0` and `CommunityToolkit.Mvvm` `8.4.2` flow in through the package dependencies.
+4. If you build with Xcode 27 on macOS, adopt the UIKit scene lifecycle as described in  the [Xcode 27 migration guide](https://devblogs.microsoft.com/dotnet/migrate-dotnet-maui-apps-uikit-scene-lifecycle/).
+
+### Raised minimum OS versions
+
+The .NET 11 / Xcode 27 toolchain enforces higher deployment floors, so the supported minimums have been raised compared to earlier versions:
+
+| Platform | 0.7.0 | 0.8.0 |
+| --- | --- | --- |
+| Android | API 21 (Android 5.0) | API 24 (Android 7.0) |
+| Mac Catalyst | Catalyst 15.0 (macOS 12) | Catalyst 17.0 (macOS 14) |
+
+Apps on Android 5/6 (API 21–23) and macOS 12/13 (Catalyst) are no longer supported.
+
 ## Nucleus 0.7.0: Deprecation of IInitializable(Async)
 The `IInitializable` and `IInitializableAsync` interfaces have been around since the start of Nucleus MVVM. Its concept of a method that handles the initialization and subsequent refreshing upon navigating back to a page remains, but in a different interface.
 

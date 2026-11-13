@@ -1,10 +1,15 @@
 # Nucleus MVVM for MAUI
 
-Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui), the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/). Its purpose is for better separation of UI and logic using MVVM conventions.
+Nucleus MVVM is a framework written to be used in .NET MAUI projects. It is build on top of [MAUI](https://github.com/dotnet/maui), the [CommunityToolkit.Mvvm](https://learn.microsoft.com/nl-nl/dotnet/communitytoolkit/mvvm/) and the [CommunityToolkit.Maui](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/). Its purpose is for better separation of UI and logic using MVVM conventions and interfaces.
 
 [![NuGet version (Mvvm.Nucleus.Maui)](https://img.shields.io/nuget/v/Mvvm.Nucleus.Maui.svg?style=flat-square)](https://www.nuget.org/packages/Mvvm.Nucleus.Maui/)
 
-**Note:** Nucleus MVVM updates are usually fully backwards-compatible, but sometimes deprecations are inevitable. If you're upgrading, do check the following resources:
+## Upgrading
+Nucleus MVVM is a deliberately lean library. Upgrading your own .NET MAUI version or other dependencies to a higher target is generally safe, even when this library was targetted to an earlier version.
+
+The same goes for upgrading Nucleus MVVM itself. If breaking changes cannot be avoided, a best effort will be done to include a compatibility option.
+
+See the following resources when upgrading:
 
 - [Release details](https://github.com/EGoverde/Mvvm.Nucleus.Maui/releases)
 - [Migration guide](/MIGRATIONS.md)
