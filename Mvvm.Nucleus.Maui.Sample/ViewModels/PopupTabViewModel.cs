@@ -23,7 +23,7 @@ public partial class PopupTabViewModel(IPopupService popupService, IPageDialogSe
         };
 
         await _popupService.ShowPopupAsync<SimplePopup>(navigationParameters);
-        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed'", "Okay");
+        await _pageDialogService.DisplayAlertAsync("Alert", $"Popup was closed", "Okay");
     }
 
     [RelayCommand]

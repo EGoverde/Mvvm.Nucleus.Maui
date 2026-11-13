@@ -1,5 +1,5 @@
 dotnet clean Mvvm.Nucleus.Maui/Mvvm.Nucleus.Maui.csproj
-dotnet pack Mvvm.Nucleus.Maui/Mvvm.Nucleus.Maui.csproj /p:ContinuousIntegrationBuild=true
+dotnet pack Mvvm.Nucleus.Maui/Mvvm.Nucleus.Maui.csproj /p:ContinuousIntegrationBuild=true /p:AppxGeneratePriEnabled=false /p:IncludeProjectPriFile=false
 rm -f *.nupkg
 rm -f *.snupkg
 mv Mvvm.Nucleus.Maui/bin/Release/*.nupkg .
