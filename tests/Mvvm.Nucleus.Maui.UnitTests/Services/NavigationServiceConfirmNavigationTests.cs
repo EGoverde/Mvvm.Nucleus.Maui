@@ -10,9 +10,7 @@ namespace Mvvm.Nucleus.Maui.UnitTests.Services;
 /// Pins the <see cref="NavigationService"/> confirm-navigation handler: the
 /// <see cref="IConfirmNavigation"/> deny/allow branches (sync), the source-to-direction mapping,
 /// the <see cref="NucleusMvvmOptions.UseConfirmNavigationForAllNavigationRequests"/> guard, and the
-/// <see cref="IConfirmNavigationAsync"/> deny branch through <c>GetDeferral()</c> (both proven to
-/// work in the bare host, so the plan's skip-fallback was not needed).
-///
+/// <see cref="IConfirmNavigationAsync"/> deny branch through <c>GetDeferral()</c>.
 /// Each test registers a fresh <see cref="Shell"/> whose <c>CurrentPage.BindingContext</c> is the
 /// recording ViewModel (the source the handler reads), then raises <c>Shell.Navigating</c> with a
 /// constructed <see cref="ShellNavigatingEventArgs"/>.

@@ -95,16 +95,19 @@ Tunables via environment:
      `{"success":false}` (the touch was synthesized but not accepted — the run-2
      failure mode, 2026-11-14) it reactivates the app to make its window key again
      and retries.
-2. **Agent-driven no-op shell navigation wedges the app (library finding).** A
-   `ui navigate` to the *current* location fires Shell's `Navigating` — the
-   library's `NavigationService` sets `IsNavigating = true` — but never fires
-   `Navigated`, so the flag is never reset and every subsequent `INavigationService`
-   request is silently ignored ("Ignoring this navigation request as another
-   request is already in progress"). Any *real* navigation (tab switch, pop) fires
-   `Navigated` and unsticks it. This was the root cause of the "all navigation
-   buttons dead until a manual tab switch" symptom (reproduced 2026-11-13). It is a
-   genuine library/DevFlow interaction issue; the library is out of scope for
-   change, so the suite works around it (see 3).
+2. **Agent-driven no-op shell navigation used to wedge the app (library finding,
+   now fixed in the library).** A `ui navigate` to the *current* location fired
+   Shell's `Navigating` — the library's `NavigationService` set `IsNavigating =
+   true` — but never fires `Navigated`, so the flag was never reset and every
+   subsequent `INavigationService` request was silently ignored ("Ignoring this
+   navigation request as another request is already in progress"). Any *real*
+   navigation (tab switch, pop) fires `Navigated` and unsticks it. This was the
+   root cause of the "all navigation buttons dead until a manual tab switch"
+   symptom (reproduced 2026-11-13). **Fixed in the library (2026-11-14):**
+   `NavigationService.ShellNavigating` now detects no-op navigations (target
+   location == current location) and leaves the navigation state untouched
+   (pinned by `NavigationServiceNoOpNavigationTests`); until that release ships —
+   and as defense against agent/MAUI churn — the suite still works around it (see 3).
 3. **`reset_to` is 100% app-UI-driven and never issues `ui navigate`.** It unwinds
    stray dialogs, popups (`Close using IPopupService` / `Close Popup`), pushed
    pages (plain `Navigate Backwards`, first tree-order match), and modals
