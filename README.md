@@ -34,6 +34,7 @@ See the following resources when upgrading:
     - [Migrating from Nucleus 0.5.0](#migrating-from-nucleus-050)
 - [Prism compatibility](#prism-compatibility)
 - [Limitations and plans](#limitations-and-plans)
+- [Contributing and building](#contributing-and-building)
 - [Support](#support)
 
 ## Main features
@@ -245,6 +246,10 @@ Contrary to Prism, dependency injection in Nucleus uses the default Microsoft im
 - Currently Shell is a required component for navigation, although theoretically a custom implementation could be added in the future.
 - Initial logic for subviews recieving page events has been added, but is not a fully supported concept yet. 
 
+## Contributing and building
+
+See the [contributions guide](/CONTRIBUTING.md) for details on how to build the source projects of Nucleus, as well as details on the unit tests and UI tests that are part of this repository. Bugfixes are welcome if tested and manually / human reviewed. New features should be discussed, as this library is intended to stay lean.
+
 ## Support
 
-- Bugs and feature requests can be created through [GitHub issues](https://github.com/EGoverde/Mvvm.Nucleus.Maui/issues/new).
+Bugs and feature requests can be created through [GitHub issues](https://github.com/EGoverde/Mvvm.Nucleus.Maui/issues/new).
