@@ -13,7 +13,7 @@ How to build this repository and run its two test lanes (unit + UI). A MacOS env
 
 ## Prerequisites
 
-| Tool | Version (verified) | Check | Install |
+| Tool | Version | Check | Install |
 |---|---|---|---|
 | .NET SDK | 11.0.100 | `dotnet --version` | [dotnet 11](https://dotnet.microsoft.com/download) |
 | MAUI workloads | android, ios, maccatalyst | `dotnet workload list` | `dotnet workload install maui` |
@@ -39,16 +39,11 @@ SDK tools are available.
 ### On macOS / Linux (per-target-framework)
 
 The full-solution build **fails** on the library's `net11.0-windows10.0.19041.0`
-target because Windows MSIX PRI expansion cannot run off-Windows. This is an
-**environmental** limit, not a code defect — the exact errors are:
+target on non-Windows hosts, because Windows MSIX PRI expansion (`MakePri.exe`,
+errors `MSB6003` / `APPX0002`) cannot run off-Windows. This is an
+**environmental** limit, not a code defect.
 
-```
-error MSB6003: The specified task executable "MakePri.exe" could not be run.
-            ... Win32Exception (8) ... Exec format error   [net11.0-windows10.0.19041.0]
-error APPX0002: Task 'WinAppSdkExpandPriContent' failed. ...   [net11.0-windows10.0.19041.0]
-```
-
-Build the target you need instead (each is self-contained and verified):
+Build the target you need instead (each target builds standalone):
 
 ```bash
 # Library, one TFM at a time (pick the platform you care about)
@@ -80,8 +75,7 @@ dotnet test tests/Mvvm.Nucleus.Maui.UnitTests/Mvvm.Nucleus.Maui.UnitTests.csproj
 
 ## Running the UI lane (DevFlow)
 
-Full operational reference (prerequisites, driver helpers, tunables, operational
-caveats, the future CI job): **[`tests/Mvvm.Nucleus.Maui.UnitTests//README.md`](tests/Mvvm.Nucleus.Maui.UnitTests//README.md)**.
+Full operational reference: **[`tests/Mvvm.Nucleus.Maui.UITests/README.md`](tests/Mvvm.Nucleus.Maui.UITests/README.md)**.
 The essentials:
 
 **Prereqs:** macOS + Xcode (Catalyst), the `maui` DevFlow CLI, `jq`. The sample
@@ -92,16 +86,15 @@ LaunchServices, starts the broker, waits for the agent, runs the 22 flows
 sequentially, tears down):
 
 ```bash
-tests/Mvvm.Nucleus.Maui.UnitTests//run-all.sh
+tests/Mvvm.Nucleus.Maui.UITests/run-all.sh
 ```
 
-**Expected:** `RESULT: 22/22 passed` (the exit criterion is **22/22 twice in a
-row**, to prove the suite is order-independent and stable).
+**Expected:** `RESULT: 22/22 passed`.
 
 Flows: navigation ×9, popups ×6, dialogs ×5, details ×2. Every flow is a
-standalone script under `tests/Mvvm.Nucleus.Maui.UnitTests//` and can be run by itself **only if** the app
-is already running and the agent connected:
+standalone script under `tests/Mvvm.Nucleus.Maui.UITests/` and can be run by
+itself **only if** the app is already running and the agent connected:
 
 ```bash
-tests/Mvvm.Nucleus.Maui.UnitTests//nav_by_type.sh        # example: a single flow
+tests/Mvvm.Nucleus.Maui.UITests/nav_by_type.sh        # example: a single flow
 ```

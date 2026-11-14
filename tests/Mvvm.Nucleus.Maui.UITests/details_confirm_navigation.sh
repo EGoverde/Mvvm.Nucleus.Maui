@@ -2,7 +2,7 @@
 #
 # details_confirm_navigation — IConfirmNavigationAsync: Cancel keeps us on Details,
 # Confirm proceeds with the pop back to the tab.
-# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UITests/ suite (see README.md). Prereq: sample app running + agent connected.
 set -euo pipefail
 
 UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

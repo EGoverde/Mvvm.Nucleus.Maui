@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # nav_params_prompt — Navigation with Parameters: prompt for a value, verify it arrives via Prepare().
-# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UITests/ suite (see README.md). Prereq: sample app running + agent connected.
 set -euo pipefail
 
 UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

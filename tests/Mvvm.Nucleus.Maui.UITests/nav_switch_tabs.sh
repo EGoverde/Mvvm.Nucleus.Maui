@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # nav_switch_tabs — Shell tab switching: "Switch Tabs" lands on the Popup tab.
-# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UITests/ suite (see README.md). Prereq: sample app running + agent connected.
 # NOTE: this flow ends on the Popup tab (declared below), so the assembler inserts
 # no tab switch before the following popup_* flows.
 set -euo pipefail

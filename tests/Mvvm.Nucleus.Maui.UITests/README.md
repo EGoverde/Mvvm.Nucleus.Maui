@@ -1,64 +1,65 @@
-# UI regression suite (DevFlow integration lane)
+# UI regression suite (DevFlow)
 
 Script-driven UI regression suite for the `Mvvm.Nucleus.Maui` sample app, driven
-against the running **Mac Catalyst** app with the DevFlow in-app agent
+against the running **Mac Catalyst** app through the DevFlow in-app agent
 (`maui devflow … --ci --json`).
 
 Companion to the unit lane in `tests/Mvvm.Nucleus.Maui.UnitTests`.
 
 ## Prerequisites
 
-- macOS (the only host that can run Mac Catalyst; ubuntu runners cannot).
+- macOS (the only host that can run Mac Catalyst).
 - .NET 11 SDK + MAUI workloads for `net11.0-maccatalyst`.
-- The `maui` DevFlow CLI (`0.1.0-preview.14.26555.2` verified) — `~/.dotnet/tools/maui`.
+- The `maui` DevFlow CLI — `~/.dotnet/tools/maui`.
 - `jq` (preinstalled on GitHub macOS runners; locally: `brew install jq`).
 - `bash` (macOS stock 3.2 works — the suite avoids bash-4-only features).
 
-The sample app embeds the DevFlow agent **Debug-only** (`Microsoft.Maui.DevFlow.Agent`
-with `Condition="'$(Configuration)' == 'Debug'"` in the sample csproj, registered in
-`#if DEBUG`, and `com.apple.security.network.server` in
+The sample app embeds the DevFlow agent **Debug-only**
+(`Microsoft.Maui.DevFlow.Agent` with `Condition="'$(Configuration)' == 'Debug'"`
+in the sample csproj, registered in `#if DEBUG`, and
+`com.apple.security.network.server` in
 `Platforms/MacCatalyst/Entitlements.Debug.plist`).
 
 ## How to run
 
 ```bash
-tests/Mvvm.Nucleus.Maui.UnitTests//run-all.sh
+tests/Mvvm.Nucleus.Maui.UITests/run-all.sh
 ```
 
 The runner builds the sample (Debug, `net11.0-maccatalyst`), launches the bundle
-via LaunchServices (`open` — see "Operational caveats" below), starts the DevFlow
-broker, waits for the agent, runs a single-CLI **recovery pass** (land on a known
-healthy tab), then executes the 22 flows in **4 tab-ordered groups** (one
-`maui devflow batch` session per group) and quits the app (the broker daemon is
-left running — stopping it is the recovery step, not the teardown step).
+via LaunchServices (`open` — see "Operational caveats"), starts the DevFlow
+broker, waits for the agent, runs a recovery pass (land on a known healthy tab),
+executes the 22 flows in **4 tab-ordered groups** (one `maui devflow batch`
+session per group) and quits the app (the broker daemon is left running —
+stopping it is a recovery step, not a teardown step).
+
 Fail-fast is at the **group** level: a group gets up to 3 escalating attempts
-(run as-is → single-CLI recovery pass → app relaunch); a group that fails all
-three is attributed to a specific flow and the suite stops there.
+(run as-is → recovery pass → app relaunch); a group that fails all three is
+attributed to a specific flow and the suite stops there.
 Per-flow results are reported as `PASS` / `FAIL` / `SKIP`.
 
 Skip the build when iterating (the Debug bundle must already exist):
 
 ```bash
-DF_SKIP_BUILD=1 tests/Mvvm.Nucleus.Maui.UnitTests//run-all.sh
+DF_SKIP_BUILD=1 tests/Mvvm.Nucleus.Maui.UITests/run-all.sh
 ```
 
 Run a single flow standalone (app running + agent connected):
 
 ```bash
-bash -c 'source tests/Mvvm.Nucleus.Maui.UnitTests//lib/devflow.sh; source tests/Mvvm.Nucleus.Maui.UnitTests//nav_by_type.sh
+bash -c 'source tests/Mvvm.Nucleus.Maui.UITests/lib/devflow.sh; source tests/Mvvm.Nucleus.Maui.UITests/nav_by_type.sh
          printf "%s\n" "${DF_CMDS[@]}" | maui devflow batch --delay 300'
 ```
 
-## Timing model (why the runner is shaped this way)
+## Timing model
 
-Two independent guards bound how fast mutations can be issued (both measured
-empirically against CLI `0.1.0-preview.14.26555.2`, 2026-11-14):
+Two independent guards bound how fast mutations can be issued:
 
 1. **DevFlow mutation lease** — app-wide, per *session*. A mutating call
    (tap/fill/alert-dismiss) claims an app-wide lease for the calling session and
    each mutation refreshes it. The lease expires ~10s after the holder's last
-   mutation (6s still conflicts; 10s is clean). Each `maui devflow <cmd>` process
-   is its own session, so two separate CLI processes mutating <10s apart
+   mutation (6s still conflicts; 10s is clean). Each `maui devflow <cmd>`
+   process is its own session, so two separate CLI processes mutating <10s apart
    conflict (`"Another DevFlow session is driving this app (MAUI CLI)"`).
    `maui devflow batch` is ONE long-lived session: its mutations keep refreshing
    the lease, so an entire group of flows runs back-to-back with **no**
@@ -80,7 +81,7 @@ Consequences, baked into the design:
 - Flow scripts are **pure declarations** (see the emitter table below); the
   runner assembles each group's declarations into a static command file and
   executes it in one batch session, so intra-group pacing is `DF_BATCH_DELAY`
-  only (~2–4s per flow instead of ~12–20s under the old per-call 12s-gap model).
+  only.
 - Tab switches are emitted **only when the tab actually changes** (a tap on the
   already-active tab is a DevFlow no-op that reports `success:false`); the
   assembler tracks each flow's declared start/end tab, so e.g. `nav_switch_tabs`
@@ -99,10 +100,10 @@ time):
 |---|---|
 | `flow_begin <tab>` | declare the tab this flow must start on (assembler inserts a tab switch if the previous flow ended elsewhere) |
 | `flow_end <tab>` | declare the tab this flow ends on (default: start tab) |
-| `tap_text <label>` | `MAUI tap --text "<label>"` — exact-text tap; labels in this suite are unique per presented context (verified) |
-| `wait_text <text>` / `assert_text` | `MAUI query --text … --wait-until exists` (presence of an in-flight transition) |
-| `wait_dialog <btn>` / `assert_dialog` | same, for a native `DialogAction` button — i.e. the alert/prompt/action sheet is up |
-| `dismiss_dialog <btn>` | `MAUI tap --text "<btn>"` — tap the dialog's button (Catalyst dialogs are dismissed via their native `DialogAction` buttons; see "Catalyst native-dialog contract") |
+| `tap_text <label>` | `MAUI tap --text "<label>"` — text-based tap scoped to `Button`; labels in this suite are unique per presented context |
+| `wait_text <text>` / `assert_text` | `MAUI query --text … --wait-until exists` |
+| `wait_dialog <btn>` / `assert_dialog` | same, scoped to `DialogAction` — i.e. the alert/prompt/action sheet is up |
+| `dismiss_dialog <btn>` | `MAUI tap --text "<btn>" --type DialogAction` — tap the dialog's native button |
 | `enter_prompt <value> [ok]` | wait for the native `UITextField`, `MAUI fill`, then tap `OK` (Catalyst prompt buttons are `OK`/`Cancel`) |
 | `assert_absent <text>` | `MAUI query --text … --wait-until gone` |
 
@@ -121,47 +122,50 @@ Tunables via environment:
 | Variable | Default | Meaning |
 |---|---|---|
 | `DF_BATCH_DELAY` | 300 | ms between two batch commands; **must stay above the library's 250ms navigation debounce** |
-| `DF_LEASE_GAP` | 10 | seconds waited before each batch so the previous session's mutation lease has expired (the measured lease TTL) |
+| `DF_LEASE_GAP` | 10 | seconds waited before each batch so the previous session's mutation lease has expired (the lease TTL) |
 | `DF_WAIT_TIMEOUT` | 10 | default `--wait-until` timeout (seconds) |
 | `DF_MAX_ATTEMPTS` | 4 | attempts per single-CLI mutating call (recovery path) |
 | `DF_RETRY_WAIT_SECS` | 3 | wait before retrying a single-CLI lease conflict |
 | `DF_SKIP_BUILD` | 0 | set to `1` to skip the dotnet build (iteration only; the Debug bundle must exist) |
 
-## Operational caveats (baked into the driver, found during verification)
+## Operational caveats
 
 1. **Launch via LaunchServices (`open`), never by executing the bundle binary
    directly.** A Catalyst app started from a terminal ends up with a non-key
    window that silently swallows DevFlow-synthesized touches — the CLI reports
-   `{"success":true}`, but the button's command never runs. Side effect: the app's
-   `AddDebug()` log lines (stderr) are only visible in that terminal-launched mode,
-   so the running suite has no live app log; flows assert on UI state instead.
-   `run-all.sh` hardens this end to end:
-   - **Select the right bundle, or `open` fails with error -54 (`procNotFound`).**
-     Both the Debug and Release builds of `net11.0-maccatalyst` emit a
-     `Mvvm.Nucleus.Maui.Sample.app` bundle (Release adds `maccatalyst-x64`,
-     `maccatalyst-arm64`, and a universal one). A broad `find … | head -1` then
-     non-deterministically grabs a **Release x64** bundle, which cannot launch on
-     an arm64 host → -54 (the run-2 / 2026-11-14 failure). `run-all.sh` therefore
-     restricts the search to `bin/Debug` — only the Debug build embeds the DevFlow
-     agent, and it yields exactly one `net11.0-maccatalyst` bundle (the host arch),
-     so the selection is unambiguous. It also runs
-     `…/LaunchServices…/lsregister -f <bundle>` before `open` as a secondary
-     defense against stale same-bundle-ID LS registrations (idempotent).
-   - It hard-kills any stale app instance before launch, launches via `open` with
-     one retry, verifies the agent's `processId` is alive after connecting, and
-     tears down deterministically (graceful quit → wait loop → SIGKILL).
-   - The `df` recovery driver also self-recovers a non-key window: if a tap/fill is
-     reported `{"success":false}` (the touch was synthesized but not accepted —
-     the run-2 failure mode, 2026-11-14) it reactivates the app to make its window
-     key again and retries.
+   `{"success":true}`, but the button's command never runs. Side effect: the
+   app's `AddDebug()` log lines (stderr) are only visible in that
+   terminal-launched mode, so the running suite has no live app log; flows
+   assert on UI state instead. `run-all.sh` handles this end to end:
+   - **Select the right bundle, or `open` fails with error -54
+     (`procNotFound`).** Both the Debug and Release builds of
+     `net11.0-maccatalyst` emit a `Mvvm.Nucleus.Maui.Sample.app` bundle
+     (Release adds `maccatalyst-x64`, `maccatalyst-arm64`, and a universal
+     one). A broad `find … | head -1` then non-deterministically grabs a
+     **Release x64** bundle, which cannot launch on an arm64 host → -54.
+     `run-all.sh` therefore restricts the search to `bin/Debug` — only the
+     Debug build embeds the DevFlow agent, and it yields exactly one
+     `net11.0-maccatalyst` bundle (the host arch), so the selection is
+     unambiguous. It also runs
+     `…/LaunchServices…/lsregister -f <bundle>` before `open` to defend
+     against stale same-bundle-ID LS registrations (idempotent).
+   - It hard-kills any stale app instance before launch, launches via `open`
+     with one retry, verifies the agent's `processId` is alive after
+     connecting, and tears down deterministically (graceful quit → wait loop
+     → SIGKILL).
+   - The `df` recovery driver also self-recovers a non-key window: if a
+     tap/fill is reported `{"success":false}` (the touch was synthesized but
+     not accepted) it reactivates the app to make its window key again and
+     retries.
 2. **Active-tab no-op tap is a failure.** Tapping the already-active tab is a
    DevFlow no-op that reports `{"success":false}` and exits non-zero — inside a
    batch that would fail the whole session. The assembler therefore emits a tab
-   switch only when a flow's declared start tab differs from the tab the previous
-   flow ended on, and `reset_to` checks the agent's route before tapping a tab.
-3. **CT 17 vs nucleus popup lifecycle order.** For `AdvancedPopup` shown via the
-   CT 17 `IPopupService`, `NucleusMvvmPopupBehavior.OnPopupOpened` fires
+   switch only when a flow's declared start tab differs from the tab the
+   previous flow ended on, and `reset_to` checks the agent's route before
+   tapping a tab.
+3. **CT 17 vs nucleus popup lifecycle order.** For `AdvancedPopup` shown via
+   the CT 17 `IPopupService`, `NucleusMvvmPopupBehavior.OnPopupOpened` fires
    `OnOpened()` **before** `Prepare()`, so the state label reads
    `State: Default, Opened, Prepared` — the reverse of the nucleus-service path
-   (`State: Default, Prepared, Opened`, see `popup_advanced.sh`). Both orders are
-   deterministic library behavior, and each flow pins its own order.
+   (`State: Default, Prepared, Opened`, see `popup_advanced.sh`). Both orders
+   are deterministic library behavior, and each flow pins its own order.

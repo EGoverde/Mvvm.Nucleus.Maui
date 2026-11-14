@@ -74,9 +74,9 @@ fi
 # and the Release build (same net11.0-maccatalyst TFM) produces additional .app
 # bundles (maccatalyst-x64 / maccatalyst-arm64 / universal) that a broader
 # `find ... | head -1` can pick non-deterministically — an x64 Release bundle
-# cannot launch on an arm64 host (LaunchServices error -54, the run-2 / 2026-11-14
-# failure). The Debug build yields exactly one net11.0-maccatalyst bundle (the host
-# arch), so this is unambiguous.
+# cannot launch on an arm64 host (LaunchServices error -54). The Debug build
+# yields exactly one net11.0-maccatalyst bundle (the host arch), so this is
+# unambiguous.
 APP="$(find Mvvm.Nucleus.Maui.Sample/bin/Debug -path '*net11.0-maccatalyst*' -name 'Mvvm.Nucleus.Maui.Sample.app' -maxdepth 6 -type d | head -1)"
 if [[ -z "$APP" ]]; then
     echo "FATAL: sample .app bundle not found" >&2
@@ -86,10 +86,9 @@ fi
 APP="$(cd "$(dirname "$APP")" && pwd)/$(basename "$APP")"
 # Force-register the freshly-built bundle with LaunchServices so `open` resolves
 # the bundle ID to THIS path. The LS database accumulates stale same-bundle-ID
-# registrations across .NET SDK upgrades (net9/net10 build artifacts observed),
-# and `open` then resolves to a stale path it cannot launch -> error -54
-# (procNotFound). `lsregister -f` re-points the registration at the current
-# bundle (idempotent; the real fix for the -54 that failed runs on 2026-11-14).
+# registrations over time, and `open` then resolves to a stale path it cannot
+# launch -> error -54 (procNotFound). `lsregister -f` re-points the registration
+# at the current bundle (idempotent).
 LSREG="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 "$LSREG" -f "$APP" 2>/dev/null \
     || _df_log "warning: lsregister -f failed (continuing; 'open' may still work)"
@@ -256,7 +255,6 @@ fi
 # --- 5. groups -------------------------------------------------------------------
 echo "== 5/6 groups =="
 
-# Flow order within a group follows the original suite order (run-2026-11-14).
 # Groups are tab-ordered so that, where a flow ends on another tab
 # (nav_switch_tabs -> PopupTab), the next group needs no switch at all.
 GROUP_LABELS=( Navigation Popup Dialog Details )
@@ -392,7 +390,7 @@ echo "== 6/6 teardown =="
 # Deterministic teardown: graceful quit -> wait for full exit -> SIGKILL.
 # A leftover instance breaks the NEXT run's launch (LaunchServices error -54)
 # and, if it survives in the background, its non-key window silently swallows
-# DevFlow-synthesized taps (the run-2 failure mode, 2026-11-14).
+# DevFlow-synthesized taps.
 osascript -e 'quit app "Mvvm.Nucleus.Maui.Sample"' >/dev/null 2>&1 || true
 for _ in 1 2 3 4 5 6; do
     pgrep -f "Mvvm.Nucleus.Maui.Sample" >/dev/null || break

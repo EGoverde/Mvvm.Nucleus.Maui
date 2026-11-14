@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #
 # lib/devflow.sh — shared DevFlow driver helpers for the Mvvm.Nucleus.Maui UI
-# regression suite (tests/Mvvm.Nucleus.Maui.UnitTests/). Sourced by run-all.sh and every flow script.
+# regression suite (tests/Mvvm.Nucleus.Maui.UITests/). Sourced by run-all.sh and every flow script.
 #
-# TIMING MODEL (measured 2026-11-14, CLI 0.1.0-preview.14.26555.2)
-# ---------------------------------------------------------------
+# TIMING MODEL
+# ------------
 # Two independent guards bound how fast mutations can be issued:
 #
 #  1. DevFlow MUTATION LEASE — app-wide, per-SESSION.
 #     - A mutating call (tap/fill/navigate/alert-dismiss) claims an app-wide
 #       lease for the CALLING SESSION. Each mutation refreshes it.
 #     - The lease expires ~10s after the last mutating call by its holder
-#       (measured: 6s after a mutation still conflicts; 10s is clean).
+#       (6s after a mutation still conflicts; 10s is clean).
 #     - Each `maui devflow <cmd>` process is its own session, so two separate
 #       CLI processes issuing mutations <10s apart conflict with
 #       "Another DevFlow session is driving this app (MAUI CLI)".
@@ -43,7 +43,7 @@
 #    cleanup) uses single-CLI calls with conflict-driven retry (poll, not a
 #    blind sleep), since it is a rare path and may need several mutations.
 #
-# Catalyst native-dialog findings (spike #1, re-confirmed 2026-11-13):
+# Catalyst native-dialog behavior:
 #   - `ui alert detect`/`ui alert dismiss` report false for Catalyst native NSAlerts,
 #     but the alert's buttons ARE registered as native `DialogAction` elements and
 #     `ui tap <id>` dismisses them reliably. The alert message BODY is not queryable
@@ -261,11 +261,10 @@ q() { printf '"%s"' "$1"; }
 # _emit <line> — append one batch command line.
 _emit() { DF_CMDS+=("$1"); }
 
-# tap_text <label> [kind] — tap a page Button whose text contains the label.
-# (kind is accepted for compatibility with the old flow scripts but not used.)
+# tap_text <label> — tap a page Button whose text contains the label.
 # `--type Button` is REQUIRED: the CLI's `--text` match is a SUBSTRING match
-# (verified 2026-11-14: `query --text "Nav"` returned every Navigation* button),
-# so the type filter keeps page-button taps out of the dialog-button space.
+# (e.g. `query --text "Nav"` matches every Navigation* button), so the type
+# filter keeps page-button taps out of the dialog-button space.
 tap_text() {
     _emit "MAUI tap --text $(q "$1") --type Button"
     return 0
@@ -283,9 +282,8 @@ assert_text() { wait_text "$1"; }
 # is registered (the alert/prompt/action sheet is up).
 # `--type DialogAction` is REQUIRED: `--text` is a substring match, so a bare
 # `query --text "Confirm"` matches the PAGE's "Display Confirm" button and
-# returns success before the dialog is actually up (the dialog_confirm failure,
-# verified 2026-11-14). Scoping to DialogAction makes the wait only resolve
-# once the native alert/prompt button is registered.
+# returns success before the dialog is actually up. Scoping to DialogAction
+# makes the wait only resolve once the native alert/prompt button is registered.
 wait_dialog() {
     _emit "MAUI query --type DialogAction --text $(q "$1") --wait-until exists --timeout ${DF_WAIT_TIMEOUT}"
     return 0
@@ -295,9 +293,9 @@ assert_dialog() { wait_dialog "$1"; }
 # dismiss_dialog <button_label> — tap the dialog's button (registered as a
 # native DialogAction element on Catalyst). `--type DialogAction` is REQUIRED:
 # `--text` is a substring match and a dialog label can collide with a page
-# button (verified 2026-11-14: `tap --text "Confirm"` hit the page's
-# "Display Confirm" button instead of the alert's "Confirm" — the dialog_confirm
-# failure). The type+text combination is verified to resolve within DialogActions.
+# button (e.g. `tap --text "Confirm"` would hit the page's "Display Confirm"
+# button instead of the alert's "Confirm"). The type+text combination resolves
+# within DialogActions.
 dismiss_dialog() {
     _emit "MAUI tap --text $(q "$1") --type DialogAction"
     return 0
@@ -319,8 +317,7 @@ assert_absent() {
 }
 
 # flow_begin <tab> — declare the tab this flow must start on (the assembler
-# inserts a tab switch if the previous flow ended elsewhere). Replaces the old
-# per-flow `reset_to` recovery call.
+# inserts a tab switch if the previous flow ended elsewhere).
 flow_begin() {
     FLOW_START_TAB="${1:?flow_begin: tab required}"
     return 0
