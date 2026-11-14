@@ -8,7 +8,7 @@ UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/devflow.sh
 source "${UI_DIR}/lib/devflow.sh"
 
-reset_to DialogTab
+flow_begin DialogTab
 tap_text "Display Alert (background thread)"
 wait_dialog "Okay"
 dismiss_dialog "Okay"

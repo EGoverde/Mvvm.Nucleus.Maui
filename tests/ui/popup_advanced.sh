@@ -9,7 +9,7 @@ UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/devflow.sh
 source "${UI_DIR}/lib/devflow.sh"
 
-reset_to PopupTab
+flow_begin PopupTab
 tap_text "Show Popup with ViewModel"
 wait_text "State: Default, Prepared, Opened"
 wait_text "Text from navigation parameters."

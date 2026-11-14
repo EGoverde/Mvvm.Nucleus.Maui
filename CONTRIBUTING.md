@@ -139,7 +139,6 @@ lease) rather than app regressions.
 | `open … failed with error -54` | Wrong/stale bundle selected. `run-all.sh` scopes the search to `bin/Debug` and re-registers via `lsregister -f`. See `tests/ui/README.md` caveat #1. |
 | Tap reports `{"success":true}` but nothing happens | Non-key window (app not launched via LaunchServices). `run-all.sh` launches with `open`; the `df` driver reactivates + retries on `{"success":false}`. |
 | `run-all.sh` killed mid-run by a shell timeout | Run it detached / without a foreground timeout — the harness kills the process group on timeout. The suite takes ~30–45 min. |
-| Navigation buttons appear "dead" | Historically a no-op agent `ui navigate` wedged the library's `IsNavigating` flag; `NavigationService` now leaves the state untouched for no-op navigations (pinned by `NavigationServiceNoOpNavigationTests`), and `reset_to` still never issues a no-op navigate as defense (see `tests/ui/README.md` caveat #2). |
 
 ## Committing
 

@@ -9,7 +9,7 @@ UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/devflow.sh
 source "${UI_DIR}/lib/devflow.sh"
 
-reset_to NavigationTab
+flow_begin NavigationTab
 tap_text "Navigation by Type"
 wait_text "Welcome to the details page."
 tap_text "Navigate Backwards (confirm)"

@@ -8,7 +8,7 @@ UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/devflow.sh
 source "${UI_DIR}/lib/devflow.sh"
 
-reset_to PopupTab
+flow_begin PopupTab
 tap_text "Show Popup from background thread"
 wait_text "IsMainThread = False"
 tap_text "Close using IPopupService"

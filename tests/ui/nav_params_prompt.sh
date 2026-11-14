@@ -8,7 +8,7 @@ UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/devflow.sh
 source "${UI_DIR}/lib/devflow.sh"
 
-reset_to NavigationTab
+flow_begin NavigationTab
 tap_text "Navigation with Parameters"
 wait_dialog "OK"
 enter_prompt "UI-Param-42"

@@ -2,7 +2,7 @@
 
 Script-driven UI regression suite for the `Mvvm.Nucleus.Maui` sample app, driven
 against the running **Mac Catalyst** app with the DevFlow in-app agent
-(`maui devflow ui … --ci --json`). It covers the integration surface that has
+(`maui devflow … --ci --json`). It covers the integration surface that has
 historically regressed on every MAUI/CommunityToolkit major jump: Shell
 navigation, all four popup flavors (incl. CommunityToolkit 17 `IPopupService` and
 V1-compat), native dialogs, parameter passing, double-navigation debounce, and
@@ -18,6 +18,7 @@ Companion to the unit lane in `tests/Mvvm.Nucleus.Maui.UnitTests` (see
 - .NET 11 SDK + MAUI workloads for `net11.0-maccatalyst`.
 - The `maui` DevFlow CLI (`0.1.0-preview.14.26555.2` verified) — `~/.dotnet/tools/maui`.
 - `jq` (preinstalled on GitHub macOS runners; locally: `brew install jq`).
+- `bash` (macOS stock 3.2 works — the suite avoids bash-4-only features).
 
 The sample app embeds the DevFlow agent **Debug-only** (`Microsoft.Maui.DevFlow.Agent`
 with `Condition="'$(Configuration)' == 'Debug'"` in the sample csproj, registered in
@@ -32,41 +33,105 @@ tests/ui/run-all.sh
 
 The runner builds the sample (Debug, `net11.0-maccatalyst`), launches the bundle
 via LaunchServices (`open` — see "Operational caveats" below), starts the DevFlow
-broker, waits for the agent, executes the 22 flow scripts **sequentially** (a
-DevFlow driving-lease constraint), fail-fasts on the first failure, and quits the
-app (the broker daemon is left running — stopping it is the recovery step, not the
-teardown step).
+broker, waits for the agent, runs a single-CLI **recovery pass** (land on a known
+healthy tab), then executes the 22 flows in **4 tab-ordered groups** (one
+`maui devflow batch` session per group) and quits the app (the broker daemon is
+left running — stopping it is the recovery step, not the teardown step).
+Fail-fast is at the **group** level: a group gets up to 3 escalating attempts
+(run as-is → single-CLI recovery pass → app relaunch); a group that fails all
+three is attributed to a specific flow and the suite stops there.
+Per-flow results are reported as `PASS` / `FAIL` / `SKIP`.
 
-Individual flows can be run standalone (the app must already be running and the
-agent connected):
+Skip the build when iterating (the Debug bundle must already exist):
 
 ```bash
-tests/ui/nav_by_type.sh
+DF_SKIP_BUILD=1 tests/ui/run-all.sh
 ```
 
-Every flow script sources `lib/devflow.sh`, which provides the driver helpers:
+Run a single flow standalone (app running + agent connected):
+
+```bash
+bash -c 'source tests/ui/lib/devflow.sh; source tests/ui/nav_by_type.sh
+         printf "%s\n" "${DF_CMDS[@]}" | maui devflow batch --delay 300'
+```
+
+## Timing model (why the runner is shaped this way)
+
+Two independent guards bound how fast mutations can be issued (both measured
+empirically against CLI `0.1.0-preview.14.26555.2`, 2026-11-14):
+
+1. **DevFlow mutation lease** — app-wide, per *session*. A mutating call
+   (tap/fill/alert-dismiss) claims an app-wide lease for the calling session and
+   each mutation refreshes it. The lease expires ~10s after the holder's last
+   mutation (6s still conflicts; 10s is clean). Each `maui devflow <cmd>` process
+   is its own session, so two separate CLI processes mutating <10s apart
+   conflict (`"Another DevFlow session is driving this app (MAUI CLI)"`).
+   `maui devflow batch` is ONE long-lived session: its mutations keep refreshing
+   the lease, so an entire group of flows runs back-to-back with **no**
+   per-step lease wait. Only *between* two sessions must the previous holder's
+   lease expire first (the runner sleeps `DF_LEASE_GAP` before every batch).
+2. **Library navigation debounce** (app-side, `NucleusMvvmCore`) —
+   `NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds` (250ms) +
+   `IgnoreNavigationWhenInProgress`. A navigation request arriving <250ms after
+   the previous one is ignored, and a request that lands after the previous one
+   completed but inside the window can leave `IsNavigating` stuck `true`
+   (see `NavigationService.SetIsNavigatingOrIgnoreRequest`), rejecting **all**
+   further navigation until the app restarts. The driver therefore keeps a
+   uniform `DF_BATCH_DELAY` (300ms) floor between every pair of batch commands —
+   non-navigation mutations aren't debounced, so the floor only costs a little
+   time and makes the rule trivially uniform.
+
+Consequences, baked into the design:
+
+- Flow scripts are **pure declarations** (see the emitter table below); the
+  runner assembles each group's declarations into a static command file and
+  executes it in one batch session, so intra-group pacing is `DF_BATCH_DELAY`
+  only (~2–4s per flow instead of ~12–20s under the old per-call 12s-gap model).
+- Tab switches are emitted **only when the tab actually changes** (a tap on the
+  already-active tab is a DevFlow no-op that reports `success:false`); the
+  assembler tracks each flow's declared start/end tab, so e.g. `nav_switch_tabs`
+  (ends on PopupTab) hands straight into the popup group with no switch at all.
+- The 3-attempt escalation ends with an **app relaunch** precisely because an
+  `IsNavigating` wedge (or any app-side state) is the one failure class that no
+  amount of driver retry can clear.
+
+## Driver API (`lib/devflow.sh`)
+
+Flow scripts source `lib/devflow.sh` and use the **emitter** helpers (they append
+to the group's command file via `DF_CMDS`; nothing is executed at declaration
+time):
+
+| Helper | Purpose (emits) |
+|---|---|
+| `flow_begin <tab>` | declare the tab this flow must start on (assembler inserts a tab switch if the previous flow ended elsewhere) |
+| `flow_end <tab>` | declare the tab this flow ends on (default: start tab) |
+| `tap_text <label>` | `MAUI tap --text "<label>"` — exact-text tap; labels in this suite are unique per presented context (verified) |
+| `wait_text <text>` / `assert_text` | `MAUI query --text … --wait-until exists` (presence of an in-flight transition) |
+| `wait_dialog <btn>` / `assert_dialog` | same, for a native `DialogAction` button — i.e. the alert/prompt/action sheet is up |
+| `dismiss_dialog <btn>` | `MAUI tap --text "<btn>"` — tap the dialog's button (Catalyst dialogs are dismissed via their native `DialogAction` buttons; see "Catalyst native-dialog contract") |
+| `enter_prompt <value> [ok]` | wait for the native `UITextField`, `MAUI fill`, then tap `OK` (Catalyst prompt buttons are `OK`/`Cancel`) |
+| `assert_absent <text>` | `MAUI query --text … --wait-until gone` |
+
+Recovery/setup path (single-CLI, used by `run-all.sh`'s pre-suite and
+mid-suite recovery, not the fast path):
 
 | Helper | Purpose |
 |---|---|
-| `df <step> <args…>` | `maui devflow <args> --ci --json` with spike #1 recovery: driving-lease conflict → wait + retry; broker lease-authority hiccup → broker stop/start + retry; stale element/epoch → `ui tree` refresh + retry |
+| `df <step> <args…>` | `maui devflow <args> --ci --json` with conflict-aware retry: driving-lease conflict → wait + retry; broker lease-authority hiccup → broker stop/start + retry; stale element/epoch → `ui tree` refresh + retry; `success:false` → reactivate the app window + retry |
 | `ensure_broker` / `wait_agent` | broker + agent health |
-| `reset_to <tab>` | land on a known tab (`//Tabs/NavigationTab` / `PopupTab` / `DialogTab`) using **only the app's own UI** — dismiss stray dialogs, close open popups, pop pushed pages, close modals, then tab-bar switch (or an un-wedge tab dance if already there); see "Operational caveats" |
-| `tap_text <label> [kind]` | exact-text lookup → tap; **topmost match wins** (overlays — popups, pushed pages, native dialogs — are appended after underlying content in the tree) |
-| `tap_text_first <label> [kind]` | same, but the **first** tree-order match (e.g. the plain `Navigate Backwards` button, first of the three `Navigate Backwards*` buttons) |
-| `assert_text` / `assert_absent` | exact-text presence / absence (presence waits up to 15s for in-flight transitions) |
-| `wait_dialog` / `assert_dialog` | a dialog button (native `DialogAction`) is registered, i.e. the dialog is up |
-| `dismiss_dialog <button>` | `ui alert detect`/`dismiss` first (in-app/off-Catalyst dialogs); fallback: tap the button (Catalyst native pattern) |
-| `enter_prompt <value> [ok]` | find the native `UITextField`, `ui fill`, then confirm (Catalyst prompt buttons are `OK`/`Cancel`) |
+| `reset_to <tab>` | RECOVERY PASS only: land on a known, healthy tab using the app's own UI — dismiss stray dialogs, close open popups, pop pushed pages, close modals, then tab-bar switch (skips the tap when the route already confirms the target tab); single-CLI, lease-aware via `df` |
+| `batch_run <cmdfile>` | execute a command file in ONE `maui devflow batch --delay $DF_BATCH_DELAY` session (JSONL on stdout, fail-fast) |
 
 Tunables via environment:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DF_GAP_SECS` | 12 | spacing after a **mutating** CLI call (keeps the next mutation outside the ~10–15s driving-lease window) |
-| `DF_RO_GAP_SECS` | 1 | spacing after a read-only CLI call (queries/trees don't take the lease) |
-| `DF_RETRY_WAIT_SECS` | 12 | wait before retrying after a driving-lease conflict |
-| `DF_MAX_ATTEMPTS` | 4 | attempts per CLI call, including the first |
-| `DF_WAIT_TIMEOUT` | 15 | default `--wait-until` timeout (seconds) |
+| `DF_BATCH_DELAY` | 300 | ms between two batch commands; **must stay above the library's 250ms navigation debounce** |
+| `DF_LEASE_GAP` | 10 | seconds waited before each batch so the previous session's mutation lease has expired (the measured lease TTL) |
+| `DF_WAIT_TIMEOUT` | 10 | default `--wait-until` timeout (seconds) |
+| `DF_MAX_ATTEMPTS` | 4 | attempts per single-CLI mutating call (recovery path) |
+| `DF_RETRY_WAIT_SECS` | 3 | wait before retrying a single-CLI lease conflict |
+| `DF_SKIP_BUILD` | 0 | set to `1` to skip the dotnet build (iteration only; the Debug bundle must exist) |
 
 ## Operational caveats (baked into the driver, found during verification)
 
@@ -91,44 +156,35 @@ Tunables via environment:
    - It hard-kills any stale app instance before launch, launches via `open` with
      one retry, verifies the agent's `processId` is alive after connecting, and
      tears down deterministically (graceful quit → wait loop → SIGKILL).
-   - The `df` driver also self-recovers a non-key window: if a tap/fill is reported
-     `{"success":false}` (the touch was synthesized but not accepted — the run-2
-     failure mode, 2026-11-14) it reactivates the app to make its window key again
-     and retries.
-2. **Agent-driven no-op shell navigation used to wedge the app (library finding,
-   now fixed in the library).** A `ui navigate` to the *current* location fired
-   Shell's `Navigating` — the library's `NavigationService` set `IsNavigating =
-   true` — but never fires `Navigated`, so the flag was never reset and every
-   subsequent `INavigationService` request was silently ignored ("Ignoring this
-   navigation request as another request is already in progress"). Any *real*
-   navigation (tab switch, pop) fires `Navigated` and unsticks it. This was the
-   root cause of the "all navigation buttons dead until a manual tab switch"
-   symptom (reproduced 2026-11-13). **Fixed in the library (2026-11-14):**
-   `NavigationService.ShellNavigating` now detects no-op navigations (target
-   location == current location) and leaves the navigation state untouched
-   (pinned by `NavigationServiceNoOpNavigationTests`); until that release ships —
-   and as defense against agent/MAUI churn — the suite still works around it (see 3).
-3. **`reset_to` is 100% app-UI-driven and never issues `ui navigate`.** It unwinds
-   stray dialogs, popups (`Close using IPopupService` / `Close Popup`), pushed
-   pages (plain `Navigate Backwards`, first tree-order match), and modals
-   (`Close All Modals (if any)`), then switches tabs via DevFlow's stable
-   `Tab_<name>` elements — a real Shell navigation through the app's own tab bar.
-   If already on the target tab with nothing to unwind, it performs an *un-wedge
-   dance* (real tab switch away and back) so a wedged `IsNavigating` flag left by
-   an interrupted flow is cleared. `_tap_tab` checks the agent's route first and
-   skips the no-op tap (a tap on the already-active tab is reported as
-   `{"success":false}` and the CLI exits non-zero), tolerating the reported failure
-   when the route already confirms the target tab.
-4. **CT 17 vs nucleus popup lifecycle order.** For `AdvancedPopup` shown via the
+   - The `df` recovery driver also self-recovers a non-key window: if a tap/fill is
+     reported `{"success":false}` (the touch was synthesized but not accepted —
+     the run-2 failure mode, 2026-11-14) it reactivates the app to make its window
+     key again and retries.
+2. **Active-tab no-op tap is a failure.** Tapping the already-active tab is a
+   DevFlow no-op that reports `{"success":false}` and exits non-zero — inside a
+   batch that would fail the whole session. The assembler therefore emits a tab
+   switch only when a flow's declared start tab differs from the tab the previous
+   flow ended on, and `reset_to` checks the agent's route before tapping a tab.
+3. **CT 17 vs nucleus popup lifecycle order.** For `AdvancedPopup` shown via the
    CT 17 `IPopupService`, `NucleusMvvmPopupBehavior.OnPopupOpened` fires
    `OnOpened()` **before** `Prepare()`, so the state label reads
    `State: Default, Opened, Prepared` — the reverse of the nucleus-service path
    (`State: Default, Prepared, Opened`, see `popup_advanced.sh`). Both orders are
    deterministic library behavior, and each flow pins its own order.
-5. **A sample bug the suite caught.** `PopupTabViewModel.ShowBackgroundThreadPopup`
+4. **A sample bug the suite caught.** `PopupTabViewModel.ShowBackgroundThreadPopup`
    built the `IsMainThread = …` navigation parameter but never passed it to
    `ShowPopupAsync<SimplePopup>` (the popup showed its "Sample Text" fallback).
    Fixed to pass the parameter (2026-11-14); `popup_background_thread.sh` pins it.
+5. **Known library bug (driver works around it; fix recommended).**
+   `NavigationService.SetIsNavigatingOrIgnoreRequest` sets `IsNavigating = true`
+   inside the lock *before* the `IgnoreNavigationWithinMilliseconds` check; when
+   the request is then rejected as "too soon" (previous request already
+   completed, i.e. `IsNavigating` had been reset, but <250ms since the last
+   trigger), it returns `false` **without resetting `IsNavigating`**. Every
+   subsequent navigation request is then rejected until the app restarts — a
+   hard deadlock observed live (2026-11-14). The driver avoids triggering it
+   (≥300ms between driver-issued navigations), and the suite's final retry
+   escalation is an app relaunch precisely to clear it if it ever fires.
 
 ## Catalyst native-dialog contract (why the flows look the way they do)
 
@@ -160,7 +216,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: 11.x }
       - run: dotnet workload install maui
-      - run: tests/ui/run-all.sh    # self-contained: build → launch → wait → flows → teardown
+      - run: tests/ui/run-all.sh    # self-contained: build → launch → wait → groups → teardown
 ```
 
 An **iOS simulator** variant (`simctl` bootstrap + launch + `maui devflow … --device <UDID>`)
