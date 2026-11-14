@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # dialog_action_sheet — DisplayActionSheet: choose Option Two, dismiss the follow-up alert.
-# Part of the tests/ui suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
 set -euo pipefail
 
 UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

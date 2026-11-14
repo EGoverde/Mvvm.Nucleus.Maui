@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # lib/devflow.sh — shared DevFlow driver helpers for the Mvvm.Nucleus.Maui UI
-# regression suite (tests/ui). Sourced by run-all.sh and every flow script.
+# regression suite (tests/Mvvm.Nucleus.Maui.UnitTests/). Sourced by run-all.sh and every flow script.
 #
 # TIMING MODEL (measured 2026-11-14, CLI 0.1.0-preview.14.26555.2)
 # ---------------------------------------------------------------

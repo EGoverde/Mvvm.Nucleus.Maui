@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # dialog_alert — DisplayAlert round-trip: alert appears (Okay button), dismiss it.
-# Part of the tests/ui suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
 set -euo pipefail
 
 UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

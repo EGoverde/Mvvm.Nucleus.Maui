@@ -2,7 +2,7 @@
 #
 # popup_advanced — popup with ViewModel: lifecycle states (Prepared/Opened) + parameter,
 # close via IPopupService.
-# Part of the tests/ui suite (see README.md). Prereq: sample app running + agent connected.
+# Part of the tests/Mvvm.Nucleus.Maui.UnitTests/ suite (see README.md). Prereq: sample app running + agent connected.
 set -euo pipefail
 
 UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

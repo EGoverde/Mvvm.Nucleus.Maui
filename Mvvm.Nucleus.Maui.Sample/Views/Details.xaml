@@ -21,7 +21,7 @@
             <!--
                 These data labels use plain Text + StringFormat (not Label.FormattedText spans) so their
                 values are exposed to the DevFlow visual tree registry and are queryable/assertable by the
-                UI test suite (tests/ui/). FormattedText spans expose no text to the registry.
+                UI test suite (tests/Mvvm.Nucleus.Maui.UnitTests//). FormattedText spans expose no text to the registry.
             -->
             <Label
                 Text="{Binding PageIdentifier, StringFormat='View Identifier: {0}'}"/>

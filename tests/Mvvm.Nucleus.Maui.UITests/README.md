@@ -2,15 +2,9 @@
 
 Script-driven UI regression suite for the `Mvvm.Nucleus.Maui` sample app, driven
 against the running **Mac Catalyst** app with the DevFlow in-app agent
-(`maui devflow … --ci --json`). It covers the integration surface that has
-historically regressed on every MAUI/CommunityToolkit major jump: Shell
-navigation, all four popup flavors (incl. CommunityToolkit 17 `IPopupService` and
-V1-compat), native dialogs, parameter passing, double-navigation debounce, and
-confirm-navigation.
+(`maui devflow … --ci --json`).
 
-Companion to the unit lane in `tests/Mvvm.Nucleus.Maui.UnitTests` (see
-`research-testingOptions.md`, `decision-ui-automation-devflow.md`,
-`plan-uiTests.md`).
+Companion to the unit lane in `tests/Mvvm.Nucleus.Maui.UnitTests`.
 
 ## Prerequisites
 
@@ -23,12 +17,12 @@ Companion to the unit lane in `tests/Mvvm.Nucleus.Maui.UnitTests` (see
 The sample app embeds the DevFlow agent **Debug-only** (`Microsoft.Maui.DevFlow.Agent`
 with `Condition="'$(Configuration)' == 'Debug'"` in the sample csproj, registered in
 `#if DEBUG`, and `com.apple.security.network.server` in
-`Platforms/MacCatalyst/Entitlements.Debug.plist`). Release builds contain no agent.
+`Platforms/MacCatalyst/Entitlements.Debug.plist`).
 
 ## How to run
 
 ```bash
-tests/ui/run-all.sh
+tests/Mvvm.Nucleus.Maui.UnitTests//run-all.sh
 ```
 
 The runner builds the sample (Debug, `net11.0-maccatalyst`), launches the bundle
@@ -45,13 +39,13 @@ Per-flow results are reported as `PASS` / `FAIL` / `SKIP`.
 Skip the build when iterating (the Debug bundle must already exist):
 
 ```bash
-DF_SKIP_BUILD=1 tests/ui/run-all.sh
+DF_SKIP_BUILD=1 tests/Mvvm.Nucleus.Maui.UnitTests//run-all.sh
 ```
 
 Run a single flow standalone (app running + agent connected):
 
 ```bash
-bash -c 'source tests/ui/lib/devflow.sh; source tests/ui/nav_by_type.sh
+bash -c 'source tests/Mvvm.Nucleus.Maui.UnitTests//lib/devflow.sh; source tests/Mvvm.Nucleus.Maui.UnitTests//nav_by_type.sh
          printf "%s\n" "${DF_CMDS[@]}" | maui devflow batch --delay 300'
 ```
 
@@ -171,66 +165,3 @@ Tunables via environment:
    `State: Default, Opened, Prepared` — the reverse of the nucleus-service path
    (`State: Default, Prepared, Opened`, see `popup_advanced.sh`). Both orders are
    deterministic library behavior, and each flow pins its own order.
-4. **A sample bug the suite caught.** `PopupTabViewModel.ShowBackgroundThreadPopup`
-   built the `IsMainThread = …` navigation parameter but never passed it to
-   `ShowPopupAsync<SimplePopup>` (the popup showed its "Sample Text" fallback).
-   Fixed to pass the parameter (2026-11-14); `popup_background_thread.sh` pins it.
-5. **Known library bug (driver works around it; fix recommended).**
-   `NavigationService.SetIsNavigatingOrIgnoreRequest` sets `IsNavigating = true`
-   inside the lock *before* the `IgnoreNavigationWithinMilliseconds` check; when
-   the request is then rejected as "too soon" (previous request already
-   completed, i.e. `IsNavigating` had been reset, but <250ms since the last
-   trigger), it returns `false` **without resetting `IsNavigating`**. Every
-   subsequent navigation request is then rejected until the app restarts — a
-   hard deadlock observed live (2026-11-14). The driver avoids triggering it
-   (≥300ms between driver-issued navigations), and the suite's final retry
-   escalation is an app relaunch precisely to clear it if it ever fires.
-
-## Catalyst native-dialog contract (why the flows look the way they do)
-
-Spike #1 (re-confirmed during implementation) established, for Catalyst native
-NSAlerts:
-
-- `ui alert detect`/`ui alert dismiss` report **false** — DevFlow is blind to the
-  alert *as an alert*;
-- the alert's **buttons are registered as native `DialogAction` elements** and are
-  tappable — this is how every dialog is dismissed here;
-- the alert **message body is not queryable** — so flows assert on the button set
-  and the follow-up state (e.g. the follow-up alert's `Okay` button) rather than on
-  message text;
-- prompt text fields are native `UITextField`s, fillable via `ui fill`; buttons are
-  `OK`/`Cancel`.
-
-## Future CI job (no workflow file in this repo yet)
-
-Per the research decision ("structure now, enable when ready"; consistent with
-`plan.md`), the workflow file itself is deliberately not authored. When it is, it is
-a drop-in **macOS runner** job:
-
-```yaml
-jobs:
-  ui-tests:
-    runs-on: macos-latest          # the only runner that can host Catalyst
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: 11.x }
-      - run: dotnet workload install maui
-      - run: tests/ui/run-all.sh    # self-contained: build → launch → wait → groups → teardown
-```
-
-An **iOS simulator** variant (`simctl` bootstrap + launch + `maui devflow … --device <UDID>`)
-is the alternate host if Catalyst ever becomes unavailable in CI; it is documented
-here but not built (Catalyst is the validated host, per spike #1).
-
-## Notes
-
-- The suite is a debug-bench for the sample, not a shipped artifact: nothing under
-  `tests/ui/` is packed, referenced, or part of the library's public surface.
-- `Details.xaml` data labels use plain `Text` + `StringFormat` (not `FormattedText`
-  spans) so their values are exposed to the DevFlow registry and assertable — do not
-  convert them back.
-- The agent package is preview-only (pinned in the sample csproj). If
-  `Microsoft.Maui.DevFlow.Agent` churns, bump-and-verify the pin first; the driver
-  targets the stable CLI surface by design (XCUITest remains the documented
-  fallback, see `decision-ui-automation-devflow.md`).
