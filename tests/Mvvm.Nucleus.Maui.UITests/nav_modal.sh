@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# nav_modal — Navigation by Modal: present Details modally, verify, close the modal.
+# Part of the tests/Mvvm.Nucleus.Maui.UITests/ suite (see README.md). Prereq: sample app running + agent connected.
+set -euo pipefail
+
+UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/devflow.sh
+source "${UI_DIR}/lib/devflow.sh"
+
+flow_begin NavigationTab
+tap_text "Navigation by Modal"
+wait_text "Welcome to the details page."
+tap_text "Close Current Modal (if any)"
+wait_text "Navigation by Type"

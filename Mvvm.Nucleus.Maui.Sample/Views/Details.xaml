@@ -18,52 +18,25 @@
                 HorizontalOptions="Center"
                 Style="{StaticResource Headline}" />
 
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="View Identifier: " FontAttributes="Bold" />
-                        <Span
-                            x:Name="ViewIdentifierSpan"
-                            Text="{Binding PageIdentifier}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Page Identifier: " FontAttributes="Bold" />
-                        <Span Text="{Binding PageIdentifier}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+            <!--
+                These data labels use plain Text + StringFormat (not Label.FormattedText spans) so their
+                values are exposed to the DevFlow visual tree registry and are queryable/assertable by the
+                UI test suite (tests/Mvvm.Nucleus.Maui.UnitTests//). FormattedText spans expose no text to the registry.
+            -->
+            <Label
+                Text="{Binding PageIdentifier, StringFormat='View Identifier: {0}'}"/>
 
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Parameters: " FontAttributes="Bold" />
-                        <Span Text="{Binding NavigationParameterData}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+            <Label
+                Text="{Binding PageIdentifier, StringFormat='Page Identifier: {0}'}"/>
 
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="OnPrepare: " FontAttributes="Bold" />
-                        <Span Text="{Binding OnPrepareData}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+            <Label
+                Text="{Binding NavigationParameterData, StringFormat='Parameters: {0}'}"/>
 
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="OnRefresh: " FontAttributes="Bold" />
-                        <Span Text="{Binding OnRefreshData}"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+            <Label
+                Text="{Binding OnPrepareData, StringFormat='OnPrepare: {0}'}"/>
+
+            <Label
+                Text="{Binding OnRefreshData, StringFormat='OnRefresh: {0}'}"/>
 
             <ContentView />
 

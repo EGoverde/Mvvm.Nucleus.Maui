@@ -413,9 +413,21 @@ public class NavigationService : INavigationService
             }
         }
 
+        var isNoOpNavigation =
+            e.Current?.Location != null &&
+            e.Target?.Location != null &&
+            string.Equals(e.Current.Location.ToString(), e.Target.Location.ToString(), StringComparison.OrdinalIgnoreCase);
+
         if (isCanceled)
         {
             _logger.LogInformation("Shell Navigation Canceled.");
+        }
+        else if (isNoOpNavigation)
+        {
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Shell Navigating to the current location '{currentLocation}' ({source}): no-op navigation, navigation state left untouched.", e.Current?.Location, e.Source);
+            }
         }
         else
         {
@@ -425,13 +437,17 @@ public class NavigationService : INavigationService
             }
         }
 
-        if (!isCanceled)
+        if (isCanceled)
+        {
+            IsNavigating = false;
+        }
+        else if (!isNoOpNavigation)
         {
             _transientPagesOnNavigating = GetNucleusTransientPagesFromNavigationStack();
+
+            IsNavigating = true;
         }
         
-        IsNavigating = !isCanceled;
-
         shellNavigatingDeferralToken?.Complete();
     }
 

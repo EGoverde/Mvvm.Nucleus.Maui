@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.txt = README.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvvm.Nucleus.Maui.UnitTests", "tests\Mvvm.Nucleus.Maui.UnitTests\Mvvm.Nucleus.Maui.UnitTests.csproj", "{D281C26F-69EF-4494-BEB9-9CF7359A28BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,9 +33,16 @@ Global
 		{3910BB4D-1916-4081-85F8-4409A7103CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3910BB4D-1916-4081-85F8-4409A7103CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3910BB4D-1916-4081-85F8-4409A7103CBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D281C26F-69EF-4494-BEB9-9CF7359A28BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D281C26F-69EF-4494-BEB9-9CF7359A28BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D281C26F-69EF-4494-BEB9-9CF7359A28BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D281C26F-69EF-4494-BEB9-9CF7359A28BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D281C26F-69EF-4494-BEB9-9CF7359A28BE} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {70F4CB20-D1C1-40FD-B3E1-44B671E61C3E}

@@ -62,6 +62,16 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
 	</ItemGroup>
 
+	<!-- DevFlow automation agent: Debug builds only (never ships in Release). -->
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<PackageReference Include="Microsoft.Maui.DevFlow.Agent" Version="0.1.0-preview.14.26555.2" />
+	</ItemGroup>
+
+	<!-- Mac Catalyst Debug builds need the in-app agent HTTP server entitlement (com.apple.security.network.server). -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net11.0-maccatalyst' AND '$(Configuration)' == 'Debug'">
+		<CodeSignEntitlements>Platforms/MacCatalyst/Entitlements.Debug.plist</CodeSignEntitlements>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <ProjectReference Include="..\Mvvm.Nucleus.Maui\Mvvm.Nucleus.Maui.csproj" />
 	</ItemGroup>

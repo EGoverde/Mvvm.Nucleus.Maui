@@ -70,7 +70,7 @@ public partial class PopupTabViewModel(IPopupService popupService, IPageDialogSe
                 { "Text", $"IsMainThread = {MainThread.IsMainThread}" }
             };
 
-            var result = await _popupService.ShowPopupAsync<SimplePopup>();
+            await _popupService.ShowPopupAsync<SimplePopup>(navigationParameters);
         });
     }
 

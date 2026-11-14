@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
+#if DEBUG
+using Microsoft.Maui.DevFlow.Agent;
+#endif
+
 namespace Mvvm.Nucleus.Maui.Sample;
 
 public static class MauiProgram
@@ -56,6 +60,7 @@ public static class MauiProgram
 
 #if DEBUG
 		builder.Logging.AddDebug();
+		builder.AddMauiDevFlowAgent();
 #endif
 
 		return builder.Build();

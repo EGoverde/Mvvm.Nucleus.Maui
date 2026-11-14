@@ -5,7 +5,5 @@ public partial class Details : ContentPage
 	public Details()
 	{
 		InitializeComponent();
-
-		ViewIdentifierSpan.Text = Guid.NewGuid().ToString();
 	}
 }
