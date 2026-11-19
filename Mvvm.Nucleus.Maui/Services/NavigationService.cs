@@ -66,7 +66,7 @@ public class NavigationService : INavigationService
     /// <inheritdoc/>
     public virtual async Task NavigateAsync(Type viewType, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
     {
-        if (!SetIsNavigatingOrIgnoreRequest())
+        if (!SetIsNavigatingOrIgnoreRequest(navigationParameters))
         {
             return;
         }
@@ -92,7 +92,7 @@ public class NavigationService : INavigationService
     /// <inheritdoc/>
     public virtual async Task NavigateToRouteAsync(string route, IDictionary<string, object>? navigationParameters = null, bool isAnimated = true)
     {
-        if (!SetIsNavigatingOrIgnoreRequest())
+        if (!SetIsNavigatingOrIgnoreRequest(navigationParameters))
         {
             return;
         }
@@ -133,7 +133,7 @@ public class NavigationService : INavigationService
     /// <inheritdoc/>
     public virtual async Task NavigateBackAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (!SetIsNavigatingOrIgnoreRequest())
+        if (!SetIsNavigatingOrIgnoreRequest(navigationParameters))
         {
             return;
         }
@@ -152,7 +152,7 @@ public class NavigationService : INavigationService
     /// <inheritdoc/>
     public virtual async Task CloseModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (!SetIsNavigatingOrIgnoreRequest())
+        if (!SetIsNavigatingOrIgnoreRequest(navigationParameters))
         {
             return;
         }
@@ -190,7 +190,7 @@ public class NavigationService : INavigationService
     /// <inheritdoc/>
     public virtual async Task CloseAllModalAsync(IDictionary<string, object>? navigationParameters, bool isAnimated = true)
     {
-        if (!SetIsNavigatingOrIgnoreRequest())
+        if (!SetIsNavigatingOrIgnoreRequest(navigationParameters))
         {
             return;
         }
@@ -299,7 +299,7 @@ public class NavigationService : INavigationService
     /// in the Navigation Parameters.
     /// </summary>
     /// <returns>A value indicating whether or not to ignore a navigation request.</returns>
-    protected virtual bool SetIsNavigatingOrIgnoreRequest(IDictionary<string, object>? navigationParameters = null)
+    protected virtual bool SetIsNavigatingOrIgnoreRequest(IDictionary<string, object>? navigationParameters)
     {
         if ((!_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && _nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds <= 0) ||
             navigationParameters?.ContainsKey(NucleusNavigationParameters.DoNotIgnoreThisNavigationRequest) == true &&
@@ -336,13 +336,16 @@ public class NavigationService : INavigationService
             isNavigationAllowed = !isNavigationTooSoon;
         }
 
-        if (!isNavigationAllowed)
+        if (!isNavigationAllowed && _logger.IsEnabled(LogLevel.Warning))
         {
-            var detailsMessage = isNavigationTooSoon ?
-                $"Ignoring this navigation request as it is within {_nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds}ms since the previous one. You can change this value in {nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds)}." :
-                $"Ignoring this navigation request as another request is already in progress. You can change this value in {nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWhenInProgress)}.";
-
-            _logger?.LogWarning(detailsMessage);
+            if (isNavigationTooSoon)
+            {
+                _logger.LogWarning("Ignoring this navigation request as it is within {ignoreNavigationWithinMilliseconds}ms since the previous one. You can change this value in {propertyName}.", _nucleusMvvmOptions.IgnoreNavigationWithinMilliseconds, $"{nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWithinMilliseconds)}");
+            }
+            else
+            {
+                _logger.LogWarning("Ignoring this navigation request as another request is already in progress. You can change this value in {propertyName}.", $"{nameof(NucleusMvvmOptions)}.{nameof(NucleusMvvmOptions.IgnoreNavigationWhenInProgress)}");
+            }
         }
 
         return isNavigationAllowed;
@@ -364,7 +367,7 @@ public class NavigationService : INavigationService
         
         IsNavigatingChanged?.Invoke(this, value);
         
-        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress)
+        if (_nucleusMvvmOptions.IgnoreNavigationWhenInProgress && _logger.IsEnabled(LogLevel.Information))
         {
             _logger?.LogInformation("IsNavigating changed to '{_isNavigating}{additionalMessage}'.", _isNavigating, _isNavigating ? " Incoming navigation requests will be ignored." : string.Empty);
         }
@@ -389,20 +392,18 @@ public class NavigationService : INavigationService
                 ShellNavigationSource.Push => NavigationDirection.Forwards,
                 _ => NavigationDirection.Other,
             };
-            
-            var confirmNavigation = currentBindingContext as IConfirmNavigation;
-            if (confirmNavigation != null && !confirmNavigation.CanNavigate(navigationDirection, NucleusMvvmCore.Current.NavigationParameters))
+
+            if (currentBindingContext is IConfirmNavigation confirmNavigation &&  !confirmNavigation.CanNavigate(navigationDirection, NucleusMvvmCore.Current.NavigationParameters))
             {
                 isCanceled = true;
                 e.Cancel();
             }
             else
             {
-                var confirmNavigationAsync =  currentBindingContext as IConfirmNavigationAsync;
-                if (confirmNavigationAsync != null)
+                if (currentBindingContext is IConfirmNavigationAsync confirmNavigationAsync)
                 {
                     shellNavigatingDeferralToken = e.GetDeferral();
-                    
+
                     var confirm = await confirmNavigationAsync.CanNavigateAsync(navigationDirection, NucleusMvvmCore.Current.NavigationParameters);
                     if (!confirm)
                     {
